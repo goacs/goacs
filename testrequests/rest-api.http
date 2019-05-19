@@ -1,0 +1,62 @@
+POST http://localhost:8085/acs
+Accept: */*
+Cache-Control: no-cache
+
+<?xml version="1.0" encoding="UTF-8"?>
+<soap-env:Envelope xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+  <soap-env:Header>
+    <cwmp:ID soap-env:mustUnderstand="1">aml6jcti</cwmp:ID>
+  </soap-env:Header>
+  <soap-env:Body>
+    <cwmp:Inform>
+      <DeviceId>
+        <Manufacturer>Huawei Technologies Co., Ltd.</Manufacturer>
+        <OUI>202BC1</OUI>
+        <ProductClass>BM632w</ProductClass>
+        <SerialNumber>000000</SerialNumber>
+      </DeviceId>
+      <Event soap-enc:arrayType="cwmp:EventStruct[1]">
+        <EventStruct>
+          <EventCode>2 PERIODIC</EventCode>
+          <CommandKey/>
+        </EventStruct>
+      </Event>
+      <MaxEnvelopes>1</MaxEnvelopes>
+      <CurrentTime>2019-05-10T13:17:46.441Z</CurrentTime>
+      <RetryCount>0</RetryCount>
+      <ParameterList soap-enc:arrayType="cwmp:ParameterValueStruct[7]">
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.DeviceInfo.SpecVersion</Name>
+          <Value xsi:type="xsd:string">1.0</Value>
+        </ParameterValueStruct>
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.DeviceInfo.HardwareVersion</Name>
+          <Value xsi:type="xsd:string">00040501</Value>
+        </ParameterValueStruct>
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
+          <Value xsi:type="xsd:string">V100R001IRQC56B017</Value>
+        </ParameterValueStruct>
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
+          <Value xsi:type="xsd:string"/>
+        </ParameterValueStruct>
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>
+          <Value xsi:type="xsd:string"/>
+        </ParameterValueStruct>
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</Name>
+          <Value xsi:type="xsd:string">http://172.3.89.139:8081/nwlrbbmqbhcda</Value>
+        </ParameterValueStruct>
+        <ParameterValueStruct>
+          <Name>InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress</Name>
+          <Value xsi:type="xsd:string">172.3.89.139</Value>
+        </ParameterValueStruct>
+      </ParameterList>
+    </cwmp:Inform>
+  </soap-env:Body>
+</soap-env:Envelope>
+
+###
+

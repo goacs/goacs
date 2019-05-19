@@ -1,22 +1,22 @@
 package http
 
 import (
-	"awesomeProject/acs"
 	"fmt"
+	"goacs/acs"
 	"net/http"
 	"time"
 )
 
 var Instance *http.Server
 
-func Start()  {
+func Start() {
 	fmt.Println("Server setup")
 	Instance = &http.Server{
-				Addr: ":8085",
-				ReadTimeout: 5 * time.Second,
-				WriteTimeout: 5 * time.Second,
-				MaxHeaderBytes: 10000,
-			}
+		Addr:           ":8085",
+		ReadTimeout:    5 * time.Second,
+		WriteTimeout:   5 * time.Second,
+		MaxHeaderBytes: 10000,
+	}
 
 	registerAcsHandler()
 
@@ -25,7 +25,7 @@ func Start()  {
 
 	if err != nil {
 		fmt.Println("Unable to start http server")
-		return;
+		return
 	}
 	fmt.Println("Http server started")
 }

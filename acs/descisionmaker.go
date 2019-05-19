@@ -1,21 +1,19 @@
 package acs
 
 import (
-	acsxml "awesomeProject/acs/xml"
 	"encoding/xml"
 	"fmt"
+	acsxml "goacs/acs/xml"
 	"io"
 	"io/ioutil"
 	"net/http"
 )
 
-
-func MakeDecision(request *http.Request)  {
-
+func MakeDecision(request *http.Request) {
 
 	buffer, err := ioutil.ReadAll(request.Body)
 
-	if(err != io.EOF && err != nil) {
+	if err != io.EOF && err != nil {
 		panic(err)
 	}
 
@@ -26,7 +24,7 @@ func parseXML(buffer []byte) {
 	var envelope acsxml.Envelope
 	err := xml.Unmarshal(buffer, &envelope)
 
-	if(err != nil) {
+	if err != nil {
 		panic(err)
 	}
 
@@ -34,6 +32,7 @@ func parseXML(buffer []byte) {
 	if err2 != nil {
 		panic("Well marshalling didn't work: " + err2.Error())
 	}
+	fmt.Println(envelope.Type())
 	fmt.Printf("Marshalled Data: %s\n", m)
 
 }
