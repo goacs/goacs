@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func MakeDecision(request *http.Request) {
+func MakeDecision(request *http.Request, w http.ResponseWriter) {
 
 	buffer, err := ioutil.ReadAll(request.Body)
 
@@ -19,7 +19,14 @@ func MakeDecision(request *http.Request) {
 
 	fmt.Println(string(buffer))
 
-	parseXML(buffer)
+	reqType, envelope := parseXML(buffer)
+
+	if reqType == acsxml.INFORM {
+		var inform acsxml.Inform
+		_ = xml.Unmarshal(buffer, &inform)
+
+	}
+
 }
 
 func parseXML(buffer []byte) (string, acsxml.Envelope) {
@@ -29,9 +36,13 @@ func parseXML(buffer []byte) (string, acsxml.Envelope) {
 	var requestType string = acsxml.EMPTY
 
 	if err == nil {
-		requestType = envelope.Type()
+		switch envelope.Type() {
+		case "inform":
+			requestType = acsxml.INFORM
+		default:
+			requestType = acsxml.UNKNOWN
+		}
 	}
-	//fmt.Printf("Marshalled Data: %s\n", m)
 
 	return requestType, envelope
 }

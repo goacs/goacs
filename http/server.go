@@ -32,6 +32,6 @@ func Start() {
 
 func registerAcsHandler() {
 	http.HandleFunc("/acs", func(respWriter http.ResponseWriter, request *http.Request) {
-		acs.MakeDecision(request)
+		acs.MakeDecision(request, respWriter)
 	})
 }
