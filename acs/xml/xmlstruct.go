@@ -56,6 +56,26 @@ type GetParameterValuesResponse struct {
 	ParameterList []ParameterInfo `xml:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
 }
 
+type ACSBool bool
+
+func (abool *ACSBool) UnmarshalXMLAttr(attr xml.Attr) (err error) {
+
+	if attr.Value == "0" {
+		*abool = false
+	}
+
+	*abool = true
+
+	return nil
+}
+
+func (abool ACSBool) String() string {
+	if abool == true {
+		return "1"
+	}
+	return "0"
+}
+
 func (envelope *Envelope) Type() string {
 	return strings.ToLower(envelope.Body.Message.XMLName.Local)
 }
