@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -27,15 +26,15 @@ func Init() {
 }
 func CreateSession(request *http.Request, w http.ResponseWriter) (*Session, http.ResponseWriter) {
 	fmt.Println("### request")
-	//printSessions()
-	sessionId := request.Header.Get("Cookie")
+	var sessionId = ""
+	cookie, err := request.Cookie("sessionId")
 
 	var session Session
 
-	if sessionId == "" {
+	if err != nil {
 		sessionId = generateSessionId()
 	} else {
-		sessionId = extractSessionId(sessionId)
+		sessionId = cookie.Value
 	}
 
 	fmt.Println("Trying to retive session from memory " + sessionId)
@@ -51,7 +50,9 @@ func CreateSession(request *http.Request, w http.ResponseWriter) (*Session, http
 		session.isNew = false
 	}
 
-	w.Header().Set("Set-Cookie", "sessionId="+session.id)
+	newCookie := http.Cookie{Name: "sessionId", Value: sessionId, Expires: time.Now().Add(SESSION_LIFETIME * time.Second)}
+	//w.Header().Set("Set-Cookie", "sessionId="+session.id)
+	http.SetCookie(w, &newCookie)
 
 	fmt.Println("returning session", session)
 	return &session, w
@@ -60,11 +61,6 @@ func CreateSession(request *http.Request, w http.ResponseWriter) (*Session, http
 func generateSessionId() string {
 	rand.NewSource(time.Now().UnixNano())
 	return strconv.Itoa(rand.Int())
-}
-
-func extractSessionId(sessionId string) string {
-	split := strings.Split(sessionId, "=")
-	return split[1]
 }
 
 func printSessions() {
