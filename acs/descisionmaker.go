@@ -13,18 +13,28 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 
 	buffer, err := ioutil.ReadAll(request.Body)
 
+	session, w := CreateSession(request, w)
+
 	if err != io.EOF && err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(buffer))
-
 	reqType, envelope := parseXML(buffer)
 
-	if reqType == acsxml.INFORM {
+	switch reqType {
+	case acsxml.INFORM:
 		var inform acsxml.Inform
 		_ = xml.Unmarshal(buffer, &inform)
-
+		session.prevReqType = acsxml.INFORM
+		_, _ = fmt.Fprint(w, envelope.InformResponse())
+	case acsxml.EMPTY:
+		if session.isNew == false {
+			fmt.Println("GPN REQ")
+			_, _ = fmt.Fprint(w, envelope.GPNRequest())
+			session.prevReqType = acsxml.EMPTY
+		}
+	default:
+		fmt.Println("NOT SUPPORTED REQTYPE ", reqType)
 	}
 
 }

@@ -52,7 +52,8 @@ func (envelope *Envelope) Type() string {
 }
 
 func (envelope *Envelope) InformResponse() string {
-	return `<soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <soapenv:Header>
         <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
     </soapenv:Header>
@@ -73,4 +74,23 @@ func (inform *Inform) isBootEvent() bool {
 	}
 
 	return false
+}
+
+func (envelope *Envelope) GPNRequest() string {
+	return ``
+}
+
+func (envelope *Envelope) GPVRequest(path string) string {
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soapenv:Header>
+        <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
+    </soapenv:Header>
+    <soapenv:Body>
+        <cwmp:GetParameterNames>
+			<ParameterPath>` + path + `</ParameterPath>
+			<NextLevel>false</NextLevel>
+		</cwmp:GetParameterNames>
+    </soapenv:Body>
+</soapenv:Envelope>`
 }
