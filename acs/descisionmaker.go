@@ -30,9 +30,14 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 	case acsxml.EMPTY:
 		if session.isNew == false {
 			fmt.Println("GPN REQ")
-			_, _ = fmt.Fprint(w, envelope.GPNRequest())
+			_, _ = fmt.Fprint(w, envelope.GPNRequest(""))
 			session.prevReqType = acsxml.EMPTY
 		}
+	case acsxml.GPNR:
+		var gpnr acsxml.GetParameterValuesResponse
+		_ = xml.Unmarshal(buffer, &gpnr)
+		fmt.Println(gpnr.ParameterList)
+
 	default:
 		fmt.Println("NOT SUPPORTED REQTYPE ", reqType)
 	}
@@ -49,7 +54,10 @@ func parseXML(buffer []byte) (string, acsxml.Envelope) {
 		switch envelope.Type() {
 		case "inform":
 			requestType = acsxml.INFORM
+		case "getparameternamesresponse":
+			requestType = acsxml.GPNR
 		default:
+			fmt.Println("NOT SUPPORTED envelope type " + envelope.Type())
 			requestType = acsxml.UNKNOWN
 		}
 	}

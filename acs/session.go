@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const SESSION_LIFETIME = 10
+
 type Session struct {
 	id          string
 	isNew       bool
@@ -21,6 +23,7 @@ var sessions map[string]Session
 func Init() {
 	fmt.Println("sessions init")
 	sessions = make(map[string]Session)
+	go removeOldSessions()
 }
 func CreateSession(request *http.Request, w http.ResponseWriter) (*Session, http.ResponseWriter) {
 	fmt.Println("### request")
@@ -74,4 +77,17 @@ func createEmptySession(sessionId string) Session {
 	session := Session{id: sessionId, isNew: true, created_at: time.Now()}
 	sessions[sessionId] = session
 	return session
+}
+
+func removeOldSessions() {
+	for {
+		now := time.Now()
+		for sessionId, session := range sessions {
+			if now.Sub(session.created_at).Minutes() > 2 {
+				fmt.Println("DELETING OLD SESSION " + sessionId)
+				delete(sessions, sessionId)
+			}
+		}
+		time.Sleep(SESSION_LIFETIME * time.Second)
+	}
 }

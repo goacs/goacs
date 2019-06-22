@@ -40,11 +40,20 @@ type ParameterValue struct {
 	Value string `xml:"Value"`
 }
 
+type ParameterInfo struct {
+	Name     string `xml:"Name"`
+	Writable string `xml:"Writable"`
+}
+
 type DeviceId struct {
 	Manufacturer string
 	OUI          string
 	ProductClass string
 	SerialNumber string
+}
+
+type GetParameterValuesResponse struct {
+	ParameterList []ParameterInfo `xml:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
 }
 
 func (envelope *Envelope) Type() string {
@@ -76,11 +85,7 @@ func (inform *Inform) isBootEvent() bool {
 	return false
 }
 
-func (envelope *Envelope) GPNRequest() string {
-	return ``
-}
-
-func (envelope *Envelope) GPVRequest(path string) string {
+func (envelope *Envelope) GPNRequest(path string) string {
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <soapenv:Header>
@@ -93,4 +98,8 @@ func (envelope *Envelope) GPVRequest(path string) string {
 		</cwmp:GetParameterNames>
     </soapenv:Body>
 </soapenv:Envelope>`
+}
+
+func (envelope *Envelope) GPVRequest(path string) string {
+	return ``
 }
