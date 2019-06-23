@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-const SESSION_LIFETIME = 10
+const SESSION_LIFETIME = 15
+const SESSION_GOROUTINE_TIMEOUT = 10
 
 type Session struct {
 	id          string
@@ -79,11 +80,11 @@ func removeOldSessions() {
 	for {
 		now := time.Now()
 		for sessionId, session := range sessions {
-			if now.Sub(session.created_at).Minutes() > 2 {
+			if now.Sub(session.created_at).Minutes() > SESSION_LIFETIME {
 				fmt.Println("DELETING OLD SESSION " + sessionId)
 				delete(sessions, sessionId)
 			}
 		}
-		time.Sleep(SESSION_LIFETIME * time.Second)
+		time.Sleep(SESSION_GOROUTINE_TIMEOUT * time.Second)
 	}
 }
