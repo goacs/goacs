@@ -25,13 +25,14 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 	case acsxml.INFORM:
 		var inform acsxml.Inform
 		_ = xml.Unmarshal(buffer, &inform)
-		session.prevReqType = acsxml.INFORM
+		session.PrevReqType = acsxml.INFORM
+		session.fillCPEFromInform(inform)
 		_, _ = fmt.Fprint(w, envelope.InformResponse())
 	case acsxml.EMPTY:
-		if session.isNew == false {
+		if session.IsNew == false {
 			fmt.Println("GPN REQ")
 			_, _ = fmt.Fprint(w, envelope.GPNRequest(""))
-			session.prevReqType = acsxml.EMPTY
+			session.PrevReqType = acsxml.EMPTY
 		}
 	case acsxml.GPNR:
 		var gpnr acsxml.GetParameterValuesResponse
