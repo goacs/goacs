@@ -1,8 +1,13 @@
 package xml
 
 const (
-	INFORM  string = "inform"
-	EMPTY   string = "empty"
-	GPNR    string = "GetParameterNamesResponse"
-	UNKNOWN string = "unknown"
+	INFORM    string = "inform"
+	EMPTY     string = "empty"
+	GPNResp   string = "GetParameterNamesResponse"
+	GPNReq    string = "GetParameterNames"
+	GPVResp   string = "GetParameterValuesResponse"
+	GPVReq    string = "GetParameterValues"
+	GRPCMReq  string = "GetRPCMethods"
+	GRPCMResp string = "GetRPCMethodsResponse"
+	UNKNOWN   string = "unknown"
 )

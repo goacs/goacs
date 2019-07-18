@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	acsxml "goacs/acs/xml"
+	"goacs/models/cpe"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -25,22 +26,42 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 	case acsxml.INFORM:
 		var inform acsxml.Inform
 		_ = xml.Unmarshal(buffer, &inform)
+		fmt.Println("BOOT", inform.IsBootEvent())
 		session.PrevReqType = acsxml.INFORM
 		session.fillCPEFromInform(inform)
 		_, _ = fmt.Fprint(w, envelope.InformResponse())
+
 	case acsxml.EMPTY:
-		if session.IsNew == false {
+		if session.IsNew == false && session.IsBoot == true {
 			fmt.Println("GPN REQ")
 			_, _ = fmt.Fprint(w, envelope.GPNRequest(""))
-			session.PrevReqType = acsxml.EMPTY
+			session.PrevReqType = acsxml.GPNReq
 		}
-	case acsxml.GPNR:
-		var gpnr acsxml.GetParameterValuesResponse
+
+	case acsxml.GPNResp:
+		var gpnr acsxml.GetParameterNamesResponse
 		_ = xml.Unmarshal(buffer, &gpnr)
-		fmt.Println(gpnr.ParameterList)
+		session.cpe.AddParametersInfoFromResponse(gpnr.ParameterList)
+		session.cpe.Root = cpe.DetermineDeviceTreeRootPath(gpnr.ParameterList)
+
+		fmt.Println("GPV REQ")
+		requestBody := envelope.GPVRequest([]acsxml.ParameterInfo{
+			{
+				Name:     session.cpe.Root + ".",
+				Writable: "0",
+			},
+		})
+		_, _ = fmt.Fprint(w, requestBody)
+		session.PrevReqType = acsxml.GPVReq
+
+	case acsxml.GPVResp:
+		var gpvr acsxml.GetParameterValuesResponse
+		_ = xml.Unmarshal(buffer, &gpvr)
+		session.cpe.AddParameterValuesFromResponse(gpvr.ParameterList)
+		fmt.Println(session.cpe.ParameterValues)
 
 	default:
-		fmt.Println("NOT SUPPORTED REQTYPE ", reqType)
+		fmt.Println("UNSUPPORTED REQTYPE ", reqType)
 	}
 
 }
@@ -56,9 +77,11 @@ func parseXML(buffer []byte) (string, acsxml.Envelope) {
 		case "inform":
 			requestType = acsxml.INFORM
 		case "getparameternamesresponse":
-			requestType = acsxml.GPNR
+			requestType = acsxml.GPNResp
+		case "getparametervaluesresponse":
+			requestType = acsxml.GPVResp
 		default:
-			fmt.Println("NOT SUPPORTED envelope type " + envelope.Type())
+			fmt.Println("UNSUPPORTED envelope type " + envelope.Type())
 			requestType = acsxml.UNKNOWN
 		}
 	}
