@@ -2,30 +2,31 @@ package acs
 
 import (
 	"fmt"
-	"goacs/acs/cpe"
 	"goacs/acs/xml"
+	"goacs/models/cpe"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-const SESSION_LIFETIME = 15
-const SESSION_GOROUTINE_TIMEOUT = 10
+const SessionLifetime = 15
+const SessionGoroutineTimeout = 10
 
 type ACSSession struct {
 	Id          string
 	IsNew       bool
+	IsBoot      bool
 	PrevReqType string
 	created_at  time.Time
 	cpe         cpe.CPE
 }
 
-var acsSessions map[string]ACSSession
+var acsSessions map[string]*ACSSession
 
 func StartSession() {
 	fmt.Println("acsSessions init")
-	acsSessions = make(map[string]ACSSession)
+	acsSessions = make(map[string]*ACSSession)
 	go removeOldSessions()
 }
 func CreateSession(request *http.Request, w http.ResponseWriter) (*ACSSession, http.ResponseWriter) {
@@ -33,7 +34,7 @@ func CreateSession(request *http.Request, w http.ResponseWriter) (*ACSSession, h
 	var sessionId = ""
 	cookie, err := request.Cookie("sessionId")
 
-	var session ACSSession
+	var session *ACSSession
 
 	if err != nil {
 		sessionId = generateSessionId()
@@ -42,24 +43,22 @@ func CreateSession(request *http.Request, w http.ResponseWriter) (*ACSSession, h
 	}
 
 	fmt.Println("Trying to retive session from memory " + sessionId)
-	memorySession, exist := acsSessions[sessionId]
+	_, exist := acsSessions[sessionId]
 
 	if exist == false {
 		fmt.Println("session non exist in memory")
-		fmt.Println("Creating new session " + session.Id)
+		fmt.Println("Creating new session " + sessionId)
 		session = createEmptySession(sessionId)
 	} else {
-		session = memorySession
+		session = acsSessions[sessionId]
 		fmt.Println("session exist in memory")
 		session.IsNew = false
 	}
 
-	newCookie := http.Cookie{Name: "sessionId", Value: sessionId, Expires: time.Now().Add(SESSION_LIFETIME * time.Second)}
-	//w.Header().Set("Set-Cookie", "sessionId="+session.Id)
+	newCookie := http.Cookie{Name: "sessionId", Value: sessionId, Expires: time.Now().Add(SessionLifetime * time.Second)}
 	http.SetCookie(w, &newCookie)
 
-	fmt.Println("returning session", session)
-	return &session, w
+	return session, w
 }
 
 func generateSessionId() string {
@@ -73,25 +72,26 @@ func printSessions() {
 	}
 }
 
-func createEmptySession(sessionId string) ACSSession {
+func createEmptySession(sessionId string) *ACSSession {
 	session := ACSSession{Id: sessionId, IsNew: true, created_at: time.Now()}
-	acsSessions[sessionId] = session
-	return session
+	acsSessions[sessionId] = &session
+	return acsSessions[sessionId]
 }
 
 func removeOldSessions() {
 	for {
 		now := time.Now()
 		for sessionId, session := range acsSessions {
-			if now.Sub(session.created_at).Minutes() > SESSION_LIFETIME {
+			if now.Sub(session.created_at).Minutes() > SessionLifetime {
 				fmt.Println("DELETING OLD SESSION " + sessionId)
 				delete(acsSessions, sessionId)
 			}
 		}
-		time.Sleep(SESSION_GOROUTINE_TIMEOUT * time.Second)
+		time.Sleep(SessionGoroutineTimeout * time.Second)
 	}
 }
 
 func (session *ACSSession) fillCPEFromInform(inform xml.Inform) {
 	session.cpe = cpe.CPE{}
+	session.IsBoot = inform.IsBootEvent()
 }
