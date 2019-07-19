@@ -92,6 +92,10 @@ func removeOldSessions() {
 }
 
 func (session *ACSSession) fillCPEFromInform(inform xml.Inform) {
-	session.cpe = cpe.CPE{}
+	session.cpe = cpe.CPE{
+		Manufacturer:    inform.DeviceId.Manufacturer,
+		SerialNumber:    inform.DeviceId.SerialNumber,
+		HardwareVersion: "1.0",
+	}
 	session.IsBoot = inform.IsBootEvent()
 }

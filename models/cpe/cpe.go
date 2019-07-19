@@ -7,6 +7,7 @@ import (
 )
 
 type CPE struct {
+	UUID                 string
 	SerialNumber         string
 	OUI                  string
 	ProductClass         string

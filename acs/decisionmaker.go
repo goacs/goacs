@@ -5,6 +5,8 @@ import (
 	"fmt"
 	acsxml "goacs/acs/xml"
 	"goacs/models/cpe"
+	"goacs/repository"
+	"goacs/repository/impl"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -22,6 +24,8 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 
 	reqType, envelope := parseXML(buffer)
 
+	cpeRepository := impl.NewMysqlCPERepository(repository.DatabaseConnection())
+
 	switch reqType {
 	case acsxml.INFORM:
 		var inform acsxml.Inform
@@ -29,6 +33,8 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 		fmt.Println("BOOT", inform.IsBootEvent())
 		session.PrevReqType = acsxml.INFORM
 		session.fillCPEFromInform(inform)
+		fmt.Println(session.cpe)
+		_, _ = cpeRepository.UpdateOrCreate(&session.cpe)
 		_, _ = fmt.Fprint(w, envelope.InformResponse())
 
 	case acsxml.EMPTY:
