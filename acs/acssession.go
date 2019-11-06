@@ -1,9 +1,9 @@
 package acs
 
 import (
+	"../models/cpe"
+	"./xml"
 	"fmt"
-	"goacs/acs/xml"
-	"goacs/models/cpe"
 	"math/rand"
 	"net/http"
 	"strconv"

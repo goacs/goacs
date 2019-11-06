@@ -1,11 +1,11 @@
 package main
 
 import (
+	"./acs"
+	acshttp "./http"
+	"./lib"
 	"fmt"
 	"github.com/joho/godotenv"
-	"goacs/acs"
-	acshttp "goacs/http"
-	"goacs/lib"
 	"os"
 	"strconv"
 )

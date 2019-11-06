@@ -1,12 +1,12 @@
 package impl
 
 import (
+	".."
+	"../../models/cpe"
+	"../interfaces"
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
-	"goacs/models/cpe"
-	"goacs/repository"
-	"goacs/repository/interfaces"
 	"time"
 )
 

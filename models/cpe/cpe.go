@@ -1,7 +1,7 @@
 package cpe
 
 import (
-	"goacs/acs/xml"
+	"../../acs/xml"
 	"net"
 	"strings"
 )

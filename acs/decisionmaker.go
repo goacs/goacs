@@ -1,12 +1,12 @@
 package acs
 
 import (
+	acsxml "../acs/xml"
+	"../models/cpe"
+	"../repository"
+	"../repository/impl"
 	"encoding/xml"
 	"fmt"
-	acsxml "goacs/acs/xml"
-	"goacs/models/cpe"
-	"goacs/repository"
-	"goacs/repository/impl"
 	"io"
 	"io/ioutil"
 	"net/http"
