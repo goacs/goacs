@@ -24,7 +24,7 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 
 	reqType, envelope := parseXML(buffer)
 
-	cpeRepository := impl.NewMysqlCPERepository(repository.DatabaseConnection())
+	cpeRepository := impl.NewMysqlCPERepository(repository.InitConnection())
 
 	switch reqType {
 	case acsxml.INFORM:

@@ -4,6 +4,7 @@ import (
 	"./acs"
 	acshttp "./http"
 	"./lib"
+	"./repository"
 	"fmt"
 	"github.com/joho/godotenv"
 	"os"
@@ -37,6 +38,7 @@ func init() {
 
 func main() {
 	fmt.Println("Starting server...")
+	repository.InitConnection()
 	acs.StartSession()
 	acshttp.Start()
 }
