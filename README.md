@@ -2,7 +2,7 @@
 GoACS is an Autonomous Configuration Server which implements TR-069 protocol.
 Feel free to contribute to project
 
-###Development help
+### Development help
 Current code are still in active development and are not usable!
 
 If you want to look what is server doing, do following steps 
