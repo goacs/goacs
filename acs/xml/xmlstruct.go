@@ -99,6 +99,16 @@ func (envelope *Envelope) InformResponse() string {
 </soapenv:Envelope>`
 }
 
+func (inform *Inform) IsEvent(event string) bool {
+	for idx := range inform.Events {
+		if inform.Events[idx].EventCode == event {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (inform *Inform) IsBootEvent() bool {
 	for idx := range inform.Events {
 		if inform.Events[idx].EventCode == "0 BOOTSTRAP" ||

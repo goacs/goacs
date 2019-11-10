@@ -9,7 +9,7 @@ import (
 
 var connection *sql.DB
 
-func InitConnection() (connection *sql.DB) {
+func InitConnection() *sql.DB {
 	var env *lib.Env = new(lib.Env)
 
 	fmt.Println("Connecting to database...")
@@ -22,13 +22,14 @@ func InitConnection() (connection *sql.DB) {
 		env.Get("MYSQL_DATABASE", ""),
 	)
 
-	connection, err := sql.Open("mysql", connectionString)
+	var err error
+	connection, err = sql.Open("mysql", connectionString)
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	return
+	return connection
 }
 
 func GetConnection() *sql.DB {

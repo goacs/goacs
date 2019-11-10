@@ -36,9 +36,12 @@ func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
 	}
 
 	for result.Next() {
-		fmt.Println("blebleble")
 		cpeInstance := new(cpe.CPE)
-		_ = result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.Manufacturer, &cpeInstance.HardwareVersion)
+		err = result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
+		if err != nil {
+			fmt.Println("Error while fetching query results")
+			fmt.Println(err.Error())
+		}
 		return cpeInstance, nil
 	}
 
@@ -51,7 +54,8 @@ func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
 	uuidInstance, _ := uuid.NewRandom()
 	uuidString := uuidInstance.String()
 
-	_, err := r.db.Exec("INSERT INTO cpe SET uuid=?, serial_number=?, hardware_version=?, created_at=?", uuidString, cpe.SerialNumber, cpe.HardwareVersion, time.Now())
+	_, err := r.db.Exec("INSERT INTO cpe SET uuid=?, serial_number=?, hardware_version=?, software_version=?, created_at=?, updated_at=?",
+		uuidString, cpe.SerialNumber, cpe.HardwareVersion, cpe.SoftwareVersion, time.Now(), time.Now())
 
 	if err != nil {
 		fmt.Println(err)
@@ -72,9 +76,9 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 	if existInDb == nil {
 		result, err = r.Create(cpe)
 	} else {
-		stmt, _ := r.db.Prepare("UPDATE cpe SET hardware_version=?, WHERE uuid=?")
+		stmt, _ := r.db.Prepare("UPDATE cpe SET hardware_version=?, software_version=?, updated_at=? WHERE uuid=?")
 
-		_, err := stmt.Exec(cpe.HardwareVersion, cpe.UUID)
+		_, err := stmt.Exec(cpe.HardwareVersion, cpe.SoftwareVersion, time.Now(), cpe.UUID)
 
 		if err != nil {
 			return false, repository.ErrUpdating

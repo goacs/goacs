@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func MakeDecision(request *http.Request, w http.ResponseWriter) {
+func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 
 	buffer, err := ioutil.ReadAll(request.Body)
 
@@ -24,7 +24,7 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 
 	reqType, envelope := parseXML(buffer)
 
-	cpeRepository := impl.NewMysqlCPERepository(repository.InitConnection())
+	cpeRepository := impl.NewMysqlCPERepository(repository.GetConnection())
 
 	switch reqType {
 	case acsxml.INFORM:
@@ -48,7 +48,7 @@ func MakeDecision(request *http.Request, w http.ResponseWriter) {
 		var gpnr acsxml.GetParameterNamesResponse
 		_ = xml.Unmarshal(buffer, &gpnr)
 		session.cpe.AddParametersInfoFromResponse(gpnr.ParameterList)
-		session.cpe.Root = cpe.DetermineDeviceTreeRootPath(gpnr.ParameterList)
+		session.cpe.SetRoot(cpe.DetermineDeviceTreeRootPath(gpnr.ParameterList))
 
 		fmt.Println("GPV REQ")
 		requestBody := envelope.GPVRequest([]acsxml.ParameterInfo{
