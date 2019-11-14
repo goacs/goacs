@@ -1,10 +1,11 @@
-package acs
+package logic
 
 import (
-	acsxml "../acs/xml"
-	"../models/cpe"
-	"../repository"
-	"../repository/impl"
+	".."
+	"../../repository"
+	acshttp "../http"
+	"../methods"
+	acsxml "../xml"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -13,10 +14,9 @@ import (
 )
 
 func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
-
 	buffer, err := ioutil.ReadAll(request.Body)
 
-	session, w := CreateSession(request, w)
+	session, w := acs.CreateSession(request, w)
 
 	if err != io.EOF && err != nil {
 		panic(err)
@@ -24,18 +24,23 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 
 	reqType, envelope := parseXML(buffer)
 
-	cpeRepository := impl.NewMysqlCPERepository(repository.GetConnection())
+	var reqRes = acshttp.ReqRes{
+		Request:      request,
+		Response:     w,
+		DBConnection: repository.GetConnection(),
+		Session:      session,
+		Envelope:     envelope,
+	}
+
+	fmt.Println(reqRes)
+
+	baseDecision := methods.Decision{reqRes}
 
 	switch reqType {
 	case acsxml.INFORM:
-		var inform acsxml.Inform
-		_ = xml.Unmarshal(buffer, &inform)
-		fmt.Println("BOOT", inform.IsBootEvent())
-		session.PrevReqType = acsxml.INFORM
-		session.fillCPEFromInform(inform)
-		fmt.Println(session.cpe)
-		_, _ = cpeRepository.UpdateOrCreate(&session.cpe)
-		_, _ = fmt.Fprint(w, envelope.InformResponse())
+		decision := methods.InformDecision{baseDecision}
+		decision.RequestParser()
+		decision.Response()
 
 	case acsxml.EMPTY:
 		if session.IsNew == false && session.IsBoot == true {
@@ -47,13 +52,12 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 	case acsxml.GPNResp:
 		var gpnr acsxml.GetParameterNamesResponse
 		_ = xml.Unmarshal(buffer, &gpnr)
-		session.cpe.AddParametersInfoFromResponse(gpnr.ParameterList)
-		session.cpe.SetRoot(cpe.DetermineDeviceTreeRootPath(gpnr.ParameterList))
+		session.CPE.AddParametersInfoFromResponse(gpnr.ParameterList)
 
 		fmt.Println("GPV REQ")
 		requestBody := envelope.GPVRequest([]acsxml.ParameterInfo{
 			{
-				Name:     session.cpe.Root + ".",
+				Name:     session.CPE.Root + ".",
 				Writable: "0",
 			},
 		})
@@ -63,8 +67,8 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 	case acsxml.GPVResp:
 		var gpvr acsxml.GetParameterValuesResponse
 		_ = xml.Unmarshal(buffer, &gpvr)
-		session.cpe.AddParameterValuesFromResponse(gpvr.ParameterList)
-		fmt.Println(session.cpe.ParameterValues)
+		session.CPE.AddParameterValuesFromResponse(gpvr.ParameterList)
+		//fmt.Println(session.CPE.ParameterValues)
 
 	default:
 		fmt.Println("UNSUPPORTED REQTYPE ", reqType)

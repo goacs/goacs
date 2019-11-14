@@ -66,6 +66,7 @@ create table cpe_to_templates
 (
 	cpe_uuid varchar(36) not null,
 	template_id int not null,
+	priority int null,
 	constraint cpe_to_templates_pk
 		primary key (cpe_uuid, template_id)
 );

@@ -54,8 +54,22 @@ func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
 	uuidInstance, _ := uuid.NewRandom()
 	uuidString := uuidInstance.String()
 
-	_, err := r.db.Exec("INSERT INTO cpe SET uuid=?, serial_number=?, hardware_version=?, software_version=?, created_at=?, updated_at=?",
-		uuidString, cpe.SerialNumber, cpe.HardwareVersion, cpe.SoftwareVersion, time.Now(), time.Now())
+	_, err := r.db.Exec(`INSERT INTO cpe SET uuid=?, 
+			serial_number=?, 
+			hardware_version=?, 
+			software_version=?, 
+            connection_request_url=?,
+			created_at=?, 
+			updated_at=?
+			`,
+		uuidString,
+		cpe.SerialNumber,
+		cpe.HardwareVersion,
+		cpe.SoftwareVersion,
+		cpe.ConnectionRequestUrl,
+		time.Now(),
+		time.Now(),
+	)
 
 	if err != nil {
 		fmt.Println(err)
@@ -69,16 +83,26 @@ func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
 
 func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err error) {
 
-	existInDb, _ := r.FindBySerial(cpe.SerialNumber)
+	dbCPE, _ := r.FindBySerial(cpe.SerialNumber)
 
-	fmt.Println(cpe)
-
-	if existInDb == nil {
+	if dbCPE == nil {
 		result, err = r.Create(cpe)
 	} else {
-		stmt, _ := r.db.Prepare("UPDATE cpe SET hardware_version=?, software_version=?, updated_at=? WHERE uuid=?")
+		fmt.Println("Updating CPE", cpe)
+		stmt, _ := r.db.Prepare(`UPDATE cpe SET 
+               hardware_version=?, 
+               software_version=?, 
+               connection_request_url=?, 
+               updated_at=? 
+			   WHERE uuid=?`)
 
-		_, err := stmt.Exec(cpe.HardwareVersion, cpe.SoftwareVersion, time.Now(), cpe.UUID)
+		_, err := stmt.Exec(
+			cpe.HardwareVersion,
+			cpe.SoftwareVersion,
+			cpe.ConnectionRequestUrl,
+			time.Now(),
+			dbCPE.UUID,
+		)
 
 		if err != nil {
 			return false, repository.ErrUpdating

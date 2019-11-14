@@ -28,7 +28,7 @@ type XMLMessage struct {
 type Inform struct {
 	DeviceId      DeviceId         `xml:"Body>Inform>DeviceId"`
 	Events        []Event          `xml:"Body>Inform>Event>EventStruct"`
-	ParameterList []ParameterValue `xml:"ParameterList"`
+	ParameterList []ParameterValue `xml:"Body>Inform>ParameterList>ParameterValueStruct"`
 }
 
 type Event struct {

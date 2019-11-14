@@ -79,7 +79,7 @@ func (cpe *CPE) SetRoot(root string) {
 	}
 }
 
-func DetermineDeviceTreeRootPath(parameters []xml.ParameterInfo) string {
+func DetermineDeviceTreeRootPath(parameters []xml.ParameterValue) string {
 	for _, parameter := range parameters {
 		splittedParamName := strings.Split(parameter.Name, ".")
 

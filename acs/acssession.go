@@ -19,7 +19,7 @@ type ACSSession struct {
 	IsBoot      bool
 	PrevReqType string
 	created_at  time.Time
-	cpe         cpe.CPE
+	CPE         cpe.CPE
 }
 
 var acsSessions map[string]*ACSSession
@@ -91,17 +91,16 @@ func removeOldSessions() {
 	}
 }
 
-func (session *ACSSession) fillCPEFromInform(inform xml.Inform) {
-	fmt.Println(inform)
-	session.cpe = cpe.CPE{
+func (session *ACSSession) FillCPEFromInform(inform xml.Inform) {
+	session.CPE = cpe.CPE{
 		Manufacturer:    inform.DeviceId.Manufacturer,
 		SerialNumber:    inform.DeviceId.SerialNumber,
+		OUI:             inform.DeviceId.OUI,
 		HardwareVersion: "1.0",
 	}
-
-	session.cpe.AddParameterValuesFromResponse(inform.ParameterList)
-
-	session.cpe.ConnectionRequestUrl, _ = session.cpe.GetParameterValue(session.cpe.Root + ".ManagementServer.ConnectionRequestURL")
-
+	session.CPE.AddParameterValuesFromResponse(inform.ParameterList)
+	session.CPE.SetRoot(cpe.DetermineDeviceTreeRootPath(session.CPE.ParameterValues))
+	session.CPE.ConnectionRequestUrl, _ = session.CPE.GetParameterValue(session.CPE.Root + ".ManagementServer.ConnectionRequestURL")
 	session.IsBoot = inform.IsBootEvent()
+	fmt.Println(session.CPE)
 }
