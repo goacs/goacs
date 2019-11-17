@@ -13,4 +13,5 @@ type ReqRes struct {
 	DBConnection *sql.DB
 	Session      *acs.ACSSession
 	Envelope     acsxml.Envelope
+	Body         []byte
 }

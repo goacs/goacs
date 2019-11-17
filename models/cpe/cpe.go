@@ -21,7 +21,7 @@ type CPE struct {
 	ConnectionRequestUrl      string
 	Root                      string
 	ParametersInfo            []xml.ParameterInfo
-	ParameterValues           []xml.ParameterValue
+	ParameterValues           []xml.ParameterValueStruct
 }
 
 func (cpe *CPE) AddParameterInfo(parameter xml.ParameterInfo) {
@@ -34,7 +34,7 @@ func (cpe *CPE) AddParametersInfoFromResponse(parameters []xml.ParameterInfo) {
 	}
 }
 
-func (cpe *CPE) AddParameter(parameter xml.ParameterValue) {
+func (cpe *CPE) AddParameter(parameter xml.ParameterValueStruct) {
 	for index := range cpe.ParameterValues {
 		if cpe.ParameterValues[index].Name == parameter.Name {
 			//Replace exist parameter
@@ -45,7 +45,7 @@ func (cpe *CPE) AddParameter(parameter xml.ParameterValue) {
 	cpe.ParameterValues = append(cpe.ParameterValues, parameter)
 }
 
-func (cpe *CPE) AddParameterValuesFromResponse(parameters []xml.ParameterValue) {
+func (cpe *CPE) AddParameterValuesFromResponse(parameters []xml.ParameterValueStruct) {
 	for _, parameter := range parameters {
 		cpe.AddParameter(parameter)
 	}
@@ -54,7 +54,7 @@ func (cpe *CPE) AddParameterValuesFromResponse(parameters []xml.ParameterValue) 
 func (cpe *CPE) GetParameterValue(parameterName string) (string, error) {
 	for index := range cpe.ParameterValues {
 		if cpe.ParameterValues[index].Name == parameterName {
-			return cpe.ParameterValues[index].Value, nil
+			return cpe.ParameterValues[index].Value.Value, nil
 		}
 	}
 
@@ -79,7 +79,7 @@ func (cpe *CPE) SetRoot(root string) {
 	}
 }
 
-func DetermineDeviceTreeRootPath(parameters []xml.ParameterValue) string {
+func DetermineDeviceTreeRootPath(parameters []xml.ParameterValueStruct) string {
 	for _, parameter := range parameters {
 		splittedParamName := strings.Split(parameter.Name, ".")
 

@@ -30,29 +30,28 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		DBConnection: repository.GetConnection(),
 		Session:      session,
 		Envelope:     envelope,
+		Body:         buffer,
 	}
 
-	fmt.Println(reqRes)
-
-	baseDecision := methods.Decision{reqRes}
+	fmt.Println("ENVELOPE TYPE", reqRes.Envelope.Type())
 
 	switch reqType {
 	case acsxml.INFORM:
-		decision := methods.InformDecision{baseDecision}
-		decision.RequestParser()
-		decision.Response()
+		decision := methods.InformDecision{&reqRes}
+		decision.ResponseParser()
+		decision.Request()
 
 	case acsxml.EMPTY:
 		if session.IsNew == false && session.IsBoot == true {
 			fmt.Println("GPN REQ")
-			_, _ = fmt.Fprint(w, envelope.GPNRequest(""))
+			decision := methods.ParameterDecisions{&reqRes}
+			decision.ParameterNamesRequest()
 			session.PrevReqType = acsxml.GPNReq
 		}
 
 	case acsxml.GPNResp:
-		var gpnr acsxml.GetParameterNamesResponse
-		_ = xml.Unmarshal(buffer, &gpnr)
-		session.CPE.AddParametersInfoFromResponse(gpnr.ParameterList)
+		decision := methods.ParameterDecisions{&reqRes}
+		decision.ParameterNamesRequest()
 
 		fmt.Println("GPV REQ")
 		requestBody := envelope.GPVRequest([]acsxml.ParameterInfo{

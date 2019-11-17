@@ -2,6 +2,7 @@ package impl
 
 import (
 	".."
+	"../../acs/xml"
 	"../../models/cpe"
 	"../interfaces"
 	"database/sql"
@@ -88,7 +89,7 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 	if dbCPE == nil {
 		result, err = r.Create(cpe)
 	} else {
-		fmt.Println("Updating CPE", cpe)
+		fmt.Println("Updating CPE")
 		stmt, _ := r.db.Prepare(`UPDATE cpe SET 
                hardware_version=?, 
                software_version=?, 
@@ -103,6 +104,7 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 			time.Now(),
 			dbCPE.UUID,
 		)
+		cpe.UUID = dbCPE.UUID
 
 		if err != nil {
 			return false, repository.ErrUpdating
@@ -114,4 +116,98 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 	}
 
 	return result, err
+}
+
+func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*xml.ParameterValueStruct, error) {
+	result, err := r.db.Query("SELECT name, value, type  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
+
+	if err != nil {
+		fmt.Println("Error while fetching query results")
+		fmt.Println(err.Error())
+	}
+
+	for result.Next() {
+		parameterValueStruct := new(xml.ParameterValueStruct)
+		err = result.Scan(&parameterValueStruct.Name, &parameterValueStruct.Value.Value, &parameterValueStruct.Value.Type)
+
+		if err != nil {
+			fmt.Println("Error while fetching query results")
+			fmt.Println(err.Error())
+		}
+		return parameterValueStruct, nil
+	}
+
+	return nil, repository.ErrNotFound
+}
+
+func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (bool, error) {
+	var query string = `INSERT INTO cpe_parameters (cpe_uuid, name, value, type, flags, created_at, updated_at) 
+						VALUES (?, ?, ?, ?, ?, ?, ?)`
+
+	stmt, _ := r.db.Prepare(query)
+
+	_, err := stmt.Exec(
+		cpe.UUID,
+		parameter.Name,
+		parameter.Value.Value,
+		parameter.Value.Type, //TODO: NORMALIZE
+		"",                   //TODO: Flags support (R - Read, W - Write and more...)
+		time.Now(),
+		time.Now(),
+	)
+
+	if err != nil {
+		fmt.Println(repository.ErrParameterCreating, err.Error())
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (result bool, err error) {
+	existParameter, err := r.FindParameter(cpe, parameter.Name)
+
+	if existParameter == nil {
+		fmt.Println("non exist param", existParameter)
+		result, err = r.CreateParameter(cpe, parameter)
+	} else {
+		fmt.Println("param exist", existParameter)
+		var query string = "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
+		stmt, _ := r.db.Prepare(query)
+
+		_, err = stmt.Exec(
+			parameter.Value.Value,
+			parameter.Value.Type,
+			"",
+			time.Now(),
+			cpe.UUID,
+			parameter.Name,
+		)
+
+		if err != nil {
+			fmt.Println("ERROR", err.Error())
+			result = false
+		}
+	}
+
+	return
+}
+
+func (r *MysqlCPERepositoryImpl) SaveParameters(cpe *cpe.CPE) (bool, error) {
+
+	for _, parameterValue := range cpe.ParameterValues {
+		fmt.Println("param value", parameterValue)
+		_, err := r.UpdateOrCreateParameter(cpe, parameterValue)
+
+		if err != nil {
+			fmt.Println(repository.ErrParameterCreating, err.Error())
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
+func (r *MysqlCPERepositoryImpl) LoadParameters(cpe *cpe.CPE) (bool, error) {
+	panic("implement me")
 }

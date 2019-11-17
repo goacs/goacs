@@ -25,8 +25,8 @@ alter table cpe
 
 create table cpe_parameters
 (
-	cpe_uuid int null,
-	`key` varchar(255) null,
+	cpe_uuid varchar(36) null,
+    name varchar(255) null,
 	value varchar(255) null,
 	type varchar(16) null,
 	flags varchar(10) null,
@@ -50,7 +50,7 @@ create table templates
 create table templates_parameters
 (
 	template_id int null,
-	`key` varchar(255) null,
+	name varchar(255) null,
 	value varchar(255) null,
 	type varchar(16) null,
 	flags varchar(10) null,

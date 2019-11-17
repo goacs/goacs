@@ -39,7 +39,7 @@ Cache-Control: no-cache
         </ParameterValueStruct>
         <ParameterValueStruct>
           <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
-          <Value xsi:type="xsd:string"/>
+          <Value xsi:type="xsd:string">TestCode</Value>
         </ParameterValueStruct>
         <ParameterValueStruct>
           <Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>

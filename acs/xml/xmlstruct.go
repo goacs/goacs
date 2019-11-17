@@ -26,9 +26,9 @@ type XMLMessage struct {
 }
 
 type Inform struct {
-	DeviceId      DeviceId         `xml:"Body>Inform>DeviceId"`
-	Events        []Event          `xml:"Body>Inform>Event>EventStruct"`
-	ParameterList []ParameterValue `xml:"Body>Inform>ParameterList>ParameterValueStruct"`
+	DeviceId      DeviceId               `xml:"Body>Inform>DeviceId"`
+	Events        []Event                `xml:"Body>Inform>Event>EventStruct"`
+	ParameterList []ParameterValueStruct `xml:"Body>Inform>ParameterList>ParameterValueStruct"`
 }
 
 type Event struct {
@@ -36,9 +36,14 @@ type Event struct {
 	CommandKey string
 }
 
+type ParameterValueStruct struct {
+	Name  string         `xml:"Name"`
+	Value ParameterValue `xml:"Value"`
+}
+
 type ParameterValue struct {
-	Name  string `xml:"Name"`
-	Value string `xml:"Value"`
+	Value string `xml:",chardata"`
+	Type  string `xml:"type,attr"`
 }
 
 type ParameterInfo struct {
@@ -58,7 +63,7 @@ type GetParameterNamesResponse struct {
 }
 
 type GetParameterValuesResponse struct {
-	ParameterList []ParameterValue `xml:"Body>GetParameterValuesResponse>ParameterList>ParameterValueStruct"`
+	ParameterList []ParameterValueStruct `xml:"Body>GetParameterValuesResponse>ParameterList>ParameterValueStruct"`
 }
 
 type ACSBool bool
