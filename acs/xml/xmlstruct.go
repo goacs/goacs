@@ -31,6 +31,13 @@ type Inform struct {
 	ParameterList []ParameterValueStruct `xml:"Body>Inform>ParameterList>ParameterValueStruct"`
 }
 
+type Fault struct {
+	FaultCode         string `xml:"Body>Fault>faultcode"`
+	FaultString       string `xml:"Body>Fault>faultstring"`
+	DetailFaultCode   string `xml:"Body>Fault>detail>Fault>FaultCode"`
+	DetailFaultString string `xml:"Body>Fault>detail>Fault>FaultString"`
+}
+
 type Event struct {
 	EventCode  string
 	CommandKey string

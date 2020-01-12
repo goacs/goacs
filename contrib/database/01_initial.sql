@@ -16,9 +16,6 @@ create table cpe
 create index cpe_serial_number_index
 	on cpe (serial_number);
 
-create unique index cpe_uuid_uindex
-	on cpe (uuid);
-
 alter table cpe
 	add constraint cpe_pk
 		primary key (uuid);
@@ -33,9 +30,9 @@ create table cpe_parameters
 	created_at datetime default CURRENT_TIMESTAMP not null,
 	updated_at datetime default CURRENT_TIMESTAMP not null,
 	constraint cpe_parameters_pk
-		unique (cpe_uuid, `key`),
-	constraint cpe_parameters_cpe_uuid_key_uindex
-		unique (cpe_uuid, `key`)
+		unique (cpe_uuid, `name`),
+	constraint cpe_parameters_cpe_uuid_key_index
+		unique (cpe_uuid, `name`)
 );
 
 create table templates
@@ -57,9 +54,9 @@ create table templates_parameters
 	created_at datetime default CURRENT_TIMESTAMP not null,
 	updated_at datetime default CURRENT_TIMESTAMP not null,
 	constraint templates_parameters_pk
-		unique (template_id, `key`),
-	constraint templates_parameters_template_id_key_uindex
-		unique (template_id, `key`)
+		unique (template_id, `name`),
+	constraint templates_parameters_template_id_key_index
+		unique (template_id, `name`)
 );
 
 create table cpe_to_templates

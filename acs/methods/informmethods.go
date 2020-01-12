@@ -1,11 +1,11 @@
 package methods
 
 import (
-	acsxml "../../acs/xml"
-	"../../repository/impl"
-	"../http"
 	"encoding/xml"
 	"fmt"
+	"goacs/acs/http"
+	acsxml "goacs/acs/xml"
+	"goacs/repository/impl"
 )
 
 type InformDecision struct {

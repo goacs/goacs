@@ -1,8 +1,8 @@
 package cpe
 
 import (
-	"../../acs/xml"
 	"errors"
+	"goacs/acs/xml"
 	"net"
 	"strings"
 )
@@ -22,6 +22,7 @@ type CPE struct {
 	Root                      string
 	ParametersInfo            []xml.ParameterInfo
 	ParameterValues           []xml.ParameterValueStruct
+	Fault                     xml.Fault
 }
 
 func (cpe *CPE) AddParameterInfo(parameter xml.ParameterInfo) {
@@ -77,6 +78,10 @@ func (cpe *CPE) SetRoot(root string) {
 	if root == "Device" || root == "InternetGatewayDevice" {
 		cpe.Root = root
 	}
+}
+
+func (cpe *CPE) Fails() bool {
+	return cpe.Fault.FaultCode != "" || cpe.Fault.FaultString != ""
 }
 
 func DetermineDeviceTreeRootPath(parameters []xml.ParameterValueStruct) string {

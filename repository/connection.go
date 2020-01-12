@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"../lib"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"goacs/lib"
 )
 
 var connection *sql.DB

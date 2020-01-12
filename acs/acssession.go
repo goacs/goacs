@@ -1,9 +1,9 @@
 package acs
 
 import (
-	"../models/cpe"
-	"./xml"
 	"fmt"
+	"goacs/acs/xml"
+	"goacs/models/cpe"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -101,6 +101,8 @@ func (session *ACSSession) FillCPEFromInform(inform xml.Inform) {
 	session.CPE.AddParameterValuesFromResponse(inform.ParameterList)
 	session.CPE.SetRoot(cpe.DetermineDeviceTreeRootPath(session.CPE.ParameterValues))
 	session.CPE.ConnectionRequestUrl, _ = session.CPE.GetParameterValue(session.CPE.Root + ".ManagementServer.ConnectionRequestURL")
+	session.CPE.ConnectionRequestUser, _ = session.CPE.GetParameterValue(session.CPE.Root + ".ManagementServer.Username")
+	session.CPE.ConnectionRequestUser, _ = session.CPE.GetParameterValue(session.CPE.Root + ".ManagementServer.Password")
 	session.IsBoot = inform.IsBootEvent()
 	fmt.Println(session.CPE)
 }

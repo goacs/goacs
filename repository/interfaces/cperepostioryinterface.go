@@ -1,7 +1,7 @@
 package interfaces
 
-import "../../models/cpe"
-import "../../acs/xml"
+import "goacs/models/cpe"
+import "goacs/acs/xml"
 
 type CPERepository interface {
 	Find(uuid string) (*cpe.CPE, error)

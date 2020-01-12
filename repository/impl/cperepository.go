@@ -1,13 +1,13 @@
 package impl
 
 import (
-	".."
-	"../../acs/xml"
-	"../../models/cpe"
-	"../interfaces"
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
+	"goacs/acs/xml"
+	"goacs/models/cpe"
+	"goacs/repository"
+	"goacs/repository/interfaces"
 	"time"
 )
 
@@ -34,6 +34,8 @@ func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
 	if err != nil {
 		fmt.Println("Error while fetching query results")
 		fmt.Println(err.Error())
+		return nil, repository.ErrNotFound
+
 	}
 
 	for result.Next() {
@@ -59,7 +61,9 @@ func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
 			serial_number=?, 
 			hardware_version=?, 
 			software_version=?, 
-            connection_request_url=?,
+      connection_request_url=?,
+      connection_request_user=?,
+      connection_request_password=?,              
 			created_at=?, 
 			updated_at=?
 			`,
@@ -68,6 +72,8 @@ func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
 		cpe.HardwareVersion,
 		cpe.SoftwareVersion,
 		cpe.ConnectionRequestUrl,
+		cpe.ConnectionRequestUser,
+		cpe.ConnectionRequestPassword,
 		time.Now(),
 		time.Now(),
 	)
@@ -94,6 +100,8 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
                hardware_version=?, 
                software_version=?, 
                connection_request_url=?, 
+               connection_request_user=?,
+      			   connection_request_password=?,       
                updated_at=? 
 			   WHERE uuid=?`)
 
@@ -101,6 +109,8 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 			cpe.HardwareVersion,
 			cpe.SoftwareVersion,
 			cpe.ConnectionRequestUrl,
+			cpe.ConnectionRequestUser,
+			cpe.ConnectionRequestPassword,
 			time.Now(),
 			dbCPE.UUID,
 		)
@@ -124,6 +134,8 @@ func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string
 	if err != nil {
 		fmt.Println("Error while fetching query results")
 		fmt.Println(err.Error())
+		return nil, repository.ErrNotFound
+
 	}
 
 	for result.Next() {
@@ -168,10 +180,10 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter
 	existParameter, err := r.FindParameter(cpe, parameter.Name)
 
 	if existParameter == nil {
-		fmt.Println("non exist param", existParameter)
+		//fmt.Println("non exist param", existParameter)
 		result, err = r.CreateParameter(cpe, parameter)
 	} else {
-		fmt.Println("param exist", existParameter)
+		//fmt.Println("param exist", existParameter)
 		var query string = "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
 		stmt, _ := r.db.Prepare(query)
 
@@ -196,7 +208,7 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter
 func (r *MysqlCPERepositoryImpl) SaveParameters(cpe *cpe.CPE) (bool, error) {
 
 	for _, parameterValue := range cpe.ParameterValues {
-		fmt.Println("param value", parameterValue)
+		//fmt.Println("param value", parameterValue)
 		_, err := r.UpdateOrCreateParameter(cpe, parameterValue)
 
 		if err != nil {

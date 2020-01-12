@@ -1,22 +1,27 @@
 package logic
 
 import (
-	".."
-	"../../repository"
-	acshttp "../http"
-	"../methods"
-	acsxml "../xml"
 	"encoding/xml"
 	"fmt"
+	"goacs/acs"
+	acshttp "goacs/acs/http"
+	"goacs/acs/methods"
+	acsxml "goacs/acs/xml"
+	"goacs/lib"
+	"goacs/repository"
 	"io"
 	"io/ioutil"
 	"net/http"
 )
 
 func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
+	env := new(lib.Env)
 	buffer, err := ioutil.ReadAll(request.Body)
-
 	session, w := acs.CreateSession(request, w)
+
+	if env.Get("DEBUG", "false") == "true" {
+		session.IsBoot = true
+	}
 
 	if err != io.EOF && err != nil {
 		panic(err)
@@ -45,13 +50,13 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		if session.IsNew == false && session.IsBoot == true {
 			fmt.Println("GPN REQ")
 			decision := methods.ParameterDecisions{&reqRes}
-			decision.ParameterNamesRequest()
+			decision.ParameterNamesRequest(true)
 			session.PrevReqType = acsxml.GPNReq
 		}
 
 	case acsxml.GPNResp:
 		decision := methods.ParameterDecisions{&reqRes}
-		decision.ParameterNamesRequest()
+		decision.ParameterNamesResponseParser()
 
 		fmt.Println("GPV REQ")
 		requestBody := envelope.GPVRequest([]acsxml.ParameterInfo{
@@ -68,6 +73,12 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		_ = xml.Unmarshal(buffer, &gpvr)
 		session.CPE.AddParameterValuesFromResponse(gpvr.ParameterList)
 		//fmt.Println(session.CPE.ParameterValues)
+
+	case acsxml.FaultResp:
+		var faultresponse acsxml.Fault
+		_ = xml.Unmarshal(buffer, &faultresponse)
+		session.CPE.Fault = faultresponse
+		//TODO: zapis do DB i zakończenie sesji
 
 	default:
 		fmt.Println("UNSUPPORTED REQTYPE ", reqType)
@@ -89,6 +100,8 @@ func parseXML(buffer []byte) (string, acsxml.Envelope) {
 			requestType = acsxml.GPNResp
 		case "getparametervaluesresponse":
 			requestType = acsxml.GPVResp
+		case "fault":
+			requestType = acsxml.FaultResp
 		default:
 			fmt.Println("UNSUPPORTED envelope type " + envelope.Type())
 			requestType = acsxml.UNKNOWN
