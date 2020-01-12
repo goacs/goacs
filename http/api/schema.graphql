@@ -1,0 +1,26 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type CPE {
+  uuid: ID!
+  oui: String
+  serial_number: String
+  software_version: String
+  hardware_version: String
+  connection_request_url: String
+}
+
+type Template {
+  id: Int!
+  name: String!
+}
+
+type Query {
+  cpe(uuid: ID): CPE!
+  cpes: [CPE!]!
+}
+
+#type Mutation {
+##  addCPE(input: NewTodo!): Todo!
+#}

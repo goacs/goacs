@@ -4,6 +4,7 @@ import "goacs/models/cpe"
 import "goacs/acs/xml"
 
 type CPERepository interface {
+	All() ([]*cpe.CPE, error)
 	Find(uuid string) (*cpe.CPE, error)
 	FindBySerial(serial string) (*cpe.CPE, error)
 	UpdateOrCreate(cpe *cpe.CPE) (bool, error)

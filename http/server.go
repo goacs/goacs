@@ -2,7 +2,9 @@ package http
 
 import (
 	"fmt"
+	"github.com/99designs/gqlgen/handler"
 	"goacs/acs/logic"
+	"goacs/http/api"
 	"net/http"
 	"time"
 )
@@ -19,6 +21,7 @@ func Start() {
 	}
 
 	registerAcsHandler()
+	registerApiHandler()
 
 	err := Instance.ListenAndServe()
 	fmt.Println("Instance started....")
@@ -35,4 +38,9 @@ func registerAcsHandler() {
 		defer request.Body.Close()
 		logic.CPERequestDecision(request, respWriter)
 	})
+}
+
+func registerApiHandler() {
+	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
+	http.Handle("/query", handler.GraphQL(api.NewExecutableSchema(api.Config{Resolvers: &api.Resolver{}})))
 }

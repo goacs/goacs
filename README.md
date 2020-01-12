@@ -2,7 +2,7 @@
 GoACS is an Autonomous Configuration Server which implements TR-069 protocol.
 Feel free to contribute to project
 
-### Development
+## Development
 Current code are still in active development and are not usable!
 
 If you want to look what is server doing, do following steps 
@@ -19,3 +19,13 @@ then
 
 `go run main.go`
 
+
+#### Genrating GraphQL 
+Type in terminal
+
+```
+cd http/api
+go run github.com/99designs/gqlgen -v
+```
+
+gqlgen isn't override `resolver.go`, you need to update manually 

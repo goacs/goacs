@@ -21,34 +21,54 @@ func NewMysqlCPERepository(connection *sql.DB) interfaces.CPERepository {
 	}
 }
 
-func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
+func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
+	r.db.Ping()
 
-	return &cpe.CPE{}, nil
+	result, err := r.db.Query("SELECT uuid, serial_number, hardware_version FROM cpe")
+
+	var cpes []*cpe.CPE
+
+	if err == nil {
+		for result.Next() {
+			cpeInstance := new(cpe.CPE)
+			_ = result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
+			cpes = append(cpes, cpeInstance)
+		}
+	}
+
+	return cpes, nil
+}
+
+func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
+	r.db.Ping()
+
+	result := r.db.QueryRow("SELECT uuid, serial_number, hardware_version FROM cpe WHERE uuid=? LIMIT 1", uuid)
+
+	cpeInstance := new(cpe.CPE)
+	err := result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
+	if err == sql.ErrNoRows {
+		fmt.Println("Error while fetching query results")
+		fmt.Println(err.Error())
+		return nil, repository.ErrNotFound
+	}
+
+	return cpeInstance, nil
 }
 
 func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
 	r.db.Ping()
 
-	result, err := r.db.Query("SELECT uuid, serial_number, hardware_version FROM cpe WHERE serial_number=? LIMIT 1", serial)
+	result := r.db.QueryRow("SELECT uuid, serial_number, hardware_version FROM cpe WHERE serial_number=? LIMIT 1", serial)
 
-	if err != nil {
+	cpeInstance := new(cpe.CPE)
+	err := result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
+	if err == sql.ErrNoRows {
 		fmt.Println("Error while fetching query results")
 		fmt.Println(err.Error())
 		return nil, repository.ErrNotFound
-
 	}
 
-	for result.Next() {
-		cpeInstance := new(cpe.CPE)
-		err = result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
-		if err != nil {
-			fmt.Println("Error while fetching query results")
-			fmt.Println(err.Error())
-		}
-		return cpeInstance, nil
-	}
-
-	return nil, repository.ErrNotFound
+	return cpeInstance, nil
 }
 
 func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
@@ -129,27 +149,18 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 }
 
 func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*xml.ParameterValueStruct, error) {
-	result, err := r.db.Query("SELECT name, value, type  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
+	result := r.db.QueryRow("SELECT name, value, type  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
 
-	if err != nil {
+	parameterValueStruct := new(xml.ParameterValueStruct)
+	err := result.Scan(&parameterValueStruct.Name, &parameterValueStruct.Value.Value, &parameterValueStruct.Value.Type)
+
+	if err == sql.ErrNoRows {
 		fmt.Println("Error while fetching query results")
 		fmt.Println(err.Error())
 		return nil, repository.ErrNotFound
-
 	}
 
-	for result.Next() {
-		parameterValueStruct := new(xml.ParameterValueStruct)
-		err = result.Scan(&parameterValueStruct.Name, &parameterValueStruct.Value.Value, &parameterValueStruct.Value.Type)
-
-		if err != nil {
-			fmt.Println("Error while fetching query results")
-			fmt.Println(err.Error())
-		}
-		return parameterValueStruct, nil
-	}
-
-	return nil, repository.ErrNotFound
+	return parameterValueStruct, nil
 }
 
 func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (bool, error) {

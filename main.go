@@ -16,7 +16,7 @@ var Configuration Config
 var Env *lib.Env
 
 type Config struct {
-	HttpPort int
+	ACSHttpPort int
 }
 
 func init() {
@@ -29,7 +29,7 @@ func init() {
 
 	Env = new(lib.Env)
 
-	Configuration.HttpPort, err = strconv.Atoi(Env.Get("HTTP_PORT", "8085"))
+	Configuration.ACSHttpPort, err = strconv.Atoi(Env.Get("HTTP_PORT", "8085"))
 
 	if err != nil {
 		exitApp("Invalid HTTP_PORT", 1)
