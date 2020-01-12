@@ -20,7 +20,12 @@ then
 `go run main.go`
 
 
-#### Genrating GraphQL 
+### GraphQL 
+To access to GraphQL Playground browse url
+`http://localhost:8085/`
+
+#### Generating server
+
 Type in terminal
 
 ```
