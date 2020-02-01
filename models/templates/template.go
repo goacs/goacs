@@ -1,7 +1,7 @@
 package templates
 
 import (
-	"goacs/acs/xml"
+	"goacs/acs/structs"
 )
 
 type Template struct {
@@ -12,7 +12,7 @@ type Template struct {
 
 type TemplateParameter struct {
 	TemplateId int64
-	xml.ParameterValueStruct
+	structs.ParameterValueStruct
 	Type  string
 	Flags string
 }

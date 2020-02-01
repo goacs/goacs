@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
-	"goacs/acs/xml"
+	"goacs/acs/structs"
 	"goacs/models/cpe"
 	"goacs/repository"
 	"goacs/repository/interfaces"
@@ -148,14 +148,14 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 	return result, err
 }
 
-func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*xml.ParameterValueStruct, error) {
+func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*structs.ParameterValueStruct, error) {
 	result := r.db.QueryRow("SELECT name, value, type  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
 
-	parameterValueStruct := new(xml.ParameterValueStruct)
+	parameterValueStruct := new(structs.ParameterValueStruct)
 	err := result.Scan(&parameterValueStruct.Name, &parameterValueStruct.Value.Value, &parameterValueStruct.Value.Type)
 
 	if err == sql.ErrNoRows {
-		fmt.Println("Error while fetching query results")
+		fmt.Printf("Error while fetching query results for cpe %s parameter %s \n", cpe.UUID, parameterKey)
 		fmt.Println(err.Error())
 		return nil, repository.ErrNotFound
 	}
@@ -163,7 +163,7 @@ func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string
 	return parameterValueStruct, nil
 }
 
-func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (bool, error) {
+func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter structs.ParameterValueStruct) (bool, error) {
 	var query string = `INSERT INTO cpe_parameters (cpe_uuid, name, value, type, flags, created_at, updated_at) 
 						VALUES (?, ?, ?, ?, ?, ?, ?)`
 
@@ -187,7 +187,7 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter xml.Par
 	return true, nil
 }
 
-func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (result bool, err error) {
+func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter structs.ParameterValueStruct) (result bool, err error) {
 	existParameter, err := r.FindParameter(cpe, parameter.Name)
 
 	if existParameter == nil {

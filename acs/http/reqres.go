@@ -3,7 +3,7 @@ package http
 import (
 	"database/sql"
 	"goacs/acs"
-	acsxml "goacs/acs/xml"
+	acsxml "goacs/acs/structs"
 	"net/http"
 )
 

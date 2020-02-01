@@ -10,6 +10,7 @@ import (
 	"goacs/repository"
 	"os"
 	"os/signal"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -45,14 +46,16 @@ func main() {
 	fmt.Println("Starting server...")
 	repository.InitConnection()
 	acs.StartSession()
+	go PrintMemUsage()
+
 	acshttp.Start()
 }
 
 func listenOnCloseSignal() {
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	channel := make(chan os.Signal, 2)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		<-c
+		<-channel
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 		defer cancel()
 
@@ -70,4 +73,19 @@ func listenOnCloseSignal() {
 func exitApp(msg string, code int) {
 	fmt.Println(msg)
 	os.Exit(code)
+}
+
+func PrintMemUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+	time.Sleep(time.Second * 5)
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
 }

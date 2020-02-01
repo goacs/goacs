@@ -1,4 +1,4 @@
-package xml
+package structs
 
 import (
 	"encoding/xml"
@@ -7,18 +7,18 @@ import (
 )
 
 type Envelope struct {
-	XMLName xml.Name `xml:"Envelope"`
-	Header  Header   `xml:"Header"`
-	Body    Body     `xml:"Body"`
+	XMLName xml.Name `structs:"Envelope"`
+	Header  Header   `structs:"Header"`
+	Body    Body     `structs:"Body"`
 }
 
 type Header struct {
-	XMLName xml.Name `xml:"Header"`
-	ID      string   `xml:"ID"`
+	XMLName xml.Name `structs:"Header"`
+	ID      string   `structs:"ID"`
 }
 
 type Body struct {
-	Message XMLMessage `xml:",any"`
+	Message XMLMessage `structs:",any"`
 }
 
 type XMLMessage struct {
@@ -26,16 +26,16 @@ type XMLMessage struct {
 }
 
 type Inform struct {
-	DeviceId      DeviceId               `xml:"Body>Inform>DeviceId"`
-	Events        []Event                `xml:"Body>Inform>Event>EventStruct"`
-	ParameterList []ParameterValueStruct `xml:"Body>Inform>ParameterList>ParameterValueStruct"`
+	DeviceId      DeviceId               `structs:"Body>Inform>DeviceId"`
+	Events        []Event                `structs:"Body>Inform>Event>EventStruct"`
+	ParameterList []ParameterValueStruct `structs:"Body>Inform>ParameterList>ParameterValueStruct"`
 }
 
 type Fault struct {
-	FaultCode         string `xml:"Body>Fault>faultcode"`
-	FaultString       string `xml:"Body>Fault>faultstring"`
-	DetailFaultCode   string `xml:"Body>Fault>detail>Fault>FaultCode"`
-	DetailFaultString string `xml:"Body>Fault>detail>Fault>FaultString"`
+	FaultCode         string `structs:"Body>Fault>faultcode"`
+	FaultString       string `structs:"Body>Fault>faultstring"`
+	DetailFaultCode   string `structs:"Body>Fault>detail>Fault>FaultCode"`
+	DetailFaultString string `structs:"Body>Fault>detail>Fault>FaultString"`
 }
 
 type Event struct {
@@ -44,18 +44,19 @@ type Event struct {
 }
 
 type ParameterValueStruct struct {
-	Name  string         `xml:"Name"`
-	Value ParameterValue `xml:"Value"`
+	Name  string         `structs:"Name"`
+	Value ParameterValue `structs:"Value"`
+	Flag  Flag
 }
 
 type ParameterValue struct {
-	Value string `xml:",chardata"`
-	Type  string `xml:"type,attr"`
+	Value string `structs:",chardata"`
+	Type  string `structs:"type,attr"`
 }
 
 type ParameterInfo struct {
-	Name     string `xml:"Name"`
-	Writable string `xml:"Writable"`
+	Name     string `structs:"Name"`
+	Writable string `structs:"Writable"`
 }
 
 type DeviceId struct {
@@ -66,11 +67,11 @@ type DeviceId struct {
 }
 
 type GetParameterNamesResponse struct {
-	ParameterList []ParameterInfo `xml:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
+	ParameterList []ParameterInfo `structs:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
 }
 
 type GetParameterValuesResponse struct {
-	ParameterList []ParameterValueStruct `xml:"Body>GetParameterValuesResponse>ParameterList>ParameterValueStruct"`
+	ParameterList []ParameterValueStruct `structs:"Body>GetParameterValuesResponse>ParameterList>ParameterValueStruct"`
 }
 
 type ACSBool bool
@@ -98,7 +99,7 @@ func (envelope *Envelope) Type() string {
 }
 
 func (envelope *Envelope) InformResponse() string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
+	return `<?structs version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <soapenv:Header>
         <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
@@ -133,7 +134,7 @@ func (inform *Inform) IsBootEvent() bool {
 }
 
 func (envelope *Envelope) GPNRequest(path string) string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
+	return `<?structs version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <soapenv:Header>
         <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
@@ -149,7 +150,7 @@ func (envelope *Envelope) GPNRequest(path string) string {
 
 //TODO: zrobić ładniej ;)
 func (envelope *Envelope) GPVRequest(info []ParameterInfo) string {
-	request := `<?xml version="1.0" encoding="UTF-8"?>
+	request := `<?structs version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <soapenv:Header>
       <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
@@ -172,7 +173,7 @@ func (envelope *Envelope) GPVRequest(info []ParameterInfo) string {
 }
 
 func (envelope *Envelope) GetRPCMethodsRequest() string {
-	return `<?xml version="1.0" encoding="UTF-8"?>
+	return `<?structs version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <soapenv:Header>
         <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>

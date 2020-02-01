@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"goacs/acs/http"
-	acsxml "goacs/acs/xml"
+	acsxml "goacs/acs/structs"
 	"goacs/repository/impl"
 )
 

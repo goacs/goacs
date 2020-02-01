@@ -2,7 +2,7 @@ package acs
 
 import (
 	"fmt"
-	"goacs/acs/xml"
+	"goacs/acs/structs"
 	"goacs/models/cpe"
 	"math/rand"
 	"net/http"
@@ -91,7 +91,7 @@ func removeOldSessions() {
 	}
 }
 
-func (session *ACSSession) FillCPEFromInform(inform xml.Inform) {
+func (session *ACSSession) FillCPEFromInform(inform structs.Inform) {
 	session.CPE = cpe.CPE{
 		Manufacturer:    inform.DeviceId.Manufacturer,
 		SerialNumber:    inform.DeviceId.SerialNumber,

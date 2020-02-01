@@ -1,7 +1,7 @@
 package interfaces
 
 import "goacs/models/cpe"
-import "goacs/acs/xml"
+import "goacs/acs/structs"
 
 type CPERepository interface {
 	All() ([]*cpe.CPE, error)
@@ -11,7 +11,7 @@ type CPERepository interface {
 	Create(cpe *cpe.CPE) (bool, error)
 	SaveParameters(cpe *cpe.CPE) (bool, error)
 	LoadParameters(cpe *cpe.CPE) (bool, error)
-	FindParameter(cpe *cpe.CPE, parameterKey string) (*xml.ParameterValueStruct, error)
-	CreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (bool, error)
-	UpdateOrCreateParameter(cpe *cpe.CPE, parameter xml.ParameterValueStruct) (result bool, err error)
+	FindParameter(cpe *cpe.CPE, parameterKey string) (*structs.ParameterValueStruct, error)
+	CreateParameter(cpe *cpe.CPE, parameter structs.ParameterValueStruct) (bool, error)
+	UpdateOrCreateParameter(cpe *cpe.CPE, parameter structs.ParameterValueStruct) (result bool, err error)
 }
