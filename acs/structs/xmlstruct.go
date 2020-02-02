@@ -184,3 +184,30 @@ func (envelope *Envelope) GetRPCMethodsRequest() string {
     </soapenv:Body>
 </soapenv:Envelope>`
 }
+
+func (envelope *Envelope) SetParameterValues(info []ParameterValueStruct) string {
+	request := `<?structs version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Header>
+      <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
+  </soapenv:Header>
+  <soapenv:Body>
+      <cwmp:SetParameterValues>
+			<ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + strconv.Itoa(len(info)) + `]">
+`
+	for _, parameter := range info {
+		request += "<ParameterValueStruct>\n"
+		request += `<Name>` + parameter.Name + `</Name>`
+		request += "\n"
+		request += `<Value>` + parameter.Value.Value + `</Value>`
+		request += "\n"
+		request += "</ParameterValueStruct>\n"
+	}
+
+	request += `</ParameterList>
+		</cwmp:SetParameterValues>
+  </soapenv:Body>
+</soapenv:Envelope>`
+
+	return request
+}
