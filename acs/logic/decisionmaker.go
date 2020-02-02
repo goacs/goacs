@@ -51,28 +51,24 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 			fmt.Println("GPN REQ")
 			decision := methods.ParameterDecisions{&reqRes}
 			decision.ParameterNamesRequest(true)
-			session.PrevReqType = acsxml.GPNReq
 		}
 
 	case acsxml.GPNResp:
-		decision := methods.ParameterDecisions{&reqRes}
+		decision := methods.ParameterDecisions{ReqRes: &reqRes}
 		decision.ParameterNamesResponseParser()
 
 		fmt.Println("GPV REQ")
-		requestBody := envelope.GPVRequest([]acsxml.ParameterInfo{
+
+		decision.ParameterValuesRequest([]acsxml.ParameterInfo{
 			{
 				Name:     session.CPE.Root + ".",
 				Writable: "0",
 			},
 		})
-		_, _ = fmt.Fprint(w, requestBody)
-		session.PrevReqType = acsxml.GPVReq
 
 	case acsxml.GPVResp:
-		var gpvr acsxml.GetParameterValuesResponse
-		_ = xml.Unmarshal(buffer, &gpvr)
-		session.CPE.AddParameterValuesFromResponse(gpvr.ParameterList)
-		//fmt.Println(session.CPE.ParameterValues)
+		decision := methods.ParameterDecisions{ReqRes: &reqRes}
+		decision.ParameterValuesResponseParser()
 
 	case acsxml.FaultResp:
 		var faultresponse acsxml.Fault

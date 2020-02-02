@@ -1,5 +1,7 @@
 package structs
 
+import "errors"
+
 type Flag struct {
 	Read         bool //R
 	Write        bool //W
@@ -9,6 +11,8 @@ type Flag struct {
 }
 
 func Parse(flags string) (Flag, error) {
+	var err error = nil
+
 	var flag Flag = Flag{
 		Read:         false,
 		Write:        false,
@@ -30,9 +34,17 @@ func Parse(flags string) (Flag, error) {
 		case 'P':
 			flag.PeriodicRead = true
 		default:
-			panic("Unknown flag " + string(token))
+			err = errors.New("Unknown flag " + string(token))
 		}
 	}
 
-	return flag, nil
+	return flag, err
+}
+
+func (flag *Flag) isReadable() bool {
+	return flag.Read
+}
+
+func (flag *Flag) isWriteable() bool {
+	return flag.Write
 }
