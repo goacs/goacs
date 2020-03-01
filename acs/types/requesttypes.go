@@ -1,4 +1,4 @@
-package structs
+package types
 
 const (
 	INFORM    string = "inform"

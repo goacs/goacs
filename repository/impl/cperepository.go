@@ -4,48 +4,42 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
-	"goacs/acs/structs"
+	"github.com/jmoiron/sqlx"
+	"goacs/acs/types"
 	"goacs/models/cpe"
 	"goacs/repository"
 	"goacs/repository/interfaces"
+	"log"
 	"time"
 )
 
 type MysqlCPERepositoryImpl struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewMysqlCPERepository(connection *sql.DB) interfaces.CPERepository {
+func NewMysqlCPERepository(connection *sqlx.DB) interfaces.CPERepository {
 	return &MysqlCPERepositoryImpl{
 		db: connection,
 	}
 }
 
 func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
-	r.db.Ping()
+	var cpes = []*cpe.CPE{}
+	err := r.db.Unsafe().Select(&cpes, "SELECT * FROM cpe")
 
-	result, err := r.db.Query("SELECT uuid, serial_number, hardware_version FROM cpe")
-
-	var cpes []*cpe.CPE
-
-	if err == nil {
-		for result.Next() {
-			cpeInstance := new(cpe.CPE)
-			_ = result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
-			cpes = append(cpes, cpeInstance)
-		}
+	if err != nil {
+		fmt.Println("Error while fetching query results")
+		fmt.Println(err.Error())
+		return nil, repository.ErrNotFound
 	}
 
 	return cpes, nil
 }
 
 func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
-	r.db.Ping()
-
-	result := r.db.QueryRow("SELECT uuid, serial_number, hardware_version FROM cpe WHERE uuid=? LIMIT 1", uuid)
-
 	cpeInstance := new(cpe.CPE)
-	err := result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
+	err := r.db.Unsafe().Get(cpeInstance, "SELECT * FROM cpe WHERE uuid=? LIMIT 1", uuid)
+
 	if err == sql.ErrNoRows {
 		fmt.Println("Error while fetching query results")
 		fmt.Println(err.Error())
@@ -56,13 +50,10 @@ func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
 }
 
 func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
-	r.db.Ping()
-
-	result := r.db.QueryRow("SELECT uuid, serial_number, hardware_version FROM cpe WHERE serial_number=? LIMIT 1", serial)
-
 	cpeInstance := new(cpe.CPE)
-	err := result.Scan(&cpeInstance.UUID, &cpeInstance.SerialNumber, &cpeInstance.HardwareVersion)
-	if err == sql.ErrNoRows {
+	err := r.db.Unsafe().Get(cpeInstance, "SELECT * FROM cpe WHERE serial_number=? LIMIT 1", serial)
+
+	if err != nil {
 		fmt.Println("Error while fetching query results")
 		fmt.Println(err.Error())
 		return nil, repository.ErrNotFound
@@ -72,8 +63,6 @@ func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
 }
 
 func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
-	r.db.Ping()
-
 	uuidInstance, _ := uuid.NewRandom()
 	uuidString := uuidInstance.String()
 
@@ -137,6 +126,7 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 		cpe.UUID = dbCPE.UUID
 
 		if err != nil {
+			log.Println("error while updatng cpe " + err.Error())
 			return false, repository.ErrUpdating
 		}
 
@@ -148,11 +138,9 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 	return result, err
 }
 
-func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*structs.ParameterValueStruct, error) {
-	result := r.db.QueryRow("SELECT name, value, type  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
-
-	parameterValueStruct := new(structs.ParameterValueStruct)
-	err := result.Scan(&parameterValueStruct.Name, &parameterValueStruct.Value.Value, &parameterValueStruct.Value.Type)
+func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*types.ParameterValueStruct, error) {
+	parameterValueStruct := new(types.ParameterValueStruct)
+	err := r.db.Unsafe().Get(&parameterValueStruct, "SELECT *  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
 
 	if err == sql.ErrNoRows {
 		fmt.Printf("Error while fetching query results for cpe %s parameter %s \n", cpe.UUID, parameterKey)
@@ -163,7 +151,7 @@ func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string
 	return parameterValueStruct, nil
 }
 
-func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter structs.ParameterValueStruct) (bool, error) {
+func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (bool, error) {
 	var query string = `INSERT INTO cpe_parameters (cpe_uuid, name, value, type, flags, created_at, updated_at) 
 						VALUES (?, ?, ?, ?, ?, ?, ?)`
 
@@ -187,7 +175,7 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter structs
 	return true, nil
 }
 
-func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter structs.ParameterValueStruct) (result bool, err error) {
+func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
 	existParameter, err := r.FindParameter(cpe, parameter.Name)
 
 	if existParameter == nil {
@@ -231,6 +219,21 @@ func (r *MysqlCPERepositoryImpl) SaveParameters(cpe *cpe.CPE) (bool, error) {
 	return true, nil
 }
 
+func (r *MysqlCPERepositoryImpl) GetCPEParameters(cpe *cpe.CPE) ([]types.ParameterValueStruct, error) {
+	var parameters = []types.ParameterValueStruct{}
+
+	err := r.db.Select(&parameters, "SELECT * FROM cpe_parameters WHERE cpe_uuid=?", cpe.UUID)
+
+	if err != nil {
+		return nil, repository.ErrNotFound
+	}
+
+	return parameters, nil
+}
+
 func (r *MysqlCPERepositoryImpl) LoadParameters(cpe *cpe.CPE) (bool, error) {
-	panic("implement me")
+	var err error
+	cpe.ParameterValues, err = r.GetCPEParameters(cpe)
+
+	return err == nil, err
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"goacs/acs/http"
-	acsxml "goacs/acs/structs"
+	acsxml "goacs/acs/types"
 )
 
 type ParameterDecisions struct {

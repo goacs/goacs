@@ -2,40 +2,61 @@ package cpe
 
 import (
 	"errors"
-	"goacs/acs/structs"
-	"net"
+	"goacs/acs/types"
 	"strings"
 )
 
+/**
+create table cpe
+(
+	uuid varchar(36) not null
+		primary key,
+	serial_number varchar(50) null,
+	oui varchar(6) null,
+	software_version varchar(20) null,
+	hardware_version varchar(20) null,
+	ip_address varchar(15) null,
+	connection_request_url varchar(255) null,
+	connection_request_user varchar(50) null,
+	connection_request_password varchar(64) null,
+	created_at datetime default current_timestamp() not null,
+	updated_at datetime default current_timestamp() not null
+);
+
+create index cpe_serial_number_index
+	on cpe (serial_number);
+
+
+*/
 type CPE struct {
-	UUID                      string
-	SerialNumber              string
-	OUI                       string
+	UUID                      string `db:"uuid"`
+	SerialNumber              string `db:"serial_number"`
+	OUI                       string `db:"oui"`
 	ProductClass              string
 	Manufacturer              string
-	SoftwareVersion           string
-	HardwareVersion           string
-	IpAddress                 net.IPAddr
-	ConnectionRequestUser     string
-	ConnectionRequestPassword string
-	ConnectionRequestUrl      string
+	SoftwareVersion           string          `db:"software_version"`
+	HardwareVersion           string          `db:"hardware_version"`
+	IpAddress                 types.IPAddress `db:"ip_address"`
+	ConnectionRequestUser     string          `db:"connection_request_user"`
+	ConnectionRequestPassword string          `db:"connection_request_password"`
+	ConnectionRequestUrl      string          `db:"connection_request_url"`
 	Root                      string
-	ParametersInfo            []structs.ParameterInfo
-	ParameterValues           []structs.ParameterValueStruct
-	Fault                     structs.Fault
+	ParametersInfo            []types.ParameterInfo
+	ParameterValues           []types.ParameterValueStruct
+	Fault                     types.Fault
 }
 
-func (cpe *CPE) AddParameterInfo(parameter structs.ParameterInfo) {
+func (cpe *CPE) AddParameterInfo(parameter types.ParameterInfo) {
 	cpe.ParametersInfo = append(cpe.ParametersInfo, parameter)
 }
 
-func (cpe *CPE) AddParametersInfoFromResponse(parameters []structs.ParameterInfo) {
+func (cpe *CPE) AddParametersInfoFromResponse(parameters []types.ParameterInfo) {
 	for _, parameter := range parameters {
 		cpe.AddParameterInfo(parameter)
 	}
 }
 
-func (cpe *CPE) AddParameter(parameter structs.ParameterValueStruct) {
+func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 	for index := range cpe.ParameterValues {
 		if cpe.ParameterValues[index].Name == parameter.Name {
 			//Replace exist parameter
@@ -46,7 +67,7 @@ func (cpe *CPE) AddParameter(parameter structs.ParameterValueStruct) {
 	cpe.ParameterValues = append(cpe.ParameterValues, parameter)
 }
 
-func (cpe *CPE) AddParameterValuesFromResponse(parameters []structs.ParameterValueStruct) {
+func (cpe *CPE) AddParameterValuesFromResponse(parameters []types.ParameterValueStruct) {
 	for _, parameter := range parameters {
 		cpe.AddParameter(parameter)
 	}
@@ -62,8 +83,8 @@ func (cpe *CPE) GetParameterValue(parameterName string) (string, error) {
 	return "", errors.New("Unable to find parameter " + parameterName + " in CPE")
 }
 
-func (cpe *CPE) GetFullPathParameterNames() []structs.ParameterInfo {
-	var filteredParameters []structs.ParameterInfo
+func (cpe *CPE) GetFullPathParameterNames() []types.ParameterInfo {
+	var filteredParameters []types.ParameterInfo
 	for _, parameter := range cpe.ParametersInfo {
 		//check if last char in Name is not equal to . (dot)
 		if parameter.Name[len(parameter.Name)-1:] != "." {
@@ -74,9 +95,9 @@ func (cpe *CPE) GetFullPathParameterNames() []structs.ParameterInfo {
 	return filteredParameters
 }
 
-func (cpe *CPE) GetParametersToWrite() []structs.ParameterValueStruct {
+func (cpe *CPE) GetParametersToWrite() []types.ParameterValueStruct {
 	//TODO
-	return []structs.ParameterValueStruct{}
+	return []types.ParameterValueStruct{}
 }
 
 func (cpe *CPE) SetRoot(root string) {
@@ -89,7 +110,7 @@ func (cpe *CPE) Fails() bool {
 	return cpe.Fault.FaultCode != "" || cpe.Fault.FaultString != ""
 }
 
-func DetermineDeviceTreeRootPath(parameters []structs.ParameterValueStruct) string {
+func DetermineDeviceTreeRootPath(parameters []types.ParameterValueStruct) string {
 	for _, parameter := range parameters {
 		splittedParamName := strings.Split(parameter.Name, ".")
 

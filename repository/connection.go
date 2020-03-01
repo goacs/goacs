@@ -1,15 +1,15 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"goacs/lib"
 )
 
-var connection *sql.DB
+var connection *sqlx.DB
 
-func InitConnection() *sql.DB {
+func InitConnection() *sqlx.DB {
 	var env *lib.Env = new(lib.Env)
 
 	fmt.Println("Connecting to database...")
@@ -23,7 +23,7 @@ func InitConnection() *sql.DB {
 	)
 
 	var err error
-	connection, err = sql.Open("mysql", connectionString)
+	connection, err = sqlx.Open("mysql", connectionString)
 
 	if err != nil {
 		panic(err.Error())
@@ -35,6 +35,6 @@ func InitConnection() *sql.DB {
 	return connection
 }
 
-func GetConnection() *sql.DB {
+func GetConnection() *sqlx.DB {
 	return connection
 }

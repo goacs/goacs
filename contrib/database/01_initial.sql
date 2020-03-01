@@ -1,14 +1,14 @@
 create table cpe
 (
 	uuid varchar(36) not null,
-	serial_number varchar(50) null,
-	oui varchar(6) null,
-	software_version varchar(20) null,
-	hardware_version varchar(20) null,
-	ip_address varchar(15) null,
-	connection_request_url varchar(255) null,
-	connection_request_user varchar(50) null,
-	connection_request_password varchar(64) null,
+	serial_number varchar(50) not null default '',
+	oui varchar(6) not null default '',
+	software_version varchar(20) not null default '',
+	hardware_version varchar(20) not null default '',
+	ip_address varchar(15) not null default '',
+	connection_request_url varchar(255) not null default '',
+	connection_request_user varchar(50) not null default '',
+	connection_request_password varchar(64) not null default '',
 	created_at datetime default CURRENT_TIMESTAMP not null,
 	updated_at datetime default CURRENT_TIMESTAMP not null
 );
@@ -22,11 +22,11 @@ alter table cpe
 
 create table cpe_parameters
 (
-	cpe_uuid varchar(36) null,
-    name varchar(255) null,
-	value varchar(255) null,
-	type varchar(16) null,
-	flags varchar(10) null,
+	cpe_uuid varchar(36) not null,
+    name varchar(255) not null,
+	value varchar(255) not null default '',
+	type varchar(16) not null,
+	flags varchar(10) not null default 'R',
 	created_at datetime default CURRENT_TIMESTAMP not null,
 	updated_at datetime default CURRENT_TIMESTAMP not null,
 	constraint cpe_parameters_pk
@@ -39,18 +39,18 @@ create table templates
 (
 	id int auto_increment
 		primary key,
-	name varchar(50) null,
+	name varchar(50) not null,
 	created_at datetime default CURRENT_TIMESTAMP null,
 	updated_at datetime default CURRENT_TIMESTAMP null
 );
 
 create table templates_parameters
 (
-	template_id int null,
-	name varchar(255) null,
-	value varchar(255) null,
-	type varchar(16) null,
-	flags varchar(10) null,
+	template_id int not null,
+	name varchar(255) not null,
+	value varchar(255) not null,
+	type varchar(16) not null,
+	flags varchar(10) not null default 'R',
 	created_at datetime default CURRENT_TIMESTAMP not null,
 	updated_at datetime default CURRENT_TIMESTAMP not null,
 	constraint templates_parameters_pk
@@ -63,7 +63,7 @@ create table cpe_to_templates
 (
 	cpe_uuid varchar(36) not null,
 	template_id int not null,
-	priority int null,
+	priority int not null default 100,
 	constraint cpe_to_templates_pk
 		primary key (cpe_uuid, template_id)
 );

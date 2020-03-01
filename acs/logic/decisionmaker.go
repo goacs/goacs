@@ -6,7 +6,7 @@ import (
 	"goacs/acs"
 	acshttp "goacs/acs/http"
 	"goacs/acs/methods"
-	acsxml "goacs/acs/structs"
+	acsxml "goacs/acs/types"
 	"goacs/lib"
 	"goacs/repository"
 	"io"
