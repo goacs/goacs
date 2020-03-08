@@ -3,6 +3,7 @@ package cpe
 import (
 	"errors"
 	"goacs/acs/types"
+	"reflect"
 	"strings"
 )
 
@@ -95,9 +96,16 @@ func (cpe *CPE) GetFullPathParameterNames() []types.ParameterInfo {
 	return filteredParameters
 }
 
-func (cpe *CPE) GetParametersToWrite() []types.ParameterValueStruct {
-	//TODO
-	return []types.ParameterValueStruct{}
+func (cpe *CPE) GetParametersWithFlag(flag string) []types.ParameterValueStruct {
+	parameters := []types.ParameterValueStruct{}
+	for _, parameter := range cpe.ParameterValues {
+		fieldName := parameter.Flag.CharToFieldName(flag)
+		flagBool := reflect.ValueOf(parameter.Flag).FieldByName(fieldName).Bool()
+		if flagBool == true {
+			parameters = append(parameters, parameter)
+		}
+	}
+	return parameters
 }
 
 func (cpe *CPE) SetRoot(root string) {
@@ -108,6 +116,18 @@ func (cpe *CPE) SetRoot(root string) {
 
 func (cpe *CPE) Fails() bool {
 	return cpe.Fault.FaultCode != "" || cpe.Fault.FaultString != ""
+}
+
+func (cpe *CPE) CompareParameters(otherParameters *[]types.ParameterValueStruct) []types.ParameterValueStruct {
+	diffParameters := []types.ParameterValueStruct{}
+	for _, cpeParam := range cpe.ParameterValues {
+		for _, otherParam := range *otherParameters {
+			if otherParam.Name == cpeParam.Name && otherParam.Value != cpeParam.Value {
+				diffParameters = append(diffParameters, otherParam)
+				break
+			}
+		}
+	}
 }
 
 func DetermineDeviceTreeRootPath(parameters []types.ParameterValueStruct) string {

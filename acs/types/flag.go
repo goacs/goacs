@@ -13,7 +13,7 @@ type Flag struct {
 func Parse(flags string) (Flag, error) {
 	var err error = nil
 
-	var flag Flag = Flag{
+	var flag = Flag{
 		Read:         false,
 		Write:        false,
 		AddObject:    false,
@@ -41,10 +41,24 @@ func Parse(flags string) (Flag, error) {
 	return flag, err
 }
 
-func (flag *Flag) isReadable() bool {
+func (flag *Flag) IsReadable() bool {
 	return flag.Read
 }
 
-func (flag *Flag) isWriteable() bool {
+func (flag *Flag) IsWriteable() bool {
 	return flag.Write
+}
+
+func (flag *Flag) CharToFieldName(char string) string {
+	switch char {
+	case "W":
+		return "Write"
+	case "A":
+		return "AddObject"
+	case "S":
+		return "System"
+	case "P":
+		return "PeriodicRead"
+	}
+	return "R"
 }

@@ -83,6 +83,7 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 }
 
 func parseXML(buffer []byte) (string, acsxml.Envelope) {
+	fmt.Println(string(buffer))
 	var envelope acsxml.Envelope
 	err := xml.Unmarshal(buffer, &envelope)
 
