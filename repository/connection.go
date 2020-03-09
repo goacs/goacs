@@ -36,5 +36,5 @@ func InitConnection() *sqlx.DB {
 }
 
 func GetConnection() *sqlx.DB {
-	return connection
+	return connection.Unsafe()
 }

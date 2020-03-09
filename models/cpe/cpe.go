@@ -51,7 +51,7 @@ func (cpe *CPE) AddParameterInfo(parameter types.ParameterInfo) {
 	cpe.ParametersInfo = append(cpe.ParametersInfo, parameter)
 }
 
-func (cpe *CPE) AddParametersInfoFromResponse(parameters []types.ParameterInfo) {
+func (cpe *CPE) AddParametersInfo(parameters []types.ParameterInfo) {
 	for _, parameter := range parameters {
 		cpe.AddParameterInfo(parameter)
 	}
@@ -68,7 +68,7 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 	cpe.ParameterValues = append(cpe.ParameterValues, parameter)
 }
 
-func (cpe *CPE) AddParameterValuesFromResponse(parameters []types.ParameterValueStruct) {
+func (cpe *CPE) AddParameterValues(parameters []types.ParameterValueStruct) {
 	for _, parameter := range parameters {
 		cpe.AddParameter(parameter)
 	}
@@ -77,7 +77,7 @@ func (cpe *CPE) AddParameterValuesFromResponse(parameters []types.ParameterValue
 func (cpe *CPE) GetParameterValue(parameterName string) (string, error) {
 	for index := range cpe.ParameterValues {
 		if cpe.ParameterValues[index].Name == parameterName {
-			return cpe.ParameterValues[index].Value.Value, nil
+			return cpe.ParameterValues[index].Value, nil
 		}
 	}
 
@@ -128,6 +128,8 @@ func (cpe *CPE) CompareParameters(otherParameters *[]types.ParameterValueStruct)
 			}
 		}
 	}
+
+	return diffParameters
 }
 
 func DetermineDeviceTreeRootPath(parameters []types.ParameterValueStruct) string {

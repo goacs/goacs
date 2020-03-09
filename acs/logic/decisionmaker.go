@@ -42,24 +42,24 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 
 	switch reqType {
 	case acsxml.INFORM:
-		decision := methods.InformDecision{&reqRes}
-		decision.ResponseParser()
-		decision.Request()
+		informDecision := methods.InformDecision{&reqRes}
+		informDecision.ResponseParser()
+		informDecision.Request()
 
 	case acsxml.EMPTY:
 		if session.IsNew == false && session.IsBoot == true {
 			fmt.Println("GPN REQ")
-			decision := methods.ParameterDecisions{&reqRes}
-			decision.ParameterNamesRequest(true)
+			parameterDecisions := methods.ParameterDecisions{&reqRes}
+			parameterDecisions.ParameterNamesRequest(true)
 		}
 
 	case acsxml.GPNResp:
-		decision := methods.ParameterDecisions{ReqRes: &reqRes}
-		decision.ParameterNamesResponseParser()
+		parameterDecisions := methods.ParameterDecisions{ReqRes: &reqRes}
+		parameterDecisions.ParameterNamesResponseParser()
 
 		fmt.Println("GPV REQ")
 
-		decision.ParameterValuesRequest([]acsxml.ParameterInfo{
+		parameterDecisions.ParameterValuesRequest([]acsxml.ParameterInfo{
 			{
 				Name:     session.CPE.Root + ".",
 				Writable: "0",
@@ -67,8 +67,8 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		})
 
 	case acsxml.GPVResp:
-		decision := methods.ParameterDecisions{ReqRes: &reqRes}
-		decision.ParameterValuesResponseParser()
+		parameterDecisions := methods.ParameterDecisions{ReqRes: &reqRes}
+		parameterDecisions.ParameterValuesResponseParser()
 
 	case acsxml.FaultResp:
 		var faultresponse acsxml.Fault
@@ -80,10 +80,20 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		fmt.Println("UNSUPPORTED REQTYPE ", reqType)
 	}
 
+	ProcessSessionJobs(&reqRes)
+
+}
+
+func ProcessSessionJobs(reqRes *acshttp.ReqRes) {
+	switch reqRes.Session.NextJob {
+	case acs.JOB_SENDPARAMETERS:
+		parameterDecisions := methods.ParameterDecisions{ReqRes: reqRes}
+		parameterDecisions.SetParameterValuesResponse()
+	}
 }
 
 func parseXML(buffer []byte) (string, acsxml.Envelope) {
-	fmt.Println(string(buffer))
+	//fmt.Println(string(buffer))
 	var envelope acsxml.Envelope
 	err := xml.Unmarshal(buffer, &envelope)
 

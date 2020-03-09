@@ -9,6 +9,7 @@ const (
 	GPVReq    string = "GetParameterValues"
 	GRPCMReq  string = "GetRPCMethods"
 	GRPCMResp string = "GetRPCMethodsResponse"
+	SPVResp   string = "SetParameterValues"
 	FaultResp string = "FaultResp"
 	UNKNOWN   string = "unknown"
 )

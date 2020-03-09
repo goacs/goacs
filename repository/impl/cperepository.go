@@ -160,9 +160,9 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.P
 	_, err := stmt.Exec(
 		cpe.UUID,
 		parameter.Name,
-		parameter.Value.Value,
-		parameter.Value.Type, //TODO: NORMALIZE
-		"",                   //TODO: Flags support (R - Read, W - Write and more...)
+		parameter.Value,
+		parameter.Type, //TODO: NORMALIZE
+		"",             //TODO: Flags support (R - Read, W - Write and more...)
 		time.Now(),
 		time.Now(),
 	)
@@ -176,6 +176,9 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.P
 }
 
 func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
+	log.Println("UoCP ", parameter.Name)
+	log.Println("UoCP ", parameter.Value)
+
 	existParameter, err := r.FindParameter(cpe, parameter.Name)
 
 	if existParameter == nil {
@@ -187,8 +190,8 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter
 		stmt, _ := r.db.Prepare(query)
 
 		_, err = stmt.Exec(
-			parameter.Value.Value,
-			parameter.Value.Type,
+			parameter.Value,
+			parameter.Type,
 			"",
 			time.Now(),
 			cpe.UUID,
@@ -225,6 +228,9 @@ func (r *MysqlCPERepositoryImpl) GetCPEParameters(cpe *cpe.CPE) ([]types.Paramet
 	err := r.db.Select(&parameters, "SELECT * FROM cpe_parameters WHERE cpe_uuid=?", cpe.UUID)
 
 	if err != nil {
+		log.Println(err.Error())
+		log.Println("CPE UUID ", cpe.UUID)
+		log.Println(parameters)
 		return nil, repository.ErrNotFound
 	}
 

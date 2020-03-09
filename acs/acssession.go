@@ -13,6 +13,10 @@ import (
 const SessionLifetime = 15
 const SessionGoroutineTimeout = 10
 
+const (
+	JOB_SENDPARAMETERS = 1
+)
+
 type ACSSession struct {
 	Id          string
 	IsNew       bool
@@ -20,6 +24,7 @@ type ACSSession struct {
 	PrevReqType string
 	created_at  time.Time
 	CPE         cpe.CPE
+	NextJob     int
 }
 
 var acsSessions map[string]*ACSSession
@@ -98,7 +103,7 @@ func (session *ACSSession) FillCPEFromInform(inform types.Inform) {
 		OUI:             inform.DeviceId.OUI,
 		HardwareVersion: "1.0",
 	}
-	session.CPE.AddParameterValuesFromResponse(inform.ParameterList)
+	session.CPE.AddParameterValues(inform.ParameterList)
 	session.CPE.SetRoot(cpe.DetermineDeviceTreeRootPath(session.CPE.ParameterValues))
 	session.CPE.ConnectionRequestUrl, _ = session.CPE.GetParameterValue(session.CPE.Root + ".ManagementServer.ConnectionRequestURL")
 	session.CPE.ConnectionRequestUser, _ = session.CPE.GetParameterValue(session.CPE.Root + ".ManagementServer.Username")

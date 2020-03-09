@@ -44,16 +44,11 @@ type Event struct {
 }
 
 type ParameterValueStruct struct {
-	Name  string         `xml:"Name" db:"name"`
-	Value ParameterValue `xml:"Value"`
-	Flag  Flag           `db:"flags"`
+	Name  string `db:"name"`
+	Value string `db:"value"`
+	Type  string `xml:",attr" db:"type"`
+	Flag  Flag
 }
-
-type ParameterValue struct {
-	Value string `xml:",chardata" db:"value"`
-	Type  string `xml:"type,attr" db:"type"`
-}
-
 type ParameterInfo struct {
 	Name     string `xml:"Name"`
 	Writable string `xml:"Writable"`
@@ -199,7 +194,7 @@ func (envelope *Envelope) SetParameterValues(info []ParameterValueStruct) string
 		request += "<ParameterValueStruct>\n"
 		request += `<Name>` + parameter.Name + `</Name>`
 		request += "\n"
-		request += `<Value>` + parameter.Value.Value + `</Value>`
+		request += `<Value>` + parameter.Value + `</Value>`
 		request += "\n"
 		request += "</ParameterValueStruct>\n"
 	}

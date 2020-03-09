@@ -14,4 +14,5 @@ type CPERepository interface {
 	FindParameter(cpe *cpe.CPE, parameterKey string) (*types.ParameterValueStruct, error)
 	CreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (bool, error)
 	UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error)
+	GetCPEParameters(cpe *cpe.CPE) ([]types.ParameterValueStruct, error)
 }
