@@ -63,7 +63,6 @@ func (pd *ParameterDecisions) ParameterValuesResponseParser() {
 }
 
 func (pd *ParameterDecisions) SetParameterValuesResponse() {
-	log.Println("Sending values", pd.ReqRes.Session.CPE.ParameterValues)
 	var request = pd.ReqRes.Envelope.SetParameterValues(pd.ReqRes.Session.CPE.ParameterValues)
 	_, _ = fmt.Fprint(pd.ReqRes.Response, request)
 	pd.ReqRes.Session.PrevReqType = acsxml.SPVResp

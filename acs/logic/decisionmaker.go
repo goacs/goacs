@@ -74,7 +74,8 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		var faultresponse acsxml.Fault
 		_ = xml.Unmarshal(buffer, &faultresponse)
 		session.CPE.Fault = faultresponse
-		//TODO: zapis do DB i zakończenie sesji
+		faultDecision := methods.FaultDecision{ReqRes: &reqRes}
+		faultDecision.ResponseDecision()
 
 	default:
 		fmt.Println("UNSUPPORTED REQTYPE ", reqType)

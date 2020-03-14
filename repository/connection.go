@@ -14,7 +14,7 @@ func InitConnection() *sqlx.DB {
 
 	fmt.Println("Connecting to database...")
 	connectionString := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8",
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true",
 		env.Get("MYSQL_USER", ""),
 		env.Get("MYSQL_PASSWORD", ""),
 		env.Get("MYSQL_HOST", ""),

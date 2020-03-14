@@ -67,3 +67,14 @@ create table cpe_to_templates
 	constraint cpe_to_templates_pk
 		primary key (cpe_uuid, template_id)
 );
+
+create table faults
+(
+    uuid varchar(36) not null,
+    cpe_uuid varchar(36) not null,
+    code varchar(50) not null,
+    message varchar(2000) not null,
+    created_at datetime default current_timestamp not null,
+    constraint fault_pk
+		primary key (uuid)
+);
