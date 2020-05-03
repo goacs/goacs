@@ -78,3 +78,15 @@ create table faults
     constraint fault_pk
 		primary key (uuid)
 );
+
+create table users
+(
+    uuid varchar(36) not null
+        primary key,
+    username varchar(30) null,
+    password varchar(128) null,
+    email varchar(100) null,
+    status int default 1 null,
+    constraint users_username_uindex
+        unique (username)
+);
