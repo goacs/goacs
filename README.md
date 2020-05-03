@@ -18,19 +18,4 @@ Run mysql dev server using **docker-compose**
 then
 
 `go run main.go`
-
-
-### GraphQL 
-To access to GraphQL Playground browse url
-`http://localhost:8085/`
-
-#### Generating server
-
-Type in terminal
-
-```
-cd http/api
-go run github.com/99designs/gqlgen -v
-```
-
-gqlgen isn't override `resolver.go`, you need to update manually 
+ 
