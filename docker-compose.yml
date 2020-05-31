@@ -15,5 +15,9 @@ services:
     ports:
       - ${MYSQL_PORT}:3306
 
+  mongodb:
+    image: mongo:latest
+
+
 networks:
   default:

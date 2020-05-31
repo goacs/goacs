@@ -8,6 +8,7 @@ type Flag struct {
 	AddObject    bool //A
 	System       bool //S
 	PeriodicRead bool //P
+	Important    bool //I
 }
 
 func Parse(flags string) (Flag, error) {
@@ -19,6 +20,7 @@ func Parse(flags string) (Flag, error) {
 		AddObject:    false,
 		System:       false,
 		PeriodicRead: false,
+		Important:    false,
 	}
 
 	for _, token := range flags {
@@ -33,6 +35,8 @@ func Parse(flags string) (Flag, error) {
 			flag.System = true
 		case 'P':
 			flag.PeriodicRead = true
+		case 'I':
+			flag.Important = true
 		default:
 			err = errors.New("Unknown flag " + string(token))
 		}
@@ -59,6 +63,8 @@ func (flag *Flag) CharToFieldName(char string) string {
 		return "System"
 	case "P":
 		return "PeriodicRead"
+	case "I":
+		return "Important"
 	}
-	return "R"
+	return "Read"
 }

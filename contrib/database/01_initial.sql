@@ -40,6 +40,7 @@ create table templates
 	id int auto_increment
 		primary key,
 	name varchar(50) not null,
+	priority int(11) not null default 100,
 	created_at datetime default CURRENT_TIMESTAMP null,
 	updated_at datetime default CURRENT_TIMESTAMP null
 );
