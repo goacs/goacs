@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"goacs/models/user"
 	"goacs/repository"
 	"goacs/repository/impl"
 	"log"
-	"net/http"
 )
 
 type UserCreateRequest struct {
@@ -15,9 +15,9 @@ type UserCreateRequest struct {
 	Email    string `json:"email"`
 }
 
-func UserCreate(w http.ResponseWriter, r *http.Request) {
+func UserCreate(ctx *gin.Context) {
 	var request UserCreateRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
+	err := json.NewDecoder(ctx.Request.Body).Decode(&request)
 	if err != nil {
 		log.Println("Error in req")
 	}
@@ -31,5 +31,5 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 	userRepository := impl.NewUserRepository(repository.GetConnection())
 	user, err := userRepository.CreateUser(&userModel)
 	log.Print(userModel, user)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(ctx.Writer).Encode(user)
 }

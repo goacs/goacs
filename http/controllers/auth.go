@@ -3,12 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"goacs/lib"
 	"goacs/models/user"
 	"goacs/repository"
 	"goacs/repository/impl"
 	"log"
-	"net/http"
 )
 
 type LoginRequest struct {
@@ -21,9 +21,9 @@ type LoginResponse struct {
 	Token string    `json:"token"`
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func Login(ctx *gin.Context) {
 	var request LoginRequest
-	err := json.NewDecoder(r.Body).Decode(&request)
+	err := json.NewDecoder(ctx.Request.Body).Decode(&request)
 
 	if err != nil {
 		log.Println("Error in req ", err)
@@ -42,7 +42,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Token: NewTokenForUser(user),
 	}
 
-	json.NewEncoder(w).Encode(loginResponse)
+	json.NewEncoder(ctx.Writer).Encode(loginResponse)
 }
 
 func NewTokenForUser(user user.User) string {
