@@ -36,6 +36,19 @@ func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
 	return cpes, nil
 }
 
+func (r *MysqlCPERepositoryImpl) List(request repository.PaginatorRequest) (cpes []cpe.CPE, total int) {
+	_ = r.db.Get(&total, "SELECT count(*) FROM cpe")
+	err := r.db.Unsafe().Select(&cpes, "SELECT * FROM cpe LIMIT ?,?", request.CalcOffset(), request.PerPage)
+
+	if err != nil {
+		fmt.Println("Error while fetching query results")
+		fmt.Println(err.Error())
+		return nil, 0
+	}
+
+	return cpes, total
+}
+
 func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
 	cpeInstance := new(cpe.CPE)
 	err := r.db.Unsafe().Get(cpeInstance, "SELECT * FROM cpe WHERE uuid=? LIMIT 1", uuid)

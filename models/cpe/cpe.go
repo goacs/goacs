@@ -5,6 +5,7 @@ import (
 	"goacs/acs/types"
 	"reflect"
 	"strings"
+	"time"
 )
 
 /**
@@ -30,12 +31,12 @@ create index cpe_serial_number_index
 
 */
 type CPE struct {
-	UUID                      string `db:"uuid"`
-	SerialNumber              string `db:"serial_number"`
-	OUI                       string `db:"oui"`
+	UUID                      string `json:"uuid" db:"uuid"`
+	SerialNumber              string `json:"serial_number" db:"serial_number"`
+	OUI                       string `json:"oui" db:"oui"`
 	ProductClass              string
 	Manufacturer              string
-	SoftwareVersion           string          `db:"software_version"`
+	SoftwareVersion           string          `json:"software_version" db:"software_version"`
 	HardwareVersion           string          `db:"hardware_version"`
 	IpAddress                 types.IPAddress `db:"ip_address"`
 	ConnectionRequestUser     string          `db:"connection_request_user"`
@@ -45,6 +46,7 @@ type CPE struct {
 	ParametersInfo            []types.ParameterInfo
 	ParameterValues           []types.ParameterValueStruct
 	Fault                     types.Fault
+	UpdatedAt                 time.Time `json:"updated_at" db:"updated_at"`
 }
 
 func (cpe *CPE) AddParameterInfo(parameter types.ParameterInfo) {

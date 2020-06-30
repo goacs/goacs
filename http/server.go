@@ -14,7 +14,11 @@ func Start() {
 	var env lib.Env
 	fmt.Println("Server setup")
 	Instance := gin.Default()
-	Instance.Use(cors.Default())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowCredentials = true
+	corsConfig.AllowHeaders = []string{"Origin", "Authorization", "Content-Type", "Accept", "Content-Length"}
+	Instance.Use(cors.New(corsConfig))
 	registerAcsHandler(Instance)
 	RegisterApiRoutes(Instance)
 

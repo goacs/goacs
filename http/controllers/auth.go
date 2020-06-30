@@ -9,6 +9,7 @@ import (
 	"goacs/repository"
 	"goacs/repository/impl"
 	"log"
+	"time"
 )
 
 type LoginRequest struct {
@@ -48,7 +49,7 @@ func Login(ctx *gin.Context) {
 func NewTokenForUser(user user.User) string {
 	env := new(lib.Env)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: 15000,
+		ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
 		Subject:   user.Uuid,
 		Issuer:    "user",
 	})
