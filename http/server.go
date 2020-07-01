@@ -2,28 +2,27 @@ package http
 
 import (
 	"fmt"
-	"github.com/99designs/gqlgen/handler"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"goacs/acs/logic"
-	"goacs/http/api"
-	"net/http"
-	"time"
+	"goacs/lib"
 )
 
-var Instance *http.Server
+var Instance *gin.Engine
 
 func Start() {
+	var env lib.Env
 	fmt.Println("Server setup")
-	Instance = &http.Server{
-		Addr:           ":8085",
-		ReadTimeout:    5 * time.Second,
-		WriteTimeout:   5 * time.Second,
-		MaxHeaderBytes: 10000,
-	}
+	Instance := gin.Default()
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowCredentials = true
+	corsConfig.AllowHeaders = []string{"Origin", "Authorization", "Content-Type", "Accept", "Content-Length"}
+	Instance.Use(cors.New(corsConfig))
+	registerAcsHandler(Instance)
+	RegisterApiRoutes(Instance)
 
-	registerAcsHandler()
-	registerApiHandler()
-
-	err := Instance.ListenAndServe()
+	err := Instance.Run(":" + env.Get("HTTP_PORT", "8085"))
 	fmt.Println("Instance started....")
 
 	if err != nil {
@@ -33,14 +32,14 @@ func Start() {
 	fmt.Println("Http server started")
 }
 
-func registerAcsHandler() {
-	http.HandleFunc("/acs", func(respWriter http.ResponseWriter, request *http.Request) {
-		defer request.Body.Close()
-		logic.CPERequestDecision(request, respWriter)
+func registerAcsHandler(router *gin.Engine) {
+	router.GET("/acs", func(ctx *gin.Context) {
+		defer ctx.Request.Body.Close()
+		logic.CPERequestDecision(ctx.Request, ctx.Writer)
 	})
-}
 
-func registerApiHandler() {
-	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", handler.GraphQL(api.NewExecutableSchema(api.Config{Resolvers: &api.Resolver{}})))
+	router.POST("/acs", func(ctx *gin.Context) {
+		defer ctx.Request.Body.Close()
+		logic.CPERequestDecision(ctx.Request, ctx.Writer)
+	})
 }

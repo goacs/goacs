@@ -1,6 +1,9 @@
 package interfaces
 
-import "goacs/models/cpe"
+import (
+	"goacs/models/cpe"
+	"goacs/repository"
+)
 import "goacs/acs/types"
 
 type CPERepository interface {
@@ -15,4 +18,5 @@ type CPERepository interface {
 	CreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (bool, error)
 	UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error)
 	GetCPEParameters(cpe *cpe.CPE) ([]types.ParameterValueStruct, error)
+	List(request repository.PaginatorRequest) (cpes []cpe.CPE, total int)
 }

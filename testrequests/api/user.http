@@ -1,0 +1,9 @@
+POST http://localhost:8085/api/user/create
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin1234",
+  "email": "admin@goacs.net"
+}
+###

@@ -40,6 +40,7 @@ create table templates
 	id int auto_increment
 		primary key,
 	name varchar(50) not null,
+	priority int(11) not null default 100,
 	created_at datetime default CURRENT_TIMESTAMP null,
 	updated_at datetime default CURRENT_TIMESTAMP null
 );
@@ -77,4 +78,16 @@ create table faults
     created_at datetime default current_timestamp not null,
     constraint fault_pk
 		primary key (uuid)
+);
+
+create table users
+(
+    uuid varchar(36) not null
+        primary key,
+    username varchar(30) null,
+    password varchar(128) null,
+    email varchar(100) null,
+    status int default 1 null,
+    constraint users_username_uindex
+        unique (username)
 );

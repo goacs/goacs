@@ -36,6 +36,19 @@ func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
 	return cpes, nil
 }
 
+func (r *MysqlCPERepositoryImpl) List(request repository.PaginatorRequest) (cpes []cpe.CPE, total int) {
+	_ = r.db.Get(&total, "SELECT count(*) FROM cpe")
+	err := r.db.Unsafe().Select(&cpes, "SELECT * FROM cpe LIMIT ?,?", request.CalcOffset(), request.PerPage)
+
+	if err != nil {
+		fmt.Println("Error while fetching query results")
+		fmt.Println(err.Error())
+		return nil, 0
+	}
+
+	return cpes, total
+}
+
 func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
 	cpeInstance := new(cpe.CPE)
 	err := r.db.Unsafe().Get(cpeInstance, "SELECT * FROM cpe WHERE uuid=? LIMIT 1", uuid)
@@ -140,11 +153,9 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 
 func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*types.ParameterValueStruct, error) {
 	parameterValueStruct := new(types.ParameterValueStruct)
-	err := r.db.Unsafe().Get(&parameterValueStruct, "SELECT *  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
+	err := r.db.Unsafe().Get(parameterValueStruct, "SELECT *  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
 
 	if err == sql.ErrNoRows {
-		fmt.Printf("Error while fetching query results for cpe %s parameter %s \n", cpe.UUID, parameterKey)
-		fmt.Println(err.Error())
 		return nil, repository.ErrNotFound
 	}
 
@@ -182,10 +193,10 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter
 	existParameter, err := r.FindParameter(cpe, parameter.Name)
 
 	if existParameter == nil {
-		//fmt.Println("non exist param", existParameter)
+		fmt.Println("non exist param", existParameter)
 		result, err = r.CreateParameter(cpe, parameter)
 	} else {
-		//fmt.Println("param exist", existParameter)
+		fmt.Println("param exist", existParameter)
 		var query string = "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
 		stmt, _ := r.db.Prepare(query)
 

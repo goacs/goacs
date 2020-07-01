@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/joho/godotenv"
 	"goacs/acs"
@@ -9,10 +8,8 @@ import (
 	"goacs/lib"
 	"goacs/repository"
 	"os"
-	"os/signal"
 	"runtime"
 	"strconv"
-	"syscall"
 	"time"
 )
 
@@ -25,7 +22,6 @@ type Config struct {
 }
 
 func init() {
-	listenOnCloseSignal()
 	fmt.Println("Initializing app...")
 	err := godotenv.Load()
 
@@ -50,25 +46,6 @@ func main() {
 
 	acshttp.Start()
 
-}
-
-func listenOnCloseSignal() {
-	channel := make(chan os.Signal, 2)
-	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-channel
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-		defer cancel()
-
-		fmt.Println("Stopping GoACS Server...")
-
-		acshttp.Instance.SetKeepAlivesEnabled(false)
-		acshttp.Instance.Shutdown(ctx)
-
-		repository.GetConnection().Close()
-
-		exitApp("GoACS Stopped", 0)
-	}()
 }
 
 func exitApp(msg string, code int) {
