@@ -17,5 +17,6 @@ func RegisterApiRoutes(gin *gin.Engine) {
 		apiGroup.POST("/user/create", controllers.UserCreate)
 
 		apiGroup.GET("/device", controllers.GetDevicesList)
+		apiGroup.GET("/device/:uuid", controllers.GetDevice)
 	}
 }

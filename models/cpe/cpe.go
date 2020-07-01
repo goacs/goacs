@@ -31,17 +31,17 @@ create index cpe_serial_number_index
 
 */
 type CPE struct {
-	UUID                      string `json:"uuid" db:"uuid"`
-	SerialNumber              string `json:"serial_number" db:"serial_number"`
-	OUI                       string `json:"oui" db:"oui"`
-	ProductClass              string
-	Manufacturer              string
+	UUID                      string          `json:"uuid" db:"uuid"`
+	SerialNumber              string          `json:"serial_number" db:"serial_number"`
+	OUI                       string          `json:"oui" db:"oui"`
+	ProductClass              string          `json:"product_class" db:"product_class"`
+	Manufacturer              string          `json:"manufacturer" db:"manufacturer"`
 	SoftwareVersion           string          `json:"software_version" db:"software_version"`
-	HardwareVersion           string          `db:"hardware_version"`
-	IpAddress                 types.IPAddress `db:"ip_address"`
-	ConnectionRequestUser     string          `db:"connection_request_user"`
-	ConnectionRequestPassword string          `db:"connection_request_password"`
-	ConnectionRequestUrl      string          `db:"connection_request_url"`
+	HardwareVersion           string          `json:"hardware_version" db:"hardware_version"`
+	IpAddress                 types.IPAddress `json:"ip_address" db:"ip_address"`
+	ConnectionRequestUser     string          `json:"connection_request_user" db:"connection_request_user"`
+	ConnectionRequestPassword string          `json:"connection_request_password" db:"connection_request_password"`
+	ConnectionRequestUrl      string          `json:"connection_request_url" db:"connection_request_url"`
 	Root                      string
 	ParametersInfo            []types.ParameterInfo
 	ParameterValues           []types.ParameterValueStruct

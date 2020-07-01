@@ -7,6 +7,17 @@ import (
 	"goacs/repository/impl"
 )
 
+func GetDevice(ctx *gin.Context) {
+	cperepository := impl.NewMysqlCPERepository(repository.GetConnection())
+	cpe, err := cperepository.Find(ctx.Param("uuid"))
+
+	if err != nil {
+		ctx.AbortWithError(404, err)
+	}
+
+	json.NewEncoder(ctx.Writer).Encode(cpe)
+}
+
 func GetDevicesList(ctx *gin.Context) {
 	paginatorRequest := repository.PaginatorRequestFromContext(ctx)
 	cperepository := impl.NewMysqlCPERepository(repository.GetConnection())
