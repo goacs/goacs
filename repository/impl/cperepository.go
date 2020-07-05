@@ -36,7 +36,9 @@ func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
 	return cpes, nil
 }
 
-func (r *MysqlCPERepositoryImpl) List(request repository.PaginatorRequest) (cpes []cpe.CPE, total int) {
+func (r *MysqlCPERepositoryImpl) List(request repository.PaginatorRequest) ([]cpe.CPE, int) {
+	var total int
+	var cpes = make([]cpe.CPE, 0)
 	_ = r.db.Get(&total, "SELECT count(*) FROM cpe")
 	err := r.db.Unsafe().Select(&cpes, "SELECT * FROM cpe LIMIT ?,?", request.CalcOffset(), request.PerPage)
 
@@ -197,22 +199,28 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter
 		result, err = r.CreateParameter(cpe, parameter)
 	} else {
 		fmt.Println("param exist", existParameter)
-		var query string = "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
-		stmt, _ := r.db.Prepare(query)
+		result, err = r.UpdateParameter(cpe, parameter)
+	}
 
-		_, err = stmt.Exec(
-			parameter.Value,
-			parameter.Type,
-			"",
-			time.Now(),
-			cpe.UUID,
-			parameter.Name,
-		)
+	return
+}
 
-		if err != nil {
-			fmt.Println("ERROR", err.Error())
-			result = false
-		}
+func (r *MysqlCPERepositoryImpl) UpdateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
+	query := "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
+	stmt, _ := r.db.Prepare(query)
+
+	_, err = stmt.Exec(
+		parameter.Value,
+		parameter.Type,
+		"",
+		time.Now(),
+		cpe.UUID,
+		parameter.Name,
+	)
+
+	if err != nil {
+		fmt.Println("ERROR", err.Error())
+		result = false
 	}
 
 	return
@@ -246,6 +254,21 @@ func (r *MysqlCPERepositoryImpl) GetCPEParameters(cpe *cpe.CPE) ([]types.Paramet
 	}
 
 	return parameters, nil
+}
+
+func (r *MysqlCPERepositoryImpl) ListCPEParameters(cpe *cpe.CPE, request repository.PaginatorRequest) ([]types.ParameterValueStruct, int) {
+	var total int
+	_ = r.db.Get(&total, "SELECT count(*) FROM cpe_parameters WHERE cpe_uuid=?", cpe.UUID)
+	parameters := make([]types.ParameterValueStruct, 0)
+	err := r.db.Unsafe().Select(&parameters, "SELECT * FROM cpe_parameters WHERE cpe_uuid=? LIMIT ?,?", cpe.UUID, request.CalcOffset(), request.PerPage)
+
+	if err != nil {
+		fmt.Println("Error while fetching query results")
+		fmt.Println(err.Error())
+		return nil, 0
+	}
+
+	return parameters, total
 }
 
 func (r *MysqlCPERepositoryImpl) LoadParameters(cpe *cpe.CPE) (bool, error) {

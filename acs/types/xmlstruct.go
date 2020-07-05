@@ -44,10 +44,10 @@ type Event struct {
 }
 
 type ParameterValueStruct struct {
-	Name  string `db:"name"`
-	Value string `db:"value"`
-	Type  string `xml:",attr" db:"type"`
-	Flag  Flag
+	Name  string `db:"name" json:"name"`
+	Value string `db:"value" json:"value"`
+	Type  string `xml:",attr" db:"type" json:"type"`
+	Flag  Flag   `json:"flag"`
 }
 type ParameterInfo struct {
 	Name     string `xml:"Name"`

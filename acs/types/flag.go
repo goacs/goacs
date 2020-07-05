@@ -3,12 +3,12 @@ package types
 import "errors"
 
 type Flag struct {
-	Read         bool //R
-	Write        bool //W
-	AddObject    bool //A
-	System       bool //S
-	PeriodicRead bool //P
-	Important    bool //I
+	Read         bool `json:"read"`          //R
+	Write        bool `json:"write"`         //W
+	AddObject    bool `json:"add_object"`    //A
+	System       bool `json:"system"`        //S
+	PeriodicRead bool `json:"periodic_read"` //P
+	Important    bool `json:"important"`     //I
 }
 
 func Parse(flags string) (Flag, error) {

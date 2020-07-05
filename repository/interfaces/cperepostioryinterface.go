@@ -16,7 +16,9 @@ type CPERepository interface {
 	LoadParameters(cpe *cpe.CPE) (bool, error)
 	FindParameter(cpe *cpe.CPE, parameterKey string) (*types.ParameterValueStruct, error)
 	CreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (bool, error)
+	UpdateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error)
 	UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error)
 	GetCPEParameters(cpe *cpe.CPE) ([]types.ParameterValueStruct, error)
 	List(request repository.PaginatorRequest) (cpes []cpe.CPE, total int)
+	ListCPEParameters(cpe *cpe.CPE, request repository.PaginatorRequest) (parameters []types.ParameterValueStruct, total int)
 }
