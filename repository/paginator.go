@@ -34,8 +34,8 @@ func PaginatorRequestFromContext(ctx *gin.Context) PaginatorRequest {
 	page, _ := strconv.Atoi(qPage)
 
 	qPerPage := ctx.Query("per_page")
-	if qPage == "" {
-		qPage = "25"
+	if qPerPage == "" {
+		qPerPage = "25"
 	}
 	perPage, _ := strconv.Atoi(qPerPage)
 
