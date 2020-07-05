@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -27,6 +28,7 @@ type ACSSession struct {
 	NextJob     int
 }
 
+var lock = sync.RWMutex{}
 var acsSessions map[string]*ACSSession
 
 func StartSession() {
@@ -34,6 +36,7 @@ func StartSession() {
 	acsSessions = make(map[string]*ACSSession)
 	go removeOldSessions()
 }
+
 func CreateSession(request *http.Request, w http.ResponseWriter) (*ACSSession, http.ResponseWriter) {
 	fmt.Println("### request")
 	var sessionId = ""
@@ -48,7 +51,9 @@ func CreateSession(request *http.Request, w http.ResponseWriter) (*ACSSession, h
 	}
 
 	fmt.Println("Trying to retive session from memory " + sessionId)
+	lock.RLock()
 	_, exist := acsSessions[sessionId]
+	lock.RUnlock()
 
 	if exist == false {
 		fmt.Println("session non exist in memory")
@@ -79,7 +84,9 @@ func printSessions() {
 
 func createEmptySession(sessionId string) *ACSSession {
 	session := ACSSession{Id: sessionId, IsNew: true, created_at: time.Now()}
+	lock.Lock()
 	acsSessions[sessionId] = &session
+	lock.Unlock()
 	return acsSessions[sessionId]
 }
 
@@ -89,7 +96,9 @@ func removeOldSessions() {
 		for sessionId, session := range acsSessions {
 			if now.Sub(session.created_at).Minutes() > SessionLifetime {
 				fmt.Println("DELETING OLD SESSION " + sessionId)
+				lock.Lock()
 				delete(acsSessions, sessionId)
+				lock.Unlock()
 			}
 		}
 		time.Sleep(SessionGoroutineTimeout * time.Second)
