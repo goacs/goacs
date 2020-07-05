@@ -49,7 +49,7 @@ func Login(ctx *gin.Context) {
 func NewTokenForUser(user user.User) string {
 	env := new(lib.Env)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+		ExpiresAt: time.Now().Add(time.Minute * 120).Unix(),
 		Subject:   user.Uuid,
 		Issuer:    "user",
 	})
