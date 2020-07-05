@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"goacs/lib"
+	"time"
 )
 
 var connection *sqlx.DB
@@ -29,8 +30,9 @@ func InitConnection() *sqlx.DB {
 		panic(err.Error())
 	}
 
-	connection.SetMaxOpenConns(20)
-	connection.SetMaxIdleConns(20)
+	connection.SetConnMaxLifetime(time.Second * 10)
+	connection.SetMaxOpenConns(50)
+	connection.SetMaxIdleConns(50)
 
 	return connection
 }

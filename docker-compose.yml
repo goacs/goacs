@@ -6,7 +6,9 @@ services:
     container_name: goacs-db
     restart: always
     volumes:
+      - goacs-database-file:/var/lib/mysql
       - ./contrib/database:/docker-entrypoint-initdb.d
+      - ./contrib/conf:/etc/mysql/conf.d
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${MYSQL_USER}
@@ -14,10 +16,14 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
     ports:
       - ${MYSQL_PORT}:3306
-
-  mongodb:
-    image: mongo:latest
-
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
 networks:
   default:
+
+volumes:
+  goacs-database-file:
+    driver: local
