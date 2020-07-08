@@ -174,8 +174,8 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.P
 		cpe.UUID,
 		parameter.Name,
 		parameter.Value,
-		parameter.Type, //TODO: NORMALIZE
-		"",             //TODO: Flags support (R - Read, W - Write and more...)
+		parameter.Type,            //TODO: NORMALIZE
+		parameter.Flag.AsString(), //TODO: Flags support (R - Read, W - Write and more...)
 		time.Now(),
 		time.Now(),
 	)
@@ -189,16 +189,16 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.P
 }
 
 func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
-	log.Println("UoCP ", parameter.Name)
-	log.Println("UoCP ", parameter.Value)
+	//log.Println("UoCP ", parameter.Name)
+	//log.Println("UoCP ", parameter.Value)
 
 	existParameter, err := r.FindParameter(cpe, parameter.Name)
 
 	if existParameter == nil {
-		fmt.Println("non exist param", existParameter)
+		//fmt.Println("non exist param", existParameter)
 		result, err = r.CreateParameter(cpe, parameter)
 	} else {
-		fmt.Println("param exist", existParameter)
+		//fmt.Println("param exist", existParameter)
 		result, err = r.UpdateParameter(cpe, parameter)
 	}
 
@@ -209,10 +209,12 @@ func (r *MysqlCPERepositoryImpl) UpdateParameter(cpe *cpe.CPE, parameter types.P
 	query := "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
 	stmt, _ := r.db.Prepare(query)
 
+	//log.Println("Parameter flags ", parameter.Flag.AsString())
+
 	_, err = stmt.Exec(
 		parameter.Value,
 		parameter.Type,
-		"",
+		parameter.Flag.AsString(),
 		time.Now(),
 		cpe.UUID,
 		parameter.Name,

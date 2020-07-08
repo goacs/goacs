@@ -45,6 +45,25 @@ func Parse(flags string) (Flag, error) {
 	return flag, err
 }
 
+func (flag *Flag) AsString() string {
+	stringFlag := ""
+	switch true {
+	case flag.Read == true:
+		stringFlag += "R"
+	case flag.Write == true:
+		stringFlag += "W"
+	case flag.AddObject == true:
+		stringFlag += "A"
+	case flag.System == true:
+		stringFlag += "S"
+	case flag.PeriodicRead == true:
+		stringFlag += "P"
+	case flag.Important == true:
+		stringFlag += "I"
+	}
+	return stringFlag
+}
+
 func (flag *Flag) IsReadable() bool {
 	return flag.Read
 }

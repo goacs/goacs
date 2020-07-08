@@ -29,29 +29,34 @@ func (pd *ParameterDecisions) ParameterNamesRequest(recursively bool) {
 
 func (pd *ParameterDecisions) ParameterNamesResponseParser() {
 	var gpnr acsxml.GetParameterNamesResponse
+	log.Println("ParameterNamesResponseParser")
+
+	//log.Println(string(pd.ReqRes.Body))
 	_ = xml.Unmarshal(pd.ReqRes.Body, &gpnr)
 	pd.ReqRes.Session.CPE.AddParametersInfo(gpnr.ParameterList)
 
 	//fmt.Println(gpnr.ParameterList)
 }
 
-func (pd *ParameterDecisions) ParameterValuesRequest(parameters []acsxml.ParameterInfo) {
+func (pd *ParameterDecisions) GetParameterValuesRequest(parameters []acsxml.ParameterInfo) {
 	var request = pd.ReqRes.Envelope.GPVRequest(parameters)
 	_, _ = fmt.Fprint(pd.ReqRes.Response, request)
 	pd.ReqRes.Session.PrevReqType = acsxml.GPVReq
 
 }
 
-func (pd *ParameterDecisions) ParameterValuesResponseParser() {
+func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 	var gpvr acsxml.GetParameterValuesResponse
 	_ = xml.Unmarshal(pd.ReqRes.Body, &gpvr)
-	log.Println("ParameterValuesResponseParser")
+	log.Println("GetParameterValuesResponseParser")
+	//log.Println(string(pd.ReqRes.Body))
+
 	pd.ReqRes.Session.CPE.AddParameterValues(gpvr.ParameterList)
 	cpeRepository := impl.NewMysqlCPERepository(repository.GetConnection())
 	dbParameters, err := cpeRepository.GetCPEParameters(&pd.ReqRes.Session.CPE)
 
 	if err != nil {
-		log.Println("Error ParameterValuesResponseParser ", err.Error())
+		log.Println("Error GetParameterValuesResponseParser ", err.Error())
 	}
 
 	if len(dbParameters) > 0 {
@@ -60,10 +65,17 @@ func (pd *ParameterDecisions) ParameterValuesResponseParser() {
 		pd.ReqRes.Session.NextJob = acs.JOB_SENDPARAMETERS
 	}
 
+	_, err = cpeRepository.SaveParameters(&pd.ReqRes.Session.CPE)
+
 }
 
 func (pd *ParameterDecisions) SetParameterValuesResponse() {
-	var request = pd.ReqRes.Envelope.SetParameterValues(pd.ReqRes.Session.CPE.ParameterValues)
-	_, _ = fmt.Fprint(pd.ReqRes.Response, request)
-	pd.ReqRes.Session.PrevReqType = acsxml.SPVResp
+	parametersToWrite := pd.ReqRes.Session.CPE.GetParametersWithFlag("W")
+	log.Println("parametersToWrite")
+	//log.Println(parametersToWrite)
+	if len(parametersToWrite) > 0 {
+		var request = pd.ReqRes.Envelope.SetParameterValues(parametersToWrite)
+		_, _ = fmt.Fprint(pd.ReqRes.Response, request)
+		pd.ReqRes.Session.PrevReqType = acsxml.SPVResp
+	}
 }

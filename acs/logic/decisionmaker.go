@@ -59,7 +59,7 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 
 		fmt.Println("GPV REQ")
 
-		parameterDecisions.ParameterValuesRequest([]acsxml.ParameterInfo{
+		parameterDecisions.GetParameterValuesRequest([]acsxml.ParameterInfo{
 			{
 				Name:     session.CPE.Root + ".",
 				Writable: "0",
@@ -68,7 +68,11 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 
 	case acsxml.GPVResp:
 		parameterDecisions := methods.ParameterDecisions{ReqRes: &reqRes}
-		parameterDecisions.ParameterValuesResponseParser()
+		parameterDecisions.GetParameterValuesResponseParser()
+
+	case acsxml.SPVResp:
+		paramaterDecisions := methods.ParameterDecisions{ReqRes: &reqRes}
+		paramaterDecisions.SetParameterValuesResponse()
 
 	case acsxml.FaultResp:
 		var faultresponse acsxml.Fault
@@ -108,6 +112,8 @@ func parseXML(buffer []byte) (string, acsxml.Envelope) {
 			requestType = acsxml.GPNResp
 		case "getparametervaluesresponse":
 			requestType = acsxml.GPVResp
+		case "setparametervaluesresponse":
+			requestType = acsxml.SPVResp
 		case "fault":
 			requestType = acsxml.FaultResp
 		default:

@@ -56,6 +56,21 @@ func (cpe *CPE) AddParameterInfo(parameter types.ParameterInfo) {
 func (cpe *CPE) AddParametersInfo(parameters []types.ParameterInfo) {
 	for _, parameter := range parameters {
 		cpe.AddParameterInfo(parameter)
+		//TODO: Apply bool conversion
+		cpe.UpdateParameterFlags(parameter.Name, types.Flag{
+			Read:  true,
+			Write: parameter.Writable == "1",
+		})
+	}
+}
+
+func (cpe *CPE) UpdateParameterFlags(parameterName string, flag types.Flag) {
+	for index := range cpe.ParameterValues {
+		if cpe.ParameterValues[index].Name == parameterName {
+			//Replace exist parameter
+			cpe.ParameterValues[index].Flag = flag
+			return
+		}
 	}
 }
 
@@ -64,6 +79,7 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 		if cpe.ParameterValues[index].Name == parameter.Name {
 			//Replace exist parameter
 			cpe.ParameterValues[index].Value = parameter.Value
+			cpe.ParameterValues[index].Flag = parameter.Flag
 			return
 		}
 	}
@@ -72,6 +88,9 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 
 func (cpe *CPE) AddParameterValues(parameters []types.ParameterValueStruct) {
 	for _, parameter := range parameters {
+		flag := parameter.Flag
+		flag.Read = true
+		parameter.Flag = flag
 		cpe.AddParameter(parameter)
 	}
 }
