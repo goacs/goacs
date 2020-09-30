@@ -75,9 +75,11 @@ func (pd *ParameterDecisions) SetParameterValuesResponse() {
 	parametersToWrite := pd.ReqRes.Session.CPE.GetParametersWithFlag("W")
 	log.Println("parametersToWrite")
 	//log.Println(parametersToWrite)
+
+	//TODO: Check why some parameters are writeable, but cpe returns fault on it
 	if len(parametersToWrite) > 0 {
-		var request = pd.ReqRes.Envelope.SetParameterValues(parametersToWrite)
-		_, _ = fmt.Fprint(pd.ReqRes.Response, request)
+		var response = pd.ReqRes.Envelope.SetParameterValues(parametersToWrite)
+		_, _ = fmt.Fprint(pd.ReqRes.Response, response)
 		pd.ReqRes.Session.PrevReqType = acsxml.SPVResp
 	}
 }

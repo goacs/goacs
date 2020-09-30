@@ -4,6 +4,7 @@ import (
 	"goacs/acs/http"
 	acsxml "goacs/acs/types"
 	"goacs/repository/mysql"
+	"log"
 )
 
 type FaultDecision struct {
@@ -11,6 +12,7 @@ type FaultDecision struct {
 }
 
 func (FaultDecision *FaultDecision) ResponseDecision() {
+	log.Print(string(FaultDecision.ReqRes.Body))
 	FaultDecision.ReqRes.Session.PrevReqType = acsxml.FaultResp
 	repository := mysql.NewFaultRepository()
 	repository.SaveFault(&FaultDecision.ReqRes.Session.CPE,

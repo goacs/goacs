@@ -3,6 +3,7 @@ package cpe
 import (
 	"errors"
 	"goacs/acs/types"
+	"log"
 	"reflect"
 	"strings"
 	"time"
@@ -63,11 +64,21 @@ func (cpe *CPE) AddParametersInfo(parameters []types.ParameterInfo) {
 	for _, parameter := range parameters {
 		cpe.AddParameterInfo(parameter)
 		//TODO: Apply bool conversion
-		cpe.UpdateParameterFlags(parameter.Name, types.Flag{
-			Read:  true,
-			Write: parameter.Writable == "1",
-		})
+		//cpe.UpdateParameterFlags(parameter.Name, types.Flag{
+		//	Read:  true,
+		//	Write: parameter.Writable == "1",
+		//})
 	}
+}
+
+func (cpe *CPE) GetParameterInfoByName(name string) (types.ParameterInfo, error) {
+	for _, parameter := range cpe.ParametersInfo {
+		if parameter.Name == name {
+			return parameter, nil
+		}
+	}
+
+	return types.ParameterInfo{}, errors.New("Cannot find parameter")
 }
 
 func (cpe *CPE) UpdateParameterFlags(parameterName string, flag types.Flag) {
@@ -85,7 +96,17 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 		if cpe.ParameterValues[index].Name == parameter.Name {
 			//Replace exist parameter
 			cpe.ParameterValues[index].Value = parameter.Value
+
+			parameterInfo, err := cpe.GetParameterInfoByName(parameter.Name)
+
+			if err == nil {
+				log.Println(parameter.Name)
+				log.Println(parameterInfo.Writable)
+				parameter.Flag.Write = parameterInfo.Writable == "1"
+			}
+
 			cpe.ParameterValues[index].Flag = parameter.Flag
+
 			return
 		}
 	}
