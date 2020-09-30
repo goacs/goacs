@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goacs/models/user"
 	"goacs/repository"
-	"goacs/repository/impl"
+	"goacs/repository/mysql"
 	"log"
 )
 
@@ -28,7 +28,7 @@ func UserCreate(ctx *gin.Context) {
 		Email:    request.Email,
 	}
 
-	userRepository := impl.NewUserRepository(repository.GetConnection())
+	userRepository := mysql.NewUserRepository(repository.GetConnection())
 	user, err := userRepository.CreateUser(&userModel)
 	log.Print(userModel, user)
 	json.NewEncoder(ctx.Writer).Encode(user)

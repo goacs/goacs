@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"goacs/acs/http"
 	acsxml "goacs/acs/types"
-	"goacs/repository/impl"
+	"goacs/repository/mysql"
 )
 
 type InformDecision struct {
@@ -22,7 +22,7 @@ func (InformDecision *InformDecision) ResponseParser() {
 	_ = xml.Unmarshal(InformDecision.ReqRes.Body, &inform)
 	fmt.Println("BOOT", inform.IsBootEvent())
 	InformDecision.ReqRes.Session.FillCPEFromInform(inform)
-	cpeRepository := impl.NewMysqlCPERepository(InformDecision.ReqRes.DBConnection)
+	cpeRepository := mysql.NewCPERepository(InformDecision.ReqRes.DBConnection)
 	_, _ = cpeRepository.UpdateOrCreate(&InformDecision.ReqRes.Session.CPE)
 	_, _ = cpeRepository.SaveParameters(&InformDecision.ReqRes.Session.CPE)
 }

@@ -49,6 +49,12 @@ type CPE struct {
 	UpdatedAt                 time.Time `json:"updated_at" db:"updated_at"`
 }
 
+type ParametersDiff struct {
+	AddedParameters    []types.ParameterValueStruct
+	ModifiedParameters []types.ParameterValueStruct
+	RemovedParameters  []types.ParameterValueStruct
+}
+
 func (cpe *CPE) AddParameterInfo(parameter types.ParameterInfo) {
 	cpe.ParametersInfo = append(cpe.ParametersInfo, parameter)
 }
@@ -88,9 +94,7 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 
 func (cpe *CPE) AddParameterValues(parameters []types.ParameterValueStruct) {
 	for _, parameter := range parameters {
-		flag := parameter.Flag
-		flag.Read = true
-		parameter.Flag = flag
+		parameter.Flag.Read = true
 		cpe.AddParameter(parameter)
 	}
 }
@@ -139,18 +143,19 @@ func (cpe *CPE) Fails() bool {
 	return cpe.Fault.FaultCode != "" || cpe.Fault.FaultString != ""
 }
 
-func (cpe *CPE) CompareParameters(otherParameters *[]types.ParameterValueStruct) []types.ParameterValueStruct {
-	diffParameters := []types.ParameterValueStruct{}
+func (cpe *CPE) GetChangedParametersToWrite(otherParameters *[]types.ParameterValueStruct) []types.ParameterValueStruct {
+	parametersDiff := []types.ParameterValueStruct{}
+
 	for _, cpeParam := range cpe.ParameterValues {
 		for _, otherParam := range *otherParameters {
-			if otherParam.Name == cpeParam.Name && otherParam.Value != cpeParam.Value {
-				diffParameters = append(diffParameters, otherParam)
+			if otherParam.Flag.Write && otherParam.Name == cpeParam.Name && otherParam.Value != cpeParam.Value {
+				parametersDiff = append(parametersDiff, otherParam)
 				break
 			}
 		}
 	}
 
-	return diffParameters
+	return parametersDiff
 }
 
 func DetermineDeviceTreeRootPath(parameters []types.ParameterValueStruct) string {

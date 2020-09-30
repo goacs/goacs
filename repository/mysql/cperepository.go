@@ -1,29 +1,30 @@
-package impl
+package mysql
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/thoas/go-funk"
 	"goacs/acs/types"
 	"goacs/models/cpe"
 	"goacs/repository"
-	"goacs/repository/interfaces"
 	"log"
+	"strings"
 	"time"
 )
 
-type MysqlCPERepositoryImpl struct {
+type CPERepository struct {
 	db *sqlx.DB
 }
 
-func NewMysqlCPERepository(connection *sqlx.DB) interfaces.CPERepository {
-	return &MysqlCPERepositoryImpl{
+func NewCPERepository(connection *sqlx.DB) CPERepository {
+	return CPERepository{
 		db: connection,
 	}
 }
 
-func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
+func (r *CPERepository) All() ([]*cpe.CPE, error) {
 	var cpes = []*cpe.CPE{}
 	err := r.db.Unsafe().Select(&cpes, "SELECT * FROM cpe")
 
@@ -36,7 +37,7 @@ func (r *MysqlCPERepositoryImpl) All() ([]*cpe.CPE, error) {
 	return cpes, nil
 }
 
-func (r *MysqlCPERepositoryImpl) List(request repository.PaginatorRequest) ([]cpe.CPE, int) {
+func (r *CPERepository) List(request repository.PaginatorRequest) ([]cpe.CPE, int) {
 	var total int
 	var cpes = make([]cpe.CPE, 0)
 	_ = r.db.Get(&total, "SELECT count(*) FROM cpe")
@@ -51,7 +52,7 @@ func (r *MysqlCPERepositoryImpl) List(request repository.PaginatorRequest) ([]cp
 	return cpes, total
 }
 
-func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
+func (r *CPERepository) Find(uuid string) (*cpe.CPE, error) {
 	cpeInstance := new(cpe.CPE)
 	err := r.db.Unsafe().Get(cpeInstance, "SELECT * FROM cpe WHERE uuid=? LIMIT 1", uuid)
 
@@ -64,7 +65,7 @@ func (r *MysqlCPERepositoryImpl) Find(uuid string) (*cpe.CPE, error) {
 	return cpeInstance, nil
 }
 
-func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
+func (r *CPERepository) FindBySerial(serial string) (*cpe.CPE, error) {
 	cpeInstance := new(cpe.CPE)
 	err := r.db.Unsafe().Get(cpeInstance, "SELECT * FROM cpe WHERE serial_number=? LIMIT 1", serial)
 
@@ -77,7 +78,7 @@ func (r *MysqlCPERepositoryImpl) FindBySerial(serial string) (*cpe.CPE, error) {
 	return cpeInstance, nil
 }
 
-func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
+func (r *CPERepository) Create(cpe *cpe.CPE) (bool, error) {
 	uuidInstance, _ := uuid.NewRandom()
 	uuidString := uuidInstance.String()
 
@@ -112,7 +113,7 @@ func (r *MysqlCPERepositoryImpl) Create(cpe *cpe.CPE) (bool, error) {
 	return true, nil
 }
 
-func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err error) {
+func (r *CPERepository) UpdateOrCreate(cpe *cpe.CPE) (result bool, err error) {
 
 	dbCPE, _ := r.FindBySerial(cpe.SerialNumber)
 
@@ -153,7 +154,7 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreate(cpe *cpe.CPE) (result bool, err 
 	return result, err
 }
 
-func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string) (*types.ParameterValueStruct, error) {
+func (r *CPERepository) FindParameter(cpe *cpe.CPE, parameterKey string) (*types.ParameterValueStruct, error) {
 	parameterValueStruct := new(types.ParameterValueStruct)
 	err := r.db.Unsafe().Get(parameterValueStruct, "SELECT *  FROM cpe_parameters WHERE cpe_uuid=? AND name=? LIMIT 1", cpe.UUID, parameterKey)
 
@@ -164,7 +165,7 @@ func (r *MysqlCPERepositoryImpl) FindParameter(cpe *cpe.CPE, parameterKey string
 	return parameterValueStruct, nil
 }
 
-func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (bool, error) {
+func (r *CPERepository) CreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (bool, error) {
 	var query string = `INSERT INTO cpe_parameters (cpe_uuid, name, value, type, flags, created_at, updated_at) 
 						VALUES (?, ?, ?, ?, ?, ?, ?)`
 
@@ -188,7 +189,49 @@ func (r *MysqlCPERepositoryImpl) CreateParameter(cpe *cpe.CPE, parameter types.P
 	return true, nil
 }
 
-func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
+func (r *CPERepository) BulkInsertOrUpdateParameters(cpe *cpe.CPE, parameters []types.ParameterValueStruct) bool {
+	tx, err := r.db.Begin()
+
+	if err != nil {
+		log.Println("Cannot create TX for BulkInsertOrUpdateParameters ", err.Error())
+		return false
+	}
+
+	chunks := funk.Chunk(parameters, 300)
+	for _, chunk := range chunks.([][]types.ParameterValueStruct) {
+		valueStrings := []string{}
+		valueArgs := []interface{}{}
+		for _, parameter := range chunk {
+			valueStrings = append(valueStrings, "(?, ?, ?, ?, ?)")
+			valueArgs = append(valueArgs, cpe.UUID)
+			valueArgs = append(valueArgs, parameter.Name)
+			valueArgs = append(valueArgs, parameter.Value)
+			valueArgs = append(valueArgs, parameter.Type)
+			valueArgs = append(valueArgs, parameter.Flag.AsString())
+		}
+
+		stmt := fmt.Sprintf("INSERT INTO cpe_parameters(cpe_uuid,name,value,type,flags) VALUES %s "+
+			"ON DUPLICATE KEY UPDATE name=values(name),value=values(value), type=values(type), flags=values(flags)", strings.Join(valueStrings, ","))
+		_, err := tx.Exec(stmt, valueArgs...)
+
+		if err != nil {
+			_ = tx.Rollback()
+			fmt.Println(err.Error())
+			return false
+		}
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	return true
+}
+
+func (r *CPERepository) UpdateOrCreateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
 	//log.Println("UoCP ", parameter.Name)
 	//log.Println("UoCP ", parameter.Value)
 
@@ -205,7 +248,7 @@ func (r *MysqlCPERepositoryImpl) UpdateOrCreateParameter(cpe *cpe.CPE, parameter
 	return
 }
 
-func (r *MysqlCPERepositoryImpl) UpdateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
+func (r *CPERepository) UpdateParameter(cpe *cpe.CPE, parameter types.ParameterValueStruct) (result bool, err error) {
 	query := "UPDATE cpe_parameters SET value=?, type=?, flags=?, updated_at=? WHERE cpe_uuid=? and name = ?"
 	stmt, _ := r.db.Prepare(query)
 
@@ -228,7 +271,7 @@ func (r *MysqlCPERepositoryImpl) UpdateParameter(cpe *cpe.CPE, parameter types.P
 	return
 }
 
-func (r *MysqlCPERepositoryImpl) SaveParameters(cpe *cpe.CPE) (bool, error) {
+func (r *CPERepository) SaveParameters(cpe *cpe.CPE) (bool, error) {
 
 	for _, parameterValue := range cpe.ParameterValues {
 		//fmt.Println("param value", parameterValue)
@@ -243,7 +286,7 @@ func (r *MysqlCPERepositoryImpl) SaveParameters(cpe *cpe.CPE) (bool, error) {
 	return true, nil
 }
 
-func (r *MysqlCPERepositoryImpl) GetCPEParameters(cpe *cpe.CPE) ([]types.ParameterValueStruct, error) {
+func (r *CPERepository) GetCPEParameters(cpe *cpe.CPE) ([]types.ParameterValueStruct, error) {
 	var parameters = []types.ParameterValueStruct{}
 
 	err := r.db.Select(&parameters, "SELECT * FROM cpe_parameters WHERE cpe_uuid=?", cpe.UUID)
@@ -258,7 +301,7 @@ func (r *MysqlCPERepositoryImpl) GetCPEParameters(cpe *cpe.CPE) ([]types.Paramet
 	return parameters, nil
 }
 
-func (r *MysqlCPERepositoryImpl) ListCPEParameters(cpe *cpe.CPE, request repository.PaginatorRequest) ([]types.ParameterValueStruct, int) {
+func (r *CPERepository) ListCPEParameters(cpe *cpe.CPE, request repository.PaginatorRequest) ([]types.ParameterValueStruct, int) {
 	var total int
 	_ = r.db.Get(&total, "SELECT count(*) FROM cpe_parameters WHERE cpe_uuid=?", cpe.UUID)
 	parameters := make([]types.ParameterValueStruct, 0)
@@ -273,7 +316,7 @@ func (r *MysqlCPERepositoryImpl) ListCPEParameters(cpe *cpe.CPE, request reposit
 	return parameters, total
 }
 
-func (r *MysqlCPERepositoryImpl) LoadParameters(cpe *cpe.CPE) (bool, error) {
+func (r *CPERepository) LoadParameters(cpe *cpe.CPE) (bool, error) {
 	var err error
 	cpe.ParameterValues, err = r.GetCPEParameters(cpe)
 

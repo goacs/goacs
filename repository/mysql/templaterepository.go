@@ -1,24 +1,23 @@
-package impl
+package mysql
 
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"goacs/models/templates"
 	"goacs/repository"
-	"goacs/repository/interfaces"
 )
 
-type MysqlTemplateRepositoryImpl struct {
+type TemplateRepository struct {
 	db *sqlx.DB
 }
 
-func NewMysqlTemplateRepository(connection *sqlx.DB) interfaces.TemplateRepository {
-	return &MysqlTemplateRepositoryImpl{
+func NewTemplateRepository(connection *sqlx.DB) TemplateRepository {
+	return TemplateRepository{
 		db: connection,
 	}
 }
 
-func (r MysqlTemplateRepositoryImpl) Find(id int64) (*templates.Template, error) {
+func (r TemplateRepository) Find(id int64) (*templates.Template, error) {
 	templateInstance := new(templates.Template)
 	err := r.db.Unsafe().Get(templateInstance, "SELECT * FROM templates WHERE id=? LIMIT 1", id)
 
@@ -32,7 +31,7 @@ func (r MysqlTemplateRepositoryImpl) Find(id int64) (*templates.Template, error)
 	return templateInstance, nil
 }
 
-func (r MysqlTemplateRepositoryImpl) FindByName(name string) (*templates.Template, error) {
+func (r TemplateRepository) FindByName(name string) (*templates.Template, error) {
 	templateInstance := new(templates.Template)
 
 	err := r.db.Unsafe().Get(templateInstance, "SELECT id, name FROM templates WHERE name=? LIMIT 1", name)
@@ -47,7 +46,7 @@ func (r MysqlTemplateRepositoryImpl) FindByName(name string) (*templates.Templat
 	return templateInstance, nil
 }
 
-func (r MysqlTemplateRepositoryImpl) GetParametersForTemplate(template_id int64) ([]templates.TemplateParameter, error) {
+func (r TemplateRepository) GetParametersForTemplate(template_id int64) ([]templates.TemplateParameter, error) {
 	var parameters = []templates.TemplateParameter{}
 
 	err := r.db.Unsafe().Select(&parameters,

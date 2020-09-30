@@ -1,4 +1,4 @@
-package impl
+package mysql
 
 import (
 	"github.com/google/uuid"

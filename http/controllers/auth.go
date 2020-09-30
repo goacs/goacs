@@ -7,7 +7,7 @@ import (
 	"goacs/lib"
 	"goacs/models/user"
 	"goacs/repository"
-	"goacs/repository/impl"
+	"goacs/repository/mysql"
 	"log"
 	"time"
 )
@@ -30,7 +30,7 @@ func Login(ctx *gin.Context) {
 		log.Println("Error in req ", err)
 	}
 
-	userRepository := impl.NewUserRepository(repository.GetConnection())
+	userRepository := mysql.NewUserRepository(repository.GetConnection())
 	user, err := userRepository.GetUserByAuthData(request.Username, request.Password)
 
 	if err != nil {

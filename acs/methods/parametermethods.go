@@ -7,7 +7,7 @@ import (
 	"goacs/acs/http"
 	acsxml "goacs/acs/types"
 	"goacs/repository"
-	"goacs/repository/impl"
+	"goacs/repository/mysql"
 	"log"
 )
 
@@ -52,7 +52,7 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 	//log.Println(string(pd.ReqRes.Body))
 
 	pd.ReqRes.Session.CPE.AddParameterValues(gpvr.ParameterList)
-	cpeRepository := impl.NewMysqlCPERepository(repository.GetConnection())
+	cpeRepository := mysql.NewCPERepository(repository.GetConnection())
 	dbParameters, err := cpeRepository.GetCPEParameters(&pd.ReqRes.Session.CPE)
 
 	if err != nil {
@@ -60,12 +60,14 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 	}
 
 	if len(dbParameters) > 0 {
-		diffParameters := pd.ReqRes.Session.CPE.CompareParameters(&dbParameters)
+		//Get modified parameters
+		//Check for AddObject instances
+		diffParameters := pd.ReqRes.Session.CPE.GetChangedParametersToWrite(&dbParameters)
 		pd.ReqRes.Session.CPE.AddParameterValues(diffParameters)
 		pd.ReqRes.Session.NextJob = acs.JOB_SENDPARAMETERS
 	}
 
-	_, err = cpeRepository.SaveParameters(&pd.ReqRes.Session.CPE)
+	_ = cpeRepository.BulkInsertOrUpdateParameters(&pd.ReqRes.Session.CPE, pd.ReqRes.Session.CPE.ParameterValues)
 
 }
 
