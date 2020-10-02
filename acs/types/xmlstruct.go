@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/xml"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -47,7 +48,7 @@ type ParameterValueStruct struct {
 	Name  string `db:"name" json:"name"`
 	Value string `db:"value" json:"value"`
 	Type  string `xml:",attr" db:"type" json:"type"`
-	Flag  Flag   `json:"flag"`
+	Flag  Flag   `json:"flag" db:"flags"`
 }
 type ParameterInfo struct {
 	Name     string `xml:"Name"`
@@ -87,6 +88,18 @@ func (abool ACSBool) String() string {
 		return "1"
 	}
 	return "0"
+}
+
+func GetParametersWithFlag(parametersToFilter []ParameterValueStruct, flag string) []ParameterValueStruct {
+	parameters := []ParameterValueStruct{}
+	for _, parameter := range parametersToFilter {
+		fieldName := parameter.Flag.CharToFieldName(flag)
+		flagBool := reflect.ValueOf(parameter.Flag).FieldByName(fieldName).Bool()
+		if flagBool == true {
+			parameters = append(parameters, parameter)
+		}
+	}
+	return parameters
 }
 
 func (envelope *Envelope) Type() string {

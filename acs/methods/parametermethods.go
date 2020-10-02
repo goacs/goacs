@@ -53,8 +53,8 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 
 	pd.ReqRes.Session.CPE.AddParameterValues(gpvr.ParameterList)
 	cpeRepository := mysql.NewCPERepository(repository.GetConnection())
-	dbParameters, err := cpeRepository.GetCPEParameters(&pd.ReqRes.Session.CPE)
 
+	dbParameters, err := cpeRepository.GetCPEParameters(&pd.ReqRes.Session.CPE)
 	if err != nil {
 		log.Println("Error GetParameterValuesResponseParser ", err.Error())
 	}
@@ -63,7 +63,7 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 		//Get modified parameters
 		//Check for AddObject instances
 		diffParameters := pd.ReqRes.Session.CPE.GetChangedParametersToWrite(&dbParameters)
-		pd.ReqRes.Session.CPE.AddParameterValues(diffParameters)
+		pd.ReqRes.Session.CPE.ParametersQueue = diffParameters
 		pd.ReqRes.Session.NextJob = acs.JOB_SENDPARAMETERS
 	}
 
@@ -72,13 +72,14 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 }
 
 func (pd *ParameterDecisions) SetParameterValuesResponse() {
-	parametersToWrite := pd.ReqRes.Session.CPE.GetParametersWithFlag("W")
-	log.Println("parametersToWrite")
-	//log.Println(parametersToWrite)
+	//parametersToWrite := pd.ReqRes.Session.CPE.GetParametersWithFlag("W")
+	//log.Println("parametersToWrite")
+	////log.Println(parametersToWrite)
 
 	//TODO: Check why some parameters are writeable, but cpe returns fault on it
-	if len(parametersToWrite) > 0 {
-		var response = pd.ReqRes.Envelope.SetParameterValues(parametersToWrite)
+	if len(pd.ReqRes.Session.CPE.ParametersQueue) > 0 {
+		var response = pd.ReqRes.Envelope.SetParameterValues(pd.ReqRes.Session.CPE.PopParametersQueue())
+		log.Println(response)
 		_, _ = fmt.Fprint(pd.ReqRes.Response, response)
 		pd.ReqRes.Session.PrevReqType = acsxml.SPVResp
 	}

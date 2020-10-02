@@ -1,6 +1,9 @@
 package types
 
-import "errors"
+import (
+	"database/sql/driver"
+	"errors"
+)
 
 type Flag struct {
 	Read         bool `json:"read"`          //R
@@ -47,20 +50,26 @@ func Parse(flags string) (Flag, error) {
 
 func (flag *Flag) AsString() string {
 	stringFlag := ""
-	switch true {
-	case flag.Read == true:
+
+	if flag.Read == true {
 		stringFlag += "R"
-	case flag.Write == true:
+	}
+	if flag.Write == true {
 		stringFlag += "W"
-	case flag.AddObject == true:
+	}
+	if flag.AddObject == true {
 		stringFlag += "A"
-	case flag.System == true:
+	}
+	if flag.System == true {
 		stringFlag += "S"
-	case flag.PeriodicRead == true:
+	}
+	if flag.PeriodicRead == true {
 		stringFlag += "P"
-	case flag.Important == true:
+	}
+	if flag.Important == true {
 		stringFlag += "I"
 	}
+
 	return stringFlag
 }
 
@@ -86,4 +95,22 @@ func (flag *Flag) CharToFieldName(char string) string {
 		return "Important"
 	}
 	return "Read"
+}
+
+func (flag *Flag) Value() (driver.Value, error) {
+	return flag.AsString(), nil
+}
+
+func (flag *Flag) Scan(src interface{}) (err error) {
+	var flagVal Flag
+	switch src.(type) {
+	case []uint8:
+		src := src.([]byte)
+		flagVal, err = Parse(string(src))
+		flag = &flagVal
+	default:
+		err = errors.New("Invalid flag")
+	}
+
+	return
 }

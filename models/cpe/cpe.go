@@ -4,7 +4,6 @@ import (
 	"errors"
 	"goacs/acs/types"
 	"log"
-	"reflect"
 	"strings"
 	"time"
 )
@@ -46,14 +45,9 @@ type CPE struct {
 	Root                      string
 	ParametersInfo            []types.ParameterInfo
 	ParameterValues           []types.ParameterValueStruct
+	ParametersQueue           []types.ParameterValueStruct
 	Fault                     types.Fault
 	UpdatedAt                 time.Time `json:"updated_at" db:"updated_at"`
-}
-
-type ParametersDiff struct {
-	AddedParameters    []types.ParameterValueStruct
-	ModifiedParameters []types.ParameterValueStruct
-	RemovedParameters  []types.ParameterValueStruct
 }
 
 func (cpe *CPE) AddParameterInfo(parameter types.ParameterInfo) {
@@ -96,18 +90,13 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 		if cpe.ParameterValues[index].Name == parameter.Name {
 			//Replace exist parameter
 			cpe.ParameterValues[index].Value = parameter.Value
+		}
+	}
+	parameterInfo, err := cpe.GetParameterInfoByName(parameter.Name)
 
-			parameterInfo, err := cpe.GetParameterInfoByName(parameter.Name)
-
-			if err == nil {
-				log.Println(parameter.Name)
-				log.Println(parameterInfo.Writable)
-				parameter.Flag.Write = parameterInfo.Writable == "1"
-			}
-
-			cpe.ParameterValues[index].Flag = parameter.Flag
-
-			return
+	if err == nil {
+		if parameterInfo.Writable == "1" {
+			parameter.Flag.Write = true
 		}
 	}
 	cpe.ParameterValues = append(cpe.ParameterValues, parameter)
@@ -141,17 +130,17 @@ func (cpe *CPE) GetFullPathParameterNames() []types.ParameterInfo {
 
 	return filteredParameters
 }
+func (cpe *CPE) PopParametersQueue() []types.ParameterValueStruct {
+
+	defer func() {
+		cpe.ParametersQueue = []types.ParameterValueStruct{}
+	}()
+
+	return cpe.ParametersQueue
+}
 
 func (cpe *CPE) GetParametersWithFlag(flag string) []types.ParameterValueStruct {
-	parameters := []types.ParameterValueStruct{}
-	for _, parameter := range cpe.ParameterValues {
-		fieldName := parameter.Flag.CharToFieldName(flag)
-		flagBool := reflect.ValueOf(parameter.Flag).FieldByName(fieldName).Bool()
-		if flagBool == true {
-			parameters = append(parameters, parameter)
-		}
-	}
-	return parameters
+	return types.GetParametersWithFlag(cpe.ParameterValues, flag)
 }
 
 func (cpe *CPE) SetRoot(root string) {
@@ -170,6 +159,8 @@ func (cpe *CPE) GetChangedParametersToWrite(otherParameters *[]types.ParameterVa
 	for _, cpeParam := range cpe.ParameterValues {
 		for _, otherParam := range *otherParameters {
 			if otherParam.Flag.Write && otherParam.Name == cpeParam.Name && otherParam.Value != cpeParam.Value {
+				log.Println("other param", otherParam.Value)
+				log.Println("cpe param", cpeParam.Value)
 				parametersDiff = append(parametersDiff, otherParam)
 				break
 			}
