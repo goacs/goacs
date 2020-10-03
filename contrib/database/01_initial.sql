@@ -24,7 +24,7 @@ create table cpe_parameters
 (
 	cpe_uuid varchar(36) not null,
     name varchar(255) not null,
-	value varchar(255) not null default '',
+	value varchar(4096) not null default '',
 	type varchar(16) not null,
 	flags varchar(10) not null default 'R',
 	created_at datetime default CURRENT_TIMESTAMP not null,

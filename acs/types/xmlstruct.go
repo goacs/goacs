@@ -157,22 +157,23 @@ func (envelope *Envelope) GPNRequest(path string) string {
 }
 
 //TODO: zrobić ładniej ;)
+//      <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
 func (envelope *Envelope) GPVRequest(info []ParameterInfo) string {
 	request := `<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <soapenv:Header>
-      <cwmp:ID soapenv:mustUnderstand="1">` + envelope.Header.ID + `</cwmp:ID>
+
   </soapenv:Header>
   <soapenv:Body>
       <cwmp:GetParameterValues>
-			<ParameterNames soapenc:arrayType=xsd:string[` + strconv.Itoa(len(info)) + `]>
+			<ParameterNames soap:arrayType="xsd:string[` + strconv.Itoa(len(info)) + `]">
 `
 	for _, parameter := range info {
-		request += `<string>` + parameter.Name + `</string>`
+		request += `				<string>` + parameter.Name + `</string>`
 		request += "\n"
 	}
 
-	request += `</ParameterNames>
+	request += `			</ParameterNames>
 		</cwmp:GetParameterValues>
   </soapenv:Body>
 </soapenv:Envelope>`
@@ -201,7 +202,7 @@ func (envelope *Envelope) SetParameterValues(info []ParameterValueStruct) string
   </soapenv:Header>
   <soapenv:Body>
       <cwmp:SetParameterValues>
-			<ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + strconv.Itoa(len(info)) + `]">
+			<ParameterList soap:arrayType="cwmp:ParameterValueStruct[` + strconv.Itoa(len(info)) + `]">
 `
 	for _, parameter := range info {
 		request += "<ParameterValueStruct>\n"

@@ -24,10 +24,10 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 	}
 
 	if err != io.EOF && err != nil {
-		panic(err)
+		return
 	}
 
-	reqType, envelope := parseXML(buffer)
+	reqType, envelope := parseEnvelope(buffer, session)
 
 	var reqRes = acshttp.ReqRes{
 		Request:      request,
@@ -37,8 +37,6 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 		Envelope:     envelope,
 		Body:         buffer,
 	}
-
-	fmt.Println("ENVELOPE TYPE", reqRes.Envelope.Type())
 
 	switch reqType {
 	case acsxml.INFORM:
@@ -59,6 +57,7 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 
 		fmt.Println("GPV REQ")
 
+		//parameterDecisions.GetParameterValuesRequest(reqRes.Session.CPE.ParametersInfo)
 		parameterDecisions.GetParameterValuesRequest([]acsxml.ParameterInfo{
 			{
 				Name:     session.CPE.Root + ".",
@@ -97,10 +96,14 @@ func ProcessSessionJobs(reqRes *acshttp.ReqRes) {
 	}
 }
 
-func parseXML(buffer []byte) (string, acsxml.Envelope) {
+func parseEnvelope(buffer []byte, session *acs.ACSSession) (string, acsxml.Envelope) {
 	//fmt.Println(string(buffer))
 	var envelope acsxml.Envelope
 	err := xml.Unmarshal(buffer, &envelope)
+
+	if envelope.Header.ID == "" {
+		envelope.Header.ID = session.Id
+	}
 
 	var requestType string = acsxml.EMPTY
 

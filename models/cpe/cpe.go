@@ -86,12 +86,6 @@ func (cpe *CPE) UpdateParameterFlags(parameterName string, flag types.Flag) {
 }
 
 func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
-	for index := range cpe.ParameterValues {
-		if cpe.ParameterValues[index].Name == parameter.Name {
-			//Replace exist parameter
-			cpe.ParameterValues[index].Value = parameter.Value
-		}
-	}
 	parameterInfo, err := cpe.GetParameterInfoByName(parameter.Name)
 
 	if err == nil {
@@ -99,6 +93,16 @@ func (cpe *CPE) AddParameter(parameter types.ParameterValueStruct) {
 			parameter.Flag.Write = true
 		}
 	}
+
+	for index := range cpe.ParameterValues {
+		if cpe.ParameterValues[index].Name == parameter.Name {
+			//Replace exist parameter
+			cpe.ParameterValues[index].Value = parameter.Value
+			cpe.ParameterValues[index].Flag = parameter.Flag
+			return
+		}
+	}
+
 	cpe.ParameterValues = append(cpe.ParameterValues, parameter)
 }
 
@@ -117,6 +121,30 @@ func (cpe *CPE) GetParameterValue(parameterName string) (string, error) {
 	}
 
 	return "", errors.New("Unable to find parameter " + parameterName + " in CPE")
+}
+
+func (cpe *CPE) GetParametersWithDotAtEnd() []types.ParameterValueStruct {
+	var filteredParameters []types.ParameterValueStruct
+	for _, parameter := range cpe.ParametersInfo {
+		// If Last character of parameter name is ".", then add it as AddObject to DB
+		if parameter.Name[len(parameter.Name)-1:] == "." {
+			filteredParameters = append(filteredParameters, types.ParameterValueStruct{
+				Name:  parameter.Name,
+				Value: "",
+				Type:  "",
+				Flag: types.Flag{
+					Read:         false,
+					Write:        false,
+					AddObject:    true,
+					System:       false,
+					PeriodicRead: false,
+					Important:    false,
+				},
+			})
+		}
+	}
+
+	return filteredParameters
 }
 
 func (cpe *CPE) GetFullPathParameterNames() []types.ParameterInfo {

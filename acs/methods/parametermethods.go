@@ -35,6 +35,9 @@ func (pd *ParameterDecisions) ParameterNamesResponseParser() {
 	_ = xml.Unmarshal(pd.ReqRes.Body, &gpnr)
 	pd.ReqRes.Session.CPE.AddParametersInfo(gpnr.ParameterList)
 
+	cpeRepository := mysql.NewCPERepository(repository.GetConnection())
+	_ = cpeRepository.BulkInsertOrUpdateParameters(&pd.ReqRes.Session.CPE, pd.ReqRes.Session.CPE.GetParametersWithDotAtEnd())
+
 	//fmt.Println(gpnr.ParameterList)
 }
 
@@ -49,7 +52,6 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 	var gpvr acsxml.GetParameterValuesResponse
 	_ = xml.Unmarshal(pd.ReqRes.Body, &gpvr)
 	log.Println("GetParameterValuesResponseParser")
-	//log.Println(string(pd.ReqRes.Body))
 
 	pd.ReqRes.Session.CPE.AddParameterValues(gpvr.ParameterList)
 	cpeRepository := mysql.NewCPERepository(repository.GetConnection())
@@ -67,6 +69,7 @@ func (pd *ParameterDecisions) GetParameterValuesResponseParser() {
 		pd.ReqRes.Session.NextJob = acs.JOB_SENDPARAMETERS
 	}
 
+	//log.Println(pd.ReqRes.Session.CPE.ParameterValues)
 	_ = cpeRepository.BulkInsertOrUpdateParameters(&pd.ReqRes.Session.CPE, pd.ReqRes.Session.CPE.ParameterValues)
 
 }
