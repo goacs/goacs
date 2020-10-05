@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goacs/acs/types"
 	"goacs/models/cpe"
+	"goacs/models/tasks"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -23,9 +24,10 @@ type ACSSession struct {
 	IsNew       bool
 	IsBoot      bool
 	PrevReqType string
-	created_at  time.Time
+	CreatedAt   time.Time
 	CPE         cpe.CPE
 	NextJob     int
+	Tasks       []tasks.Task
 }
 
 var lock = sync.RWMutex{}
@@ -83,7 +85,7 @@ func printSessions() {
 }
 
 func createEmptySession(sessionId string) *ACSSession {
-	session := ACSSession{Id: sessionId, IsNew: true, created_at: time.Now()}
+	session := ACSSession{Id: sessionId, IsNew: true, CreatedAt: time.Now()}
 	lock.Lock()
 	acsSessions[sessionId] = &session
 	lock.Unlock()
@@ -94,7 +96,7 @@ func removeOldSessions() {
 	for {
 		now := time.Now()
 		for sessionId, session := range acsSessions {
-			if now.Sub(session.created_at).Minutes() > SessionLifetime {
+			if now.Sub(session.CreatedAt).Minutes() > SessionLifetime {
 				fmt.Println("DELETING OLD SESSION " + sessionId)
 				lock.Lock()
 				delete(acsSessions, sessionId)

@@ -27,9 +27,9 @@ func (pd *ParameterDecisions) ParameterNamesRequest(recursively bool) {
 
 }
 
-func (pd *ParameterDecisions) ParameterNamesResponseParser() {
+func (pd *ParameterDecisions) CpeParameterNamesResponseParser() {
 	var gpnr acsxml.GetParameterNamesResponse
-	log.Println("ParameterNamesResponseParser")
+	log.Println("CpeParameterNamesResponseParser")
 
 	//log.Println(string(pd.ReqRes.Body))
 	_ = xml.Unmarshal(pd.ReqRes.Body, &gpnr)

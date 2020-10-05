@@ -41,19 +41,21 @@ func CPERequestDecision(request *http.Request, w http.ResponseWriter) {
 	switch reqType {
 	case acsxml.INFORM:
 		informDecision := methods.InformDecision{&reqRes}
-		informDecision.ResponseParser()
-		informDecision.Request()
+		informDecision.CpeResponseParser()
+		informDecision.AcsRequest()
 
 	case acsxml.EMPTY:
-		if session.IsNew == false && session.IsBoot == true {
-			fmt.Println("GPN REQ")
-			parameterDecisions := methods.ParameterDecisions{&reqRes}
-			parameterDecisions.ParameterNamesRequest(true)
+		if session.PrevReqType == acsxml.INFORM {
+			if session.IsNew == false && session.IsBoot == true {
+				fmt.Println("GPN REQ")
+				parameterDecisions := methods.ParameterDecisions{&reqRes}
+				parameterDecisions.ParameterNamesRequest(true)
+			}
 		}
 
 	case acsxml.GPNResp:
 		parameterDecisions := methods.ParameterDecisions{ReqRes: &reqRes}
-		parameterDecisions.ParameterNamesResponseParser()
+		parameterDecisions.CpeParameterNamesResponseParser()
 
 		fmt.Println("GPV REQ")
 

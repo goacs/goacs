@@ -91,3 +91,15 @@ create table users
     constraint users_username_uindex
         unique (username)
 );
+
+create table tasks
+(
+    id int auto_increment
+        primary key,
+    cpe_uuid varchar(36) null,
+    event varchar(20) null,
+    not_before datetime null,
+    script text null,
+    created_at datetime null,
+    done_at datetime null
+);
