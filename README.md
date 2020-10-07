@@ -2,6 +2,10 @@
 GoACS is an Autonomous Configuration Server which implements TR-069 protocol.
 Feel free to contribute to project
 
+## Sponsors
+##### [MULTIPLAY](https://multiplay.pl)
+![GRUPA MULTIPLAY](.github/sponsors/mpl_logo.png "GRUPA MULTIPLAY") 
+
 ## Development
 Current code are still in active development and are not usable!
 
@@ -18,4 +22,5 @@ Run mysql dev server using **docker-compose**
 then
 
 `go run main.go`
+ 
  
