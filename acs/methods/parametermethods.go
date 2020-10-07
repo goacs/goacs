@@ -36,7 +36,7 @@ func (pd *ParameterDecisions) CpeParameterNamesResponseParser() {
 	pd.ReqRes.Session.CPE.AddParametersInfo(gpnr.ParameterList)
 
 	cpeRepository := mysql.NewCPERepository(repository.GetConnection())
-	_ = cpeRepository.BulkInsertOrUpdateParameters(&pd.ReqRes.Session.CPE, pd.ReqRes.Session.CPE.GetParametersWithDotAtEnd())
+	_ = cpeRepository.BulkInsertOrUpdateParameters(&pd.ReqRes.Session.CPE, pd.ReqRes.Session.CPE.GetAddObjectParameters())
 
 	//fmt.Println(gpnr.ParameterList)
 }

@@ -123,18 +123,18 @@ func (cpe *CPE) GetParameterValue(parameterName string) (string, error) {
 	return "", errors.New("Unable to find parameter " + parameterName + " in CPE")
 }
 
-func (cpe *CPE) GetParametersWithDotAtEnd() []types.ParameterValueStruct {
+func (cpe *CPE) GetAddObjectParameters() []types.ParameterValueStruct {
 	var filteredParameters []types.ParameterValueStruct
 	for _, parameter := range cpe.ParametersInfo {
 		// If Last character of parameter name is ".", then add it as AddObject to DB
-		if parameter.Name[len(parameter.Name)-1:] == "." {
+		if parameter.Name[len(parameter.Name)-1:] == "." && parameter.Writable == "1" {
 			filteredParameters = append(filteredParameters, types.ParameterValueStruct{
 				Name:  parameter.Name,
 				Value: "",
 				Type:  "",
 				Flag: types.Flag{
-					Read:         false,
-					Write:        false,
+					Read:         true,
+					Write:        true,
 					AddObject:    true,
 					System:       false,
 					PeriodicRead: false,
