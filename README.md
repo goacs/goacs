@@ -4,7 +4,8 @@ Feel free to contribute to project
 
 ## Sponsors
 ##### [MULTIPLAY](https://multiplay.pl)
-![GRUPA MULTIPLAY](.github/sponsors/mpl_logo.png "GRUPA MULTIPLAY") 
+![GRUPA MULTIPLAY](.github/sponsors/mpl_logo.png "GRUPA MULTIPLAY") [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgoacs%2Fgoacs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgoacs%2Fgoacs?ref=badge_shield)
+
 
 ## Development
 Current code are still in active development and are not usable!
@@ -24,3 +25,7 @@ then
 `go run main.go`
  
  
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgoacs%2Fgoacs.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgoacs%2Fgoacs?ref=badge_large)
