@@ -2,7 +2,40 @@ version: '3'
 
 services:
   acs:
-    image: phpswoole/swoole:php8.0
+    build: docker/php-fpm
+    working_dir: /app
     volumes:
     - ./:/app
-    working_dir: /app
+    - ./docker/supervisor.conf:/etc/supervisor/conf.d/goacs.conf:ro
+    ports:
+      - 8085:8085
+      - 9912:9912
+    links:
+      - redis
+      - mariadb
+
+  redis:
+    image: redis:latest
+
+
+  mariadb:
+    image: mariadb:10.4
+    volumes:
+      - goacs-database-volume:/var/lib/mysql
+      - ./docker/database:/docker-entrypoint-initdb.d
+      - ./docker/conf:/etc/mysql/conf.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+    ports:
+      - ${DB_PORT}:3306
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+volumes:
+  goacs-database-volume:
+    driver: local

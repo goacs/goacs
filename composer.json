@@ -9,14 +9,20 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "ext-dom": "*",
+        "ext-simplexml": "*",
+        "barryvdh/laravel-ide-helper": "^2.9",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
-        "swooletw/laravel-swoole": "dev-improvement/php8"
+        "laravie/parser": "^2.1",
+        "swooletw/laravel-swoole": "dev-improvement/php8",
+        "symfony/dom-crawler": "^5.2"
     },
     "require-dev": {
+        "beyondcode/laravel-dump-server": "^1.7",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",

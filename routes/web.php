@@ -13,6 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::post('/acs', [\App\Http\Controllers\ACSController::class, 'process']);
+Route::get('/acs', [\App\Http\Controllers\ACSController::class, 'process']);
