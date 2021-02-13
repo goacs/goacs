@@ -59,8 +59,6 @@ class Context
     {
         $this->request = $request;
         $this->response = $this->configureResponse($response);
-        $this->parameterNames = new Collection();
-        $this->parameterValues = new ParameterValuesCollection();
         $this->tasks = new Collection();
         $this->loadFromSession();
         $this->processBody();
@@ -88,6 +86,8 @@ class Context
                 $this->device = $this->cpeRequest->device;
                 break;
             case Types::GetParameterNamesResponse:
+                dump("CURRENT PNC: ".$this->parameterNames->count());
+                dump("CURRENT PNV: ".$this->parameterValues->count());
                 $this->cpeResponse = new GetParameterNamesResponse($parser->body);
                 $this->parameterNames = $this->cpeResponse->parameters;
                 break;

@@ -8,17 +8,19 @@ namespace App\ACS\Request;
 
 use App\ACS\Entities\Device;
 use App\ACS\Entities\Event;
+use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\XML\ParameterListReader;
 
 class InformRequest extends CPERequest
 {
     private \DOMNode $body;
     public Device $device;
-    public array $parametersList = [];
+    public ParameterValuesCollection $parametersList;
     public array $events = [];
 
     public function __construct(\DOMNode $body) {
         $this->body = $body;
+        $this->parametersList = new ParameterValuesCollection();
         $this->readValues();
     }
 

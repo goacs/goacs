@@ -98,7 +98,6 @@ class ControllerLogic
 
         foreach($getParameterNamesResponse->parameters->chunk(50) as $chunk)
         {
-            dump("Adding GPV Task");
             $task = new Task(Types::GetParameterValues);
             $task->setPayload([
                 'parameters' => $chunk
@@ -122,5 +121,9 @@ class ControllerLogic
                 break;
         }
 
+    }
+
+    private function processGetParametersValuesResponse()
+    {
     }
 }

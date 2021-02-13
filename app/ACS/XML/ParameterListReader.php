@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\ACS\XML;
 
 
+use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
 
 class ParameterListReader
@@ -17,8 +18,8 @@ class ParameterListReader
         $this->parameterListElement = $parameterListElement;
     }
 
-    public function parameters(): array {
-        $parameters = [];
+    public function parameters(): ParameterValuesCollection {
+        $parameters = new ParameterValuesCollection();
         foreach ($this->parameterListElement->childNodes as $childNode) {
             if($childNode instanceof \DOMElement && $childNode->nodeName === "ParameterValueStruct") {
                 $parameterValueStructObject = new ParameterValueStruct();
@@ -42,7 +43,7 @@ class ParameterListReader
                             break;
                     }
                 }
-                $parameters[] = $parameterValueStructObject;
+                $parameters->put($parameterValueStructObject->name, $parameterValueStructObject);
             }
         }
 
