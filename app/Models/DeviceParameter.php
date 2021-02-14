@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 
+use App\ACS\Entities\ParameterValuesCollection;
+use App\ACS\Entities\ParameterValueStruct;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -39,4 +41,29 @@ class DeviceParameter extends Model
     protected $fillable = ['device_id', 'name', 'value', 'type', 'flags'];
 
 
+    public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {
+        foreach($parameterValuesCollection->chunk(300) as $chunk) {
+
+            $values = collect();
+            /** @var ParameterValueStruct $item */
+            foreach ($chunk as $item) {
+                $data = collect([
+                    'device_id' => $device->id,
+                    'name' => $item->name,
+                    'value' => $item->value,
+                    'type' => $item->type,
+                    'flags' => $item->flag->toJson(),
+                ]);
+
+                $data = $data->map(fn($item) => "'{$item}'");
+                $values[] = '('.$data->join(',').')';
+            }
+            $values = $values->join(',');
+
+            $query = "INSERT INTO device_parameters(device_id, name, value, type, flags) VALUES {$values}
+                    ON DUPLICATE KEY UPDATE name=values(name), value=values(value), type=values(type), flags=values(flags)";
+
+            \DB::statement($query);
+        }
+    }
 }

@@ -7,6 +7,7 @@ namespace App\ACS;
 
 
 use App\ACS\Entities\Device;
+use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\Task;
 use App\ACS\Request\ACSRequest;
@@ -53,7 +54,7 @@ class Context
 
     public string $cwmpVersion;
 
-    public Collection $parameterNames;
+    public ParameterInfoCollection $parameterInfos;
 
     public ParameterValuesCollection $parameterValues;
 
@@ -92,13 +93,13 @@ class Context
 
             case Types::GetParameterNamesResponse:
                 $this->cpeResponse = new GetParameterNamesResponse($parser->body);
-                $this->parameterNames->merge($this->cpeResponse->parameters);
+                $this->parameterInfos->merge($this->cpeResponse->parameters);
                 break;
 
             case Types::GetParameterValuesResponse:
                 $this->cpeResponse = new GetParameterValuesResponse($parser->body);
                 $this->parameterValues->merge($this->cpeResponse->parameters);
-                $this->parameterValues->assignDefaultFlags($this->parameterNames);
+                $this->parameterValues->assignDefaultFlags($this->parameterInfos);
                 break;
 
             case Types::SetParameterValuesResponse:
@@ -137,20 +138,30 @@ class Context
     public function loadFromSession()
     {
         $this->device = $this->session()->get('device', new Device());
-        $this->parameterNames = $this->session()->get('parameterNames', new Collection());
+        $this->parameterInfos = $this->session()->get('parameterNames', new Collection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
         $this->tasks = $this->session()->get('tasks', new Collection());
     }
 
     public function storeToSession() {
         $this->session()->put('device', $this->device);
-        $this->session()->put('parameterNames', $this->parameterNames);
+        $this->session()->put('parameterNames', $this->parameterInfos);
         $this->session()->put('parameterValues', $this->parameterValues);
         $this->session()->put('tasks', $this->tasks);
     }
 
     public function hasTaskOfType(string $type): bool {
         return $this->tasks->filter(fn(Task $task) => $task->name === $type)->count() > 0;
+    }
+
+    public function isNextTask(string $type): bool {
+        /** @var Task $task */
+        $task = $this->tasks->first();
+        if($task === null) {
+            return false;
+        }
+
+        return $task->name === $type;
     }
 
     public function addTask(Task $task) {

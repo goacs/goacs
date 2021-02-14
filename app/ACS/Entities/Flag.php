@@ -64,4 +64,8 @@ class Flag
             'system' => $this->system,
         ];
     }
+
+    public function toJson(): string {
+        return json_encode($this->toArray());
+    }
 }

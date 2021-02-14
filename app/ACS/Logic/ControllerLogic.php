@@ -11,10 +11,12 @@ use App\ACS\Entities\Task;
 use App\ACS\Request\GetParameterNamesRequest;
 use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
+use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\InformResponse;
 use App\ACS\Types;
 use App\Models\Device;
+use League\CommonMark\Block\Element\ThematicBreak;
 
 class ControllerLogic
 {
@@ -83,7 +85,9 @@ class ControllerLogic
     {
         if($this->context->device->new === true) {
             $this->context->response->setContent(
-                (new GetParameterNamesRequest($this->context, $this->context->device->root))->getBody()
+                //Maybe need to query at first only for nextlevel params
+                //then chun response to next GPN requests
+                (new GetParameterNamesRequest($this->context, $this->context->device->root, false))->getBody()
             )->send();
         }
     }
@@ -104,13 +108,14 @@ class ControllerLogic
         /** @var GetParameterNamesResponse $getParameterNamesResponse */
         $getParameterNamesResponse = $this->context->cpeResponse;
 
-        foreach($getParameterNamesResponse->parameters->chunk(50) as $chunk)
-        {
-            $task = new Task(Types::GetParameterValues);
-            $task->setPayload([
-                'parameters' => $chunk
-            ]);
-            $this->context->addTask($task);
+        if($this->context->isNextTask(Types::GetParameterNames) === false) {
+            foreach ($getParameterNamesResponse->parameters->filterEndsWithDot()->chunk(50) as $chunk) {
+                $task = new Task(Types::GetParameterValues);
+                $task->setPayload([
+                    'parameters' => $chunk
+                ]);
+                $this->context->addTask($task);
+            }
         }
     }
 
@@ -127,6 +132,10 @@ class ControllerLogic
                 $request->setParameters($task->payload['parameters']);
                 $this->context->response->setContent($request->getBody())->send();
                 break;
+
+            case Types::SetParameterValues:
+                $setterLogic = new ParameterSetterLogic($this->context);
+                $request = new SetParameterValuesRequest($this->context);
         }
 
     }

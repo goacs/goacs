@@ -6,9 +6,9 @@ declare(strict_types=1);
 namespace App\ACS\Response;
 
 
+use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterInfoStruct;
 use App\ACS\XML\BoolConverter;
-use App\ACS\XML\ParameterListReader;
 use Illuminate\Support\Collection;
 
 class GetParameterNamesResponse extends CPEResponse
@@ -16,11 +16,11 @@ class GetParameterNamesResponse extends CPEResponse
     /**
      * @var Collection
      */
-    public Collection $parameters;
+    public ParameterInfoCollection $parameters;
 
     public function __construct(\DOMNode $body) {
         parent::__construct($body);
-        $this->parameters = new Collection();
+        $this->parameters = new ParameterInfoCollection();
         $this->readValues();
     }
 
