@@ -27,14 +27,14 @@ class GetParameterValuesResponse extends CPEResponse
         $xpath = new \DOMXPath($this->body->ownerDocument);
         foreach ($xpath->query("//cwmp:GetParameterValuesResponse/ParameterList/*") as $parameterValueStruct)
         {
-           $this->processList($parameterValueStruct);
+            $this->processList($parameterValueStruct);
         }
     }
 
     private function processList(\DOMElement $element)
     {
+        $parameterValueStruct = new ParameterValueStruct();
         foreach($element->childNodes as $childNode) {
-            $parameterValueStruct = new ParameterValueStruct();
             if($childNode instanceof \DOMElement) {
                 switch ($childNode->nodeName) {
                     case 'Name':
@@ -46,9 +46,9 @@ class GetParameterValuesResponse extends CPEResponse
                         break;
                 }
             }
-            if($parameterValueStruct->name !== '') {
-                $this->parameters->put($parameterValueStruct->name, $parameterValueStruct);
-            }
+        }
+        if($parameterValueStruct->name !== '') {
+            $this->parameters->put($parameterValueStruct->name, $parameterValueStruct);
         }
     }
 }

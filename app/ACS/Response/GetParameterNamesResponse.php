@@ -35,8 +35,8 @@ class GetParameterNamesResponse extends CPEResponse
 
     private function processList(\DOMElement $element)
     {
+        $parameterInfoStruct = new ParameterInfoStruct();
         foreach($element->childNodes as $childNode) {
-            $parameterInfoStruct = new ParameterInfoStruct();
             if($childNode instanceof \DOMElement) {
                 switch ($childNode->nodeName) {
                     case 'Name':
@@ -47,9 +47,10 @@ class GetParameterNamesResponse extends CPEResponse
                         break;
                 }
             }
-            if($parameterInfoStruct->name !== '') {
-                $this->parameters->put($parameterInfoStruct->name, $parameterInfoStruct);
-            }
+
+        }
+        if($parameterInfoStruct->name !== '') {
+            $this->parameters->put($parameterInfoStruct->name, $parameterInfoStruct);
         }
     }
 }

@@ -19,6 +19,8 @@ class ParameterInfoCollection extends Collection
     }
 
     public function filterEndsWithDot(): ParameterInfoCollection {
-        return $this->filter(fn(ParameterInfoStruct $item) => Str::endsWith('.', $item->name));
+        return $this->filter(function(ParameterInfoStruct $item) {
+            return Str::endsWith($item->name, '.');
+        });
     }
 }

@@ -138,9 +138,13 @@ class Context
     public function loadFromSession()
     {
         $this->device = $this->session()->get('device', new Device());
-        $this->parameterInfos = $this->session()->get('parameterNames', new Collection());
+        $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
         $this->tasks = $this->session()->get('tasks', new Collection());
+
+        if($this->device->serialNumber !== "") {
+            $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
+        }
     }
 
     public function storeToSession() {
@@ -155,6 +159,7 @@ class Context
     }
 
     public function isNextTask(string $type): bool {
+        dump("Next task", $this->tasks->first());
         /** @var Task $task */
         $task = $this->tasks->first();
         if($task === null) {

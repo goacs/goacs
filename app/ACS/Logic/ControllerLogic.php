@@ -16,11 +16,14 @@ use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\InformResponse;
 use App\ACS\Types;
 use App\Models\Device;
+use App\Models\DeviceParameter;
 use League\CommonMark\Block\Element\ThematicBreak;
 
 class ControllerLogic
 {
     const SESSION_NEW = 'new';
+
+    const GET_PARAMETER_VALUES_CHUNK_SIZE = 4;
 
     /**
      * @var Context
@@ -109,7 +112,8 @@ class ControllerLogic
         $getParameterNamesResponse = $this->context->cpeResponse;
 
         if($this->context->isNextTask(Types::GetParameterNames) === false) {
-            foreach ($getParameterNamesResponse->parameters->filterEndsWithDot()->chunk(50) as $chunk) {
+            $filteredParameters = $getParameterNamesResponse->parameters->filterByChunkCount(2)->filterEndsWithDot();
+            foreach ($filteredParameters->chunk(self::GET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
                 $task = new Task(Types::GetParameterValues);
                 $task->setPayload([
                     'parameters' => $chunk
@@ -142,6 +146,10 @@ class ControllerLogic
 
     private function processGetParametersValuesResponse()
     {
+        if($this->context->device->new) {
+            //Save Parameters in db
+            DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
+        }
     }
 
     private function processAddObjectResponse()

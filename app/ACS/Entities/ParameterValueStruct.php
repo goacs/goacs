@@ -9,8 +9,8 @@ namespace App\ACS\Entities;
 class ParameterValueStruct
 {
     public string $name = "";
-    public string $value;
-    public string $type;
+    public string $value = '';
+    public string $type = '';
     public Flag $flag;
 
     public function __construct()

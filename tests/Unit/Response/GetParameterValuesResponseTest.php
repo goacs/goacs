@@ -19,7 +19,11 @@ class GetParameterValuesResponseTest extends TestCase
         $xml = file_get_contents(__DIR__.'/gpvresponse.xml');
         $parser = new XMLParser((string)$xml);
         $response = new GetParameterValuesResponse($parser->body);
-        $this->assertCount(7,$response->parameters);
+        $this->assertNotEmpty($response->parameters->first()->value);
+        $this->assertNotEmpty($response->parameters->first()->name);
+        $this->assertNotEmpty($response->parameters->last()->value);
+        $this->assertNotEmpty($response->parameters->last()->name);
+        $this->assertCount(7, $response->parameters);
         $this->assertInstanceOf(ParameterValueStruct::class, $response->parameters->first());
     }
 }

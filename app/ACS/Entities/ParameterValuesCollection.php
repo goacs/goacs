@@ -27,14 +27,14 @@ class ParameterValuesCollection extends Collection
             /** @var ParameterInfoStruct $parameterInfo */
             if($parameterInfo = $parameterInfoCollection->has($item->name)) {
                 $flag = new Flag();
-                if($parameterInfo->writable && Str::endsWith('.',$parameterInfo->name)) {
+                if($parameterInfo->writable && Str::endsWith($parameterInfo->name,'.')) {
                     $flag->object = true;
                     $flag->write = true;
                 } else if ($parameterInfo->writable) {
                     $flag->write = true;
                 }
+                $this->items[$key]->flag = $flag;
             }
-            $this->items[$key]->flag = $flag;
         }
     }
 }

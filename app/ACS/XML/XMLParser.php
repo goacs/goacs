@@ -36,6 +36,7 @@ class XMLParser
             $this->bodyType = Types::EMPTY;
             return;
         }
+
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->loadXml($this->xml);
@@ -84,7 +85,7 @@ class XMLParser
                 $this->cwmpVersion = '1.3';
                 break;
             default:
-                throw new ACSException("Unknown cwmp version");
+                throw new ACSException("Unknown cwmp version: ".$uri);
         }
     }
 }

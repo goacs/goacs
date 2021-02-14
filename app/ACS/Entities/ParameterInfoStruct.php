@@ -11,9 +11,9 @@ use Illuminate\Support\Str;
 class ParameterInfoStruct
 {
     public string $name = "";
-    public bool $writable;
+    public bool $writable = false;
 
-    public bool $object;
+    public bool $object = false;
 
     public function setName($name) {
         $this->name = $name;
@@ -21,6 +21,6 @@ class ParameterInfoStruct
     }
 
     public function isObject() {
-        return Str::endsWith('.', $this->name) && $this->writable;
+        return Str::endsWith( $this->name, '.') && $this->writable;
     }
 }

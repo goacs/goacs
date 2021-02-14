@@ -17,6 +17,8 @@ class GetParameterNamesResponseTest extends TestCase
         $xml = file_get_contents(__DIR__.'/gpnresponse.xml');
         $parser = new XMLParser((string)$xml);
         $response = new GetParameterNamesResponse($parser->body);
+        $this->assertNotEmpty($response->parameters->first()->name);
+        $this->assertNotEmpty($response->parameters->last()->name);
         $this->assertCount(9263,$response->parameters);
         $this->assertInstanceOf(ParameterInfoStruct::class, $response->parameters->first());
     }

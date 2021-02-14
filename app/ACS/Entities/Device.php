@@ -8,10 +8,11 @@ namespace App\ACS\Entities;
 
 class Device
 {
-    public string $oui;
-    public string $manufacturer;
-    public string $serialNumber;
-    public string $productClass;
-    public bool $new;
-    public string $root;
+    public string $oui = '';
+    public string $manufacturer = '';
+    public string $serialNumber = '';
+    public string $productClass = '';
+    public bool $new = false;
+    public string $root = '';
+
 }
