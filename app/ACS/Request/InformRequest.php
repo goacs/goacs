@@ -13,13 +13,12 @@ use App\ACS\XML\ParameterListReader;
 
 class InformRequest extends CPERequest
 {
-    private \DOMNode $body;
     public Device $device;
     public ParameterValuesCollection $parametersList;
     public array $events = [];
 
     public function __construct(\DOMNode $body) {
-        $this->body = $body;
+        parent::__construct($body);
         $this->parametersList = new ParameterValuesCollection();
         $this->readValues();
     }

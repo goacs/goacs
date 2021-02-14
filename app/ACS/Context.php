@@ -13,9 +13,13 @@ use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
 use App\ACS\Request\InformRequest;
 use App\ACS\Response\ACSResponse;
-use App\ACS\Response\CPEresponse;
+use App\ACS\Response\AddObjectResponse;
+use App\ACS\Response\CPEResponse;
+use App\ACS\Response\DeleteObjectResponse;
+use App\ACS\Response\DownloadResponse;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\GetParameterValuesResponse;
+use App\ACS\Response\SetParameterValuesResponse;
 use App\ACS\XML\XMLParser;
 use App\Models\Device as DeviceModel;
 use Illuminate\Http\Request;
@@ -35,7 +39,7 @@ class Context
 
     public CPERequest $cpeRequest;
 
-    public CPEresponse $cpeResponse;
+    public CPEResponse $cpeResponse;
 
     public ACSRequest $acsRequest;
 
@@ -85,15 +89,42 @@ class Context
                 $this->cpeRequest = new InformRequest($parser->body);
                 $this->device = $this->cpeRequest->device;
                 break;
+
             case Types::GetParameterNamesResponse:
-                dump("CURRENT PNC: ".$this->parameterNames->count());
-                dump("CURRENT PNV: ".$this->parameterValues->count());
                 $this->cpeResponse = new GetParameterNamesResponse($parser->body);
-                $this->parameterNames = $this->cpeResponse->parameters;
+                $this->parameterNames->merge($this->cpeResponse->parameters);
                 break;
+
             case Types::GetParameterValuesResponse:
                 $this->cpeResponse = new GetParameterValuesResponse($parser->body);
+                $this->parameterValues->merge($this->cpeResponse->parameters);
+                $this->parameterValues->assignDefaultFlags($this->parameterNames);
                 break;
+
+            case Types::SetParameterValuesResponse:
+                $this->cpeResponse = new SetParameterValuesResponse($parser->body);
+                break;
+
+            case Types::AddObjectResponse:
+                $this->cpeResponse = new AddObjectResponse($parser->body);
+                break;
+
+            case Types::DeleteObjectResponse:
+                $this->cpeResponse = new DeleteObjectResponse($parser->body);
+                break;
+
+            case Types::DownloadResponse:
+                $this->cpeResponse = new DownloadResponse($parser->body);
+                break;
+
+            case Types::TransferComplete:
+
+                break;
+
+            case Types::FaultResponse:
+
+                break;
+
         }
     }
 
@@ -125,4 +156,5 @@ class Context
     public function addTask(Task $task) {
         $this->tasks->push($task);
     }
+
 }

@@ -6,11 +6,7 @@ declare(strict_types=1);
 namespace App\ACS\Response;
 
 
-class DownloadResponse extends ACSResponse
+class DownloadResponse extends CPEResponse
 {
 
-    public function getBody(): string
-    {
-        return "";
-    }
 }

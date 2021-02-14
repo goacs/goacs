@@ -10,6 +10,6 @@ class TransferCompleteResponse extends ACSResponse
 {
     public function getBody(): string
     {
-        return "";
+        return '<cwmp:TransferCompleteResponse/';
     }
 }

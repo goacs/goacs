@@ -15,11 +15,15 @@ class Types
     const GetParameterNamesResponse = 'GetParameterNamesResponse';
     const GetParameterValues = 'GetParameterValues';
     const GetParameterValuesResponse = 'GetParameterValuesResponse';
+    const SetParameterValues = 'SetParameterValues';
+    const SetParameterValuesResponse = 'SetParameterValuesResponse';
     const AddObject = 'AddObject';
     const AddObjectResponse = 'AddObjectResponse';
     const DeleteObject = 'DeleteObject';
     const DeleteObjectResponse = 'DeleteObjectResponse';
     const Download = 'Download';
     const DownloadResponse = 'DownloadResponse';
+    const FaultResponse = 'Fault';
+    const TransferComplete = 'TransferComplete';
 
 }

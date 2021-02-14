@@ -10,6 +10,13 @@ class DownloadRequest extends ACSRequest
 {
     public function getBody(): string
     {
-        return "";
+        $body = '<cwmp:Download>';
+        $body .= '<FileType></FileType>';
+		$body .= '<URL></URL>';
+        //Later add Username Password FileSize fields
+
+	    $body .= '</cwmp:Download>';
+
+	    return $this->withBaseBody($body);
     }
 }

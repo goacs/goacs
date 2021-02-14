@@ -11,16 +11,15 @@ use App\ACS\XML\BoolConverter;
 use App\ACS\XML\ParameterListReader;
 use Illuminate\Support\Collection;
 
-class GetParameterNamesResponse extends CPEresponse
+class GetParameterNamesResponse extends CPEResponse
 {
-    private \DOMNode $body;
     /**
      * @var Collection
      */
     public Collection $parameters;
 
     public function __construct(\DOMNode $body) {
-        $this->body = $body;
+        parent::__construct($body);
         $this->parameters = new Collection();
         $this->readValues();
     }

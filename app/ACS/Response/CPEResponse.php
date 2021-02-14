@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 
-namespace App\ACS\Request;
+namespace App\ACS\Response;
 
 
-abstract class CPERequest
+abstract class CPEResponse
 {
     protected \DOMNode $body;
 

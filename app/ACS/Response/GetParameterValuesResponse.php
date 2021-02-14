@@ -6,23 +6,18 @@ declare(strict_types=1);
 namespace App\ACS\Response;
 
 
-use App\ACS\Entities\ParameterInfoStruct;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
-use App\ACS\XML\BoolConverter;
-use App\ACS\XML\ParameterListReader;
-use Illuminate\Support\Collection;
 
-class GetParameterValuesResponse extends CPEresponse
+class GetParameterValuesResponse extends CPEResponse
 {
-    private \DOMNode $body;
     /**
-     * @var Collection
+     * @var ParameterValuesCollection
      */
-    public Collection $parameters;
+    public ParameterValuesCollection $parameters;
 
     public function __construct(\DOMNode $body) {
-        $this->body = $body;
+        parent::__construct($body);
         $this->parameters = new ParameterValuesCollection();
         $this->readValues();
     }

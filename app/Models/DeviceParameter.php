@@ -34,5 +34,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class DeviceParameter extends Model
 {
+    protected $table = 'device_parameters';
+
+    protected $fillable = ['device_id', 'name', 'value', 'type', 'flags'];
+
 
 }

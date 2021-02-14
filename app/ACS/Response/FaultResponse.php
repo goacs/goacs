@@ -6,11 +6,8 @@ declare(strict_types=1);
 namespace App\ACS\Response;
 
 
-class FaultResponse extends ACSResponse
+class FaultResponse extends CPEResponse
 {
 
-    public function getBody(): string
-    {
-        return "";
-    }
+
 }

@@ -32,7 +32,7 @@ class ControllerLogic
     public function process() {
         switch ($this->context->bodyType) {
             case Types::INFORM:
-                $this->processInform();
+                $this->processInformRequest();
                 $this->updateDeviceData();
                 $body = (new InformResponse($this->context))->getBody();
                 $this->context->response->setContent($body)->send();
@@ -48,6 +48,14 @@ class ControllerLogic
 
             case Types::GetParameterValuesResponse:
                 $this->processGetParametersValuesResponse();
+                break;
+
+            case Types::AddObjectResponse:
+                $this->processAddObjectResponse();
+                break;
+
+            case Types::DeleteObjectResponse:
+                $this->processDeleteObjectResponse();
                 break;
 
         }
@@ -80,7 +88,7 @@ class ControllerLogic
         }
     }
 
-    private function processInform()
+    private function processInformRequest()
     {
         /** @var InformRequest $infom */
         $infom = $this->context->cpeRequest;
@@ -124,6 +132,14 @@ class ControllerLogic
     }
 
     private function processGetParametersValuesResponse()
+    {
+    }
+
+    private function processAddObjectResponse()
+    {
+    }
+
+    private function processDeleteObjectResponse()
     {
     }
 }
