@@ -10,6 +10,7 @@ use App\ACS\Entities\Device;
 use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\Task;
+use App\ACS\Entities\TaskCollection;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
 use App\ACS\Request\InformRequest;
@@ -60,6 +61,8 @@ class Context
 
     public Collection $tasks;
 
+    public string $requestId = '';
+
     public function __construct(Request $request, Response $response)
     {
         $this->request = $request;
@@ -71,7 +74,10 @@ class Context
 
     public function envelopeId(): string
     {
-        return time() . mt_rand(100000, 999999);
+        if($this->requestId !== '') {
+            return $this->requestId;
+        }
+        return (string) (time() . mt_rand(100000, 999999));
     }
 
     public function session()
@@ -84,6 +90,7 @@ class Context
         $parser = new XMLParser((string)$this->request->getContent());
         $this->bodyType = $parser->bodyType;
         $this->cwmpVersion = $parser->cwmpVersion;
+        $this->requestId = $parser->requestId;
 
         switch ($this->bodyType) {
             case Types::INFORM:
@@ -93,12 +100,12 @@ class Context
 
             case Types::GetParameterNamesResponse:
                 $this->cpeResponse = new GetParameterNamesResponse($parser->body);
-                $this->parameterInfos->merge($this->cpeResponse->parameters);
+                $this->parameterInfos = $this->parameterInfos->merge($this->cpeResponse->parameters);
                 break;
 
             case Types::GetParameterValuesResponse:
                 $this->cpeResponse = new GetParameterValuesResponse($parser->body);
-                $this->parameterValues->merge($this->cpeResponse->parameters);
+                $this->parameterValues = $this->parameterValues->merge($this->cpeResponse->parameters);
                 $this->parameterValues->assignDefaultFlags($this->parameterInfos);
                 break;
 
@@ -131,8 +138,10 @@ class Context
 
     private function configureResponse(Response $response)
     {
-        return $response->header('Content-Type', 'text/xml')
-            ->header('Connection', 'Keep-alive');
+        return $response
+            ->header('Content-Type', 'text/xml')
+            //->header('Connection', 'Keep-alive')
+            ;
     }
 
     public function loadFromSession()
@@ -140,7 +149,7 @@ class Context
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
-        $this->tasks = $this->session()->get('tasks', new Collection());
+        $this->tasks = $this->session()->get('tasks', new TaskCollection());
 
         if($this->device->serialNumber !== "") {
             $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
@@ -152,25 +161,6 @@ class Context
         $this->session()->put('parameterNames', $this->parameterInfos);
         $this->session()->put('parameterValues', $this->parameterValues);
         $this->session()->put('tasks', $this->tasks);
-    }
-
-    public function hasTaskOfType(string $type): bool {
-        return $this->tasks->filter(fn(Task $task) => $task->name === $type)->count() > 0;
-    }
-
-    public function isNextTask(string $type): bool {
-        dump("Next task", $this->tasks->first());
-        /** @var Task $task */
-        $task = $this->tasks->first();
-        if($task === null) {
-            return false;
-        }
-
-        return $task->name === $type;
-    }
-
-    public function addTask(Task $task) {
-        $this->tasks->push($task);
     }
 
 }

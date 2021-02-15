@@ -38,9 +38,6 @@ class ControllerLogic
         switch ($this->context->bodyType) {
             case Types::INFORM:
                 $this->processInformRequest();
-                $this->updateDeviceData();
-                $body = (new InformResponse($this->context))->getBody();
-                $this->context->response->setContent($body)->send();
                 break;
 
             case Types::EMPTY:
@@ -77,6 +74,7 @@ class ControllerLogic
             [
                 'oui' => $this->context->device->oui,
                 'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
+                'updated_at' => now(),
             ]
         );
 
@@ -88,8 +86,8 @@ class ControllerLogic
     {
         if($this->context->device->new === true) {
             $this->context->response->setContent(
-                //Maybe need to query at first only for nextlevel params
-                //then chun response to next GPN requests
+            //Maybe need to query at first only for nextlevel params
+            //then chun response to next GPN requests
                 (new GetParameterNamesRequest($this->context, $this->context->device->root, false))->getBody()
             )->send();
         }
@@ -104,6 +102,12 @@ class ControllerLogic
         if($this->context->parameterValues->first() !==  null) {
             $this->context->device->root = explode(".", $this->context->parameterValues->first()->name)[0].".";
         }
+
+        $this->updateDeviceData();
+        //TODO: add to check BOOT/BOOTSTRAP flags
+        $body = (new InformResponse($this->context))->getBody();
+        $this->context->response->setContent($body)->send();
+
     }
 
     private function processGetParameterNamesResponse()
@@ -111,22 +115,48 @@ class ControllerLogic
         /** @var GetParameterNamesResponse $getParameterNamesResponse */
         $getParameterNamesResponse = $this->context->cpeResponse;
 
-        if($this->context->isNextTask(Types::GetParameterNames) === false) {
-            $filteredParameters = $getParameterNamesResponse->parameters->filterByChunkCount(2)->filterEndsWithDot();
+        if($this->context->tasks->isNextTask(Types::GetParameterNames) === false) {
+            $filteredParameters = $getParameterNamesResponse->parameters->filterByChunkCount(2,2)->filterEndsWithDot();
             foreach ($filteredParameters->chunk(self::GET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
                 $task = new Task(Types::GetParameterValues);
                 $task->setPayload([
                     'parameters' => $chunk
                 ]);
-                $this->context->addTask($task);
+                $this->context->tasks->addTask($task);
             }
         }
     }
 
+    private function processGetParametersValuesResponse()
+    {
+        if($this->context->device->new) {
+            //Save Parameters in db
+            DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
+
+            if($this->context->isNextTask(Types::GetParameterValues) === false) {
+                //Save object parameters
+                DeviceParameter::massUpdateOrInsert(
+                    $this->context->deviceModel,
+                    $this->context->parameterInfos->filterEndsWithDot()->toParameterValuesCollecton()
+                );
+            }
+        }
+    }
+
+    private function processAddObjectResponse()
+    {
+    }
+
+    private function processDeleteObjectResponse()
+    {
+    }
+
     private function runTasks()
     {
+        /** @var Task $task */
         $task = $this->context->tasks->shift();
         if($task === null) {
+            $this->endSession();
             return;
         }
 
@@ -144,19 +174,8 @@ class ControllerLogic
 
     }
 
-    private function processGetParametersValuesResponse()
+    private function endSession()
     {
-        if($this->context->device->new) {
-            //Save Parameters in db
-            DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
-        }
-    }
-
-    private function processAddObjectResponse()
-    {
-    }
-
-    private function processDeleteObjectResponse()
-    {
+        //End session end response empty
     }
 }

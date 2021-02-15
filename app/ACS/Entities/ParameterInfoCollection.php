@@ -23,4 +23,24 @@ class ParameterInfoCollection extends Collection
             return Str::endsWith($item->name, '.');
         });
     }
+
+    public function toParameterValuesCollecton(): ParameterValuesCollection {
+        $collection = new ParameterValuesCollection();
+        /** @var ParameterInfoStruct $item */
+        foreach($this->items as $item) {
+            $parameterValueStruct = new ParameterValueStruct();
+            $parameterValueStruct->name = $item->name;
+            $parameterValueStruct->flag = new Flag();
+            if($item->writable) {
+                $parameterValueStruct->flag->write = true;
+            }
+            if(Str::endsWith($item->name,'.')) {
+                $parameterValueStruct->flag->object = true;
+                $parameterValueStruct->type = 'object';
+            }
+            $collection->put($item->name, $parameterValueStruct);
+        }
+
+        return $collection;
+    }
 }

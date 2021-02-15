@@ -21,5 +21,6 @@ class Device extends Model
     protected $table = 'device';
 
     protected $fillable = ['serial_number', 'oui', 'software_version', 'hardware_version',
-        'connection_request_url', 'connection_request_user', 'connection_request_password'];
+        'connection_request_url', 'connection_request_user', 'connection_request_password',
+        'updated_at'];
 }

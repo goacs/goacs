@@ -24,6 +24,8 @@ class XMLParser
 
     public string $cwmpVersion = '1.0';
 
+    public string $requestId = '';
+
 
     public function __construct(string $reqBodyContent) {
         $this->xml = $reqBodyContent;
@@ -59,6 +61,7 @@ class XMLParser
 
         $this->bodyType = $this->body->localName;
         $this->fillCwmpVersion($this->body->namespaceURI);
+        $this->extractRequestId();
     }
 
     private function lookupNamespaces(): array {
@@ -72,9 +75,6 @@ class XMLParser
 
     private function fillCwmpVersion(string $uri) {
         switch ($uri) {
-            case 'urn:dslforum-org:cwmp-1-0':
-                $this->cwmpVersion = '1.0';
-                break;
             case 'urn:dslforum-org:cwmp-1-1':
                 $this->cwmpVersion = '1.1';
                 break;
@@ -85,7 +85,18 @@ class XMLParser
                 $this->cwmpVersion = '1.3';
                 break;
             default:
-                throw new ACSException("Unknown cwmp version: ".$uri);
+            case 'urn:dslforum-org:cwmp-1-0':
+                $this->cwmpVersion = '1.0';
+                break;
+        }
+    }
+
+    private function extractRequestId() {
+        foreach($this->header->childNodes as $child) {
+            if($child instanceof \DOMElement && $child->localName === 'ID') {
+                $this->requestId = $child->firstChild->nodeValue;
+                return;
+            }
         }
     }
 }

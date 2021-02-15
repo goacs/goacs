@@ -30,7 +30,7 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_DATABASE}
     ports:
-      - ${DB_PORT}:3306
+      - 3399:3306
     ulimits:
       nofile:
         soft: 65536

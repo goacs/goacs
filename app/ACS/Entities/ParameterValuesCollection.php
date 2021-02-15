@@ -25,9 +25,10 @@ class ParameterValuesCollection extends Collection
          */
         foreach ($this->items as $key => $item) {
             /** @var ParameterInfoStruct $parameterInfo */
-            if($parameterInfo = $parameterInfoCollection->has($item->name)) {
+            if($parameterInfo = $parameterInfoCollection->get($item->name)) {
                 $flag = new Flag();
                 if($parameterInfo->writable && Str::endsWith($parameterInfo->name,'.')) {
+                    $this->items[$key]->type = 'object';
                     $flag->object = true;
                     $flag->write = true;
                 } else if ($parameterInfo->writable) {
