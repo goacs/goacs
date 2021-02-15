@@ -9,7 +9,6 @@ RUN apt-get update -y && \
 
 # Install selected extensions
 RUN apt-get update && \
-    apt-get install -y
     apt-get install -y libpq-dev       \
             inotify-tools              \
             libcurl4-openssl-dev       \
@@ -22,6 +21,7 @@ RUN apt-get update && \
 RUN pecl install swoole redis
 
 RUN docker-php-ext-enable swoole
+RUN docker-php-ext-enable redis
 
 RUN docker-php-ext-install \
     pdo \
@@ -33,3 +33,5 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 RUN mkdir -p /var/log/supervisor && \
         rm -rf /var/lib/apt/lists/* $HOME/.composer/*-old.phar /usr/bin/qemu-*-static
 
+
+CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
