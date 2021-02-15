@@ -6,7 +6,9 @@ declare(strict_types=1);
 namespace App\ACS\Entities;
 
 
-class Flag
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+
+class Flag implements CastsAttributes
 {
     public function __construct(
         public bool $read = true,
@@ -67,5 +69,15 @@ class Flag
 
     public function toJson(): string {
         return json_encode($this->toArray());
+    }
+
+    public function get($model, string $key, $value, array $attributes)
+    {
+        return Flag::fromArray(json_decode($value, true));
+    }
+
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return $value->toJson();
     }
 }

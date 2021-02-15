@@ -6,9 +6,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 
+use App\ACS\Entities\Flag;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\DeviceParameter
@@ -40,6 +42,13 @@ class DeviceParameter extends Model
 
     protected $fillable = ['device_id', 'name', 'value', 'type', 'flags'];
 
+    protected $casts = [
+        'flags' => Flag::class,
+    ];
+
+    public function device(): BelongsTo {
+        return $this->belongsTo(Device::class);
+    }
 
     public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {
         foreach($parameterValuesCollection->chunk(300) as $chunk) {

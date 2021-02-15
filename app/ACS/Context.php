@@ -14,6 +14,7 @@ use App\ACS\Entities\TaskCollection;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
 use App\ACS\Request\InformRequest;
+use App\ACS\Request\TransferCompleteRequest;
 use App\ACS\Response\ACSResponse;
 use App\ACS\Response\AddObjectResponse;
 use App\ACS\Response\CPEResponse;
@@ -59,7 +60,7 @@ class Context
 
     public ParameterValuesCollection $parameterValues;
 
-    public Collection $tasks;
+    public TaskCollection $tasks;
 
     public string $requestId = '';
 
@@ -67,7 +68,6 @@ class Context
     {
         $this->request = $request;
         $this->response = $this->configureResponse($response);
-        $this->tasks = new Collection();
         $this->loadFromSession();
         $this->processBody();
     }
@@ -126,7 +126,7 @@ class Context
                 break;
 
             case Types::TransferComplete:
-
+                $this->cpeRequest = new TransferCompleteRequest($parser->body);
                 break;
 
             case Types::FaultResponse:

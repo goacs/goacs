@@ -19,7 +19,8 @@
         "laravel/tinker": "^2.5",
         "laravie/parser": "^2.1",
         "swooletw/laravel-swoole": "dev-improvement/php8",
-        "symfony/dom-crawler": "^5.2"
+        "symfony/dom-crawler": "^5.2",
+        "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.7",

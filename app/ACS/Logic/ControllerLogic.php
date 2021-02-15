@@ -133,7 +133,7 @@ class ControllerLogic
             //Save Parameters in db
             DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
 
-            if($this->context->isNextTask(Types::GetParameterValues) === false) {
+            if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
                 //Save object parameters
                 DeviceParameter::massUpdateOrInsert(
                     $this->context->deviceModel,
