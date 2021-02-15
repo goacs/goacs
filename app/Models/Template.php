@@ -7,6 +7,8 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Template
@@ -26,5 +28,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Template extends Model
 {
+    protected $table = 'templates';
 
+    protected $fillable = ['name'];
+
+    public function parameters(): HasMany {
+        return $this->hasMany(TemplateParameter::class);
+    }
+
+    public function devices(): BelongsToMany {
+        return $this->belongsToMany(Device::class, 'device_to_template');
+    }
 }

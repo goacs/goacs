@@ -7,7 +7,10 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * App\Models\Device
@@ -27,5 +30,12 @@ class Device extends Model
 
     public function parameters(): HasMany {
         return $this->hasMany(DeviceParameter::class);
+    }
+
+    public function templates(): BelongsToMany {
+        return $this->belongsToMany(Template::class, 'device_to_template');
+    }
+    public function tasks(): MorphMany {
+        return $this->morphMany(Task::class, 'for');
     }
 }

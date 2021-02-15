@@ -26,6 +26,10 @@ Route::prefix('dashboard')->group(function() {
 
 Route::apiResource('device', \App\Http\Controllers\Device\DeviceController::class)->only(['index', 'show', 'destroy']);
 Route::apiResource('device.parameters', \App\Http\Controllers\Device\DeviceParameterController::class);
+Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTemplateController::class);
+Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
+Route::apiResource('template', \App\Http\Controllers\Template\TemplateController::class);
+Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

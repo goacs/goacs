@@ -14,7 +14,7 @@ class DeviceParameterStoreRequest extends FormRequest
             'name' => [
                 'string',
                 'required',
-                Rule::unique('device_parameters','name')->ignore($this->deviceParameter)
+                Rule::unique('device_parameters','name')->ignore($this->parameter)
             ],
             'value' => 'string',
             'type' => 'string|required',
