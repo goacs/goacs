@@ -33,8 +33,9 @@ class Device extends Model
     }
 
     public function templates(): BelongsToMany {
-        return $this->belongsToMany(Template::class, 'device_to_template');
+        return $this->belongsToMany(Template::class, 'device_to_template')->withPivot('priority');
     }
+
     public function tasks(): MorphMany {
         return $this->morphMany(Task::class, 'for');
     }

@@ -10,6 +10,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class DeviceTaskController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index(Device $device) {
         return new JsonResource($device->tasks);
     }

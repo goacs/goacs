@@ -49,11 +49,11 @@ class Flag implements CastsAttributes
 
     public static function fromArray(array $data): Flag {
         return new Flag(
-            $data['read'],
-            $data['write'],
-            $data['object'],
-            $data['send'],
-            $data['system'],
+            $data['read'] ?? false,
+            $data['write'] ?? false,
+            $data['object'] ?? false,
+            $data['send'] ?? false,
+            $data['system'] ?? false,
         );
     }
 
@@ -78,6 +78,9 @@ class Flag implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes)
     {
+        if(is_array($value)) {
+            $value = self::fromArray($value);
+        }
         return $value->toJson();
     }
 }

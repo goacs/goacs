@@ -9,6 +9,7 @@ namespace App\Models;
 use App\ACS\Entities\Flag;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
+use App\ACS\XML\XSDTypes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -48,6 +49,31 @@ class DeviceParameter extends Model
 
     public function device(): BelongsTo {
         return $this->belongsTo(Device::class);
+    }
+
+    public static function setParameter(string $path, $value, string $flags = 'RWS', $type = null) {
+        $parameter = static::where(['name' => $path])->firstOrNew();
+        if($parameter->wasRecentlyCreated == true) {
+            //ParameterNotExist
+            if($type === null) {
+                $type = XSDTypes::STRING;
+            }
+        } else {
+            $type = $parameter->type;
+        }
+
+        $parameter->name = $path;
+        $parameter->value = (string)$value;
+        $parameter->type = $type;
+        $parameter->flags = Flag::fromString($flags);
+        $parameter->save();
+    }
+
+    public static function getParameterValue($path) {
+        $parameter = static::where(['name' => $path])->first();
+
+        //magic XD
+        return $parameter?->value ?? '';
     }
 
     public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {

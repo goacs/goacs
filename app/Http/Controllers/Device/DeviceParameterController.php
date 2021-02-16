@@ -13,6 +13,11 @@ use Illuminate\Http\Request;
 
 class DeviceParameterController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index(Request $request, Device $device) {
         $query = $device->parameters();
         $this->prepareFilter($request, $query);

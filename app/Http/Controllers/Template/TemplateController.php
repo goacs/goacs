@@ -12,6 +12,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TemplateController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index(Request $request) {
         $query = Template::withCount('parameters');
         $this->prepareFilter($request, $query);
