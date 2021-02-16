@@ -25,6 +25,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Template whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Template whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Device[] $devices
+ * @property-read int|null $devices_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TemplateParameter[] $parameters
+ * @property-read int|null $parameters_count
  */
 class Template extends Model
 {

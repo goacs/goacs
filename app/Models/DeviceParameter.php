@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|DeviceParameter whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DeviceParameter whereValue($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\Device $device
  */
 class DeviceParameter extends Model
 {

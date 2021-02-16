@@ -30,6 +30,7 @@ Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTempla
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
 Route::apiResource('template', \App\Http\Controllers\Template\TemplateController::class);
 Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);
+Route::apiResource('file', \App\Http\Controllers\File\FileController::class);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

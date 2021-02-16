@@ -17,6 +17,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter query()
  * @mixin \Eloquent
+ * @property int $id
+ * @property int $template_id
+ * @property string $name
+ * @property string $value
+ * @property string $type
+ * @property $flags
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Template $template
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereFlags($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereTemplateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereValue($value)
  */
 class TemplateParameter extends Model
 {

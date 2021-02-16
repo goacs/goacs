@@ -19,6 +19,32 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Device newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Device query()
  * @mixin \Eloquent
+ * @property int $id
+ * @property string $serial_number
+ * @property string $oui
+ * @property string|null $software_version
+ * @property string|null $hardware_version
+ * @property string $connection_request_url
+ * @property string|null $connection_request_user
+ * @property string|null $connection_request_password
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DeviceParameter[] $parameters
+ * @property-read int|null $parameters_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Task[] $tasks
+ * @property-read int|null $tasks_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Template[] $templates
+ * @property-read int|null $templates_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereConnectionRequestPassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereConnectionRequestUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereConnectionRequestUser($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereHardwareVersion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereOui($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereSerialNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereSoftwareVersion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereUpdatedAt($value)
  */
 class Device extends Model
 {
