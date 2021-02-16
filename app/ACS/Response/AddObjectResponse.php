@@ -15,12 +15,11 @@ use Illuminate\Support\Collection;
 
 class AddObjectResponse extends CPEResponse
 {
-    private \DOMNode $body;
     private int $status;
     protected int $instanceNumber;
 
     public function __construct(\DOMNode $body) {
-        $this->body = $body;
+        parent::__construct($body);
         $this->readValues();
     }
 

@@ -10,15 +10,17 @@ use App\ACS\Entities\Device;
 use App\ACS\Entities\Event;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\XML\ParameterListReader;
+use Illuminate\Support\Collection;
 
 class InformRequest extends CPERequest
 {
     public Device $device;
     public ParameterValuesCollection $parametersList;
-    public array $events = [];
+    public Collection $events;
 
     public function __construct(\DOMNode $body) {
         parent::__construct($body);
+        $this->events = new Collection();
         $this->parametersList = new ParameterValuesCollection();
         $this->readValues();
     }
@@ -71,7 +73,7 @@ class InformRequest extends CPERequest
             $event = new Event();
             switch ($param->nodeName) {
                 case 'EventCode':
-                    $event->code = $param->firstChild->nodeValue;
+                    $event->setCode($param->firstChild->nodeValue);
                     break;
                 case 'CommandKey':
                     $event->key = $param->firstChild->nodeValue;
@@ -79,5 +81,9 @@ class InformRequest extends CPERequest
             }
             $this->events[] = $event;
         }
+    }
+
+    public function hasEvent(int $number): bool {
+        return $this->events->filter(fn(Event $item) => $item->getCodeNumber() === $number)->count() > 0;
     }
 }

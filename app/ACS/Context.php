@@ -64,6 +64,8 @@ class Context
 
     public TaskCollection $tasks;
 
+    public bool $boot = false;
+
     public string $requestId = '';
 
     public function __construct(Request $request, Response $response)
@@ -102,6 +104,9 @@ class Context
             case Types::INFORM:
                 $this->cpeRequest = new InformRequest($parser->body);
                 $this->device = $this->cpeRequest->device;
+                if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1)) {
+                    $this->boot = true;
+                }
                 break;
 
             case Types::GetParameterNamesResponse:

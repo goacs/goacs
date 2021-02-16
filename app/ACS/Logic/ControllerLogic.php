@@ -63,7 +63,14 @@ class ControllerLogic
                 break;
 
         }
-
+        //Może zamiast wysyłać acsReq z taska, to lepiej sterować w context acsRequest a następnie zrobić tak:
+        /*
+         * if(context->cpeRequest) {
+         *      send response and return
+         * } else if(context->acsRequest) {
+         *      send request and return
+         * }
+         */
         $this->runTasks();
         $this->context->storeToSession();
     }
@@ -86,7 +93,7 @@ class ControllerLogic
 
     private function processEmptyResponse()
     {
-        if($this->context->device->new === true) {
+        if($this->context->device->new === true || $this->context->boot === true) {
             $this->context->response->setContent(
             //Maybe need to query at first only for nextlevel params
             //then chun response to next GPN requests
@@ -143,6 +150,21 @@ class ControllerLogic
                 );
             }
         }
+
+        if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
+            DeviceParameter::setParameter(
+                $this->context->device->root.'ManagementServer.PeriodicInformInterval',
+                    $this->calculatePIIValue()
+            );
+
+            if($this->context->boot) {
+                $this->runTasks();
+            }
+        }
+
+        /*
+         * Przemyśleć, czy nie wykonywać tutaj skryptów
+         */
     }
 
     private function processAddObjectResponse()
@@ -170,7 +192,6 @@ class ControllerLogic
                 break;
 
             case Types::SetParameterValues:
-                $setterLogic = new ParameterSetterLogic($this->context);
                 $request = new SetParameterValuesRequest($this->context);
                 break;
 
@@ -190,5 +211,9 @@ class ControllerLogic
     private function endSession()
     {
         //End session end response empty
+    }
+
+    private function calculatePIIValue(): int {
+        return rand(10000, 40000);
     }
 }

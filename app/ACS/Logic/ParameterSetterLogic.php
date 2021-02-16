@@ -22,6 +22,15 @@ class ParameterSetterLogic
     }
 
     public function getParametersToSend(): ParameterValuesCollection {
+        if($this->context->boot === true)
+        {
+            return $this->getParametersForBoot();
+        }
         return new ParameterValuesCollection();
+    }
+
+    public function getParametersForBoot(): ParameterValuesCollection {
+        return new ParameterValuesCollection();
+
     }
 }
