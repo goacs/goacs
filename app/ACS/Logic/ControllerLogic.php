@@ -8,6 +8,8 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\ACS\Entities\Task;
+use App\ACS\Logic\Script\Sandbox;
+use App\ACS\Logic\Script\SandboxException;
 use App\ACS\Request\GetParameterNamesRequest;
 use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
@@ -170,6 +172,17 @@ class ControllerLogic
             case Types::SetParameterValues:
                 $setterLogic = new ParameterSetterLogic($this->context);
                 $request = new SetParameterValuesRequest($this->context);
+                break;
+
+            case Types::RunScript:
+                $sandbox = new Sandbox($this->context, $task->payload['script']);
+                try {
+                    $sandbox->run();
+                } catch (SandboxException $exception) {
+                    //TODO Save to db as fault
+                }
+
+                break;
         }
 
     }

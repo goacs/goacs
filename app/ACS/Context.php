@@ -28,6 +28,8 @@ use App\Models\Device as DeviceModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
+use function Symfony\Component\Translation\t;
 
 class Context
 {
@@ -82,7 +84,11 @@ class Context
 
     public function session()
     {
-        return $this->request->session();
+        try {
+            return $this->request->session();
+        } catch (\RuntimeException $exception) {
+            return \session();
+        }
     }
 
     private function processBody()

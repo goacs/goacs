@@ -7,6 +7,7 @@ namespace App\ACS\Logic;
 
 
 use App\ACS\Context;
+use App\ACS\Entities\ParameterValuesCollection;
 
 class ParameterSetterLogic
 {
@@ -18,5 +19,9 @@ class ParameterSetterLogic
     public function __construct(Context $context)
     {
         $this->context = $context;
+    }
+
+    public function getParametersToSend(): ParameterValuesCollection {
+        return new ParameterValuesCollection();
     }
 }

@@ -26,4 +26,6 @@ class Types
     const FaultResponse = 'Fault';
     const TransferComplete = 'TransferComplete';
 
+    const RunScript = 'RunScript';
+
 }
