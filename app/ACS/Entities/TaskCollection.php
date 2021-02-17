@@ -25,4 +25,12 @@ class TaskCollection extends Collection
     public function addTask(Task $task) {
         $this->push($task);
     }
+
+    public function nextTask(): ?Task {
+        return $this->filter(fn(Task $task) => $task->done_at === null)->first();
+    }
+
+    public function prevTask(): ?Task {
+        return $this->filter(fn(Task $task) => $task->done_at !== null)->last();
+    }
 }

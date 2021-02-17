@@ -13,6 +13,9 @@ services:
     links:
       - redis
       - mariadb
+    depends_on:
+      - redis
+      - mariadb
 
   redis:
     image: redis:latest

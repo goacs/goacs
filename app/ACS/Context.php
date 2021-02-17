@@ -42,13 +42,13 @@ class Context
      */
     public Response $response;
 
-    public CPERequest $cpeRequest;
+    public ?CPERequest $cpeRequest = null;
 
-    public CPEResponse $cpeResponse;
+    public ?CPEResponse $cpeResponse = null;
 
-    public ACSRequest $acsRequest;
+    public ?ACSRequest $acsRequest = null;
 
-    public ACSResponse $acsResponse;
+    public ?ACSResponse $acsResponse = null;
 
     public ?Device $device = null;
 

@@ -7,24 +7,29 @@ namespace App\ACS\Logic;
 
 
 use App\ACS\Context;
+use App\ACS\Entities\ParameterInfoStruct;
 use App\ACS\Entities\Task;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
+use App\ACS\Request\AddObjectRequest;
+use App\ACS\Request\DeleteObjectRequest;
+use App\ACS\Request\DownloadRequest;
 use App\ACS\Request\GetParameterNamesRequest;
 use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
 use App\ACS\Request\SetParameterValuesRequest;
+use App\ACS\Response\AddObjectResponse;
 use App\ACS\Response\GetParameterNamesResponse;
+use App\ACS\Response\GetRPCMethodsACSResponse;
 use App\ACS\Response\InformResponse;
+use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
-use League\CommonMark\Block\Element\ThematicBreak;
+use MongoDB\BSON\Type;
 
 class ControllerLogic
 {
-    const SESSION_NEW = 'new';
-
     const GET_PARAMETER_VALUES_CHUNK_SIZE = 4;
 
     /**
@@ -40,6 +45,10 @@ class ControllerLogic
         switch ($this->context->bodyType) {
             case Types::INFORM:
                 $this->processInformRequest();
+                break;
+
+            case Types::GetRPCMethodsRequest:
+                $this->processGetRPCMethodsRequest();
                 break;
 
             case Types::EMPTY:
@@ -72,6 +81,22 @@ class ControllerLogic
          * }
          */
         $this->runTasks();
+
+        if($this->context->cpeRequest !== null) {
+            $this->context
+                ->response
+                ->setContent(
+                    $this->context->acsResponse->getBody()
+                )
+                ->send();
+        } else if($this->context->acsRequest !== null) {
+            $this->context->response
+                ->setContent(
+                    $this->context->acsRequest->getBody()
+                )
+                ->send();
+        }
+
         $this->context->storeToSession();
     }
 
@@ -94,11 +119,12 @@ class ControllerLogic
     private function processEmptyResponse()
     {
         if($this->context->device->new === true || $this->context->boot === true) {
-            $this->context->response->setContent(
-            //Maybe need to query at first only for nextlevel params
-            //then chun response to next GPN requests
-                (new GetParameterNamesRequest($this->context, $this->context->device->root, false))->getBody()
-            )->send();
+            $task = new Task(Types::GetParameterNames);
+            $task->setPayload([
+                'parameter' => $this->context->device->root
+            ]);
+
+            $this->context->tasks->addTask($task);
         }
     }
 
@@ -114,9 +140,13 @@ class ControllerLogic
 
         $this->updateDeviceData();
         //TODO: add to check BOOT/BOOTSTRAP flags
-        $body = (new InformResponse($this->context))->getBody();
-        $this->context->response->setContent($body)->send();
 
+        $task = new Task(Types::INFORMResponse);
+        $task->setPayload([
+            'parameter' => $this->context->device->root
+        ]);
+
+        $this->context->tasks->addTask($task);
     }
 
     private function processGetParameterNamesResponse()
@@ -151,15 +181,19 @@ class ControllerLogic
             }
         }
 
+        if($this->context->tasks->prevTask()?->name === Types::AddObject) {
+            DeviceParameter::massUpdateOrInsert(
+                $this->context->deviceModel,
+                $this->context->cpeResponse->parameters
+            );
+        }
+
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
             DeviceParameter::setParameter(
                 $this->context->device->root.'ManagementServer.PeriodicInformInterval',
                     $this->calculatePIIValue()
             );
 
-            if($this->context->boot) {
-                $this->runTasks();
-            }
         }
 
         /*
@@ -169,6 +203,26 @@ class ControllerLogic
 
     private function processAddObjectResponse()
     {
+        $prevTask = $this->context->tasks->prevTask();
+        if($prevTask->name !== Types::AddObject) {
+            //log
+            \Log::error('AddObjectResponse out of order!', ['context' => $this->context]);
+            return;
+        }
+        /** @var AddObjectResponse $addObjectResponse */
+        $addObjectResponse = $this->context->cpeResponse;
+        $path = $prevTask->payload['parameter'];
+        $gpvTask = new Task(Types::GetParameterValues);
+
+        $gpvTask->setPayload(
+            [
+                'parameters' => [
+                    (new ParameterInfoStruct())->name => $path.".".$addObjectResponse->getInstanceNumber()."."
+                ]
+            ]
+        );
+
+
     }
 
     private function processDeleteObjectResponse()
@@ -178,21 +232,53 @@ class ControllerLogic
     private function runTasks()
     {
         /** @var Task $task */
-        $task = $this->context->tasks->shift();
+        $task = $this->context->tasks->nextTask();
         if($task === null) {
             $this->endSession();
             return;
         }
 
         switch ($task->name) {
+            case Types::INFORMResponse:
+                $acsResponse = (new InformResponse($this->context));
+                $this->context->acsResponse = $acsResponse;
+                break;
+
+            case Types::GetParameterNames:
+                $acsRequest = (new GetParameterNamesRequest($this->context, $task->payload['parameter']));
+                $this->context->acsRequest = $acsRequest;
+                break;
+
+
             case Types::GetParameterValues:
                 $request = new GetParameterValuesRequest($this->context);
                 $request->setParameters($task->payload['parameters']);
-                $this->context->response->setContent($request->getBody())->send();
+                $this->context->acsRequest = $request;
                 break;
 
             case Types::SetParameterValues:
                 $request = new SetParameterValuesRequest($this->context);
+                $this->context->acsRequest = $request;
+                break;
+
+            case Types::AddObject:
+                $request = new AddObjectRequest($this->context, $task->payload['parameter']);
+                $this->context->acsRequest = $request;
+                break;
+
+            case Types::DeleteObject:
+                $request = new DeleteObjectRequest($this->context, $task->payload['parameter']);
+                $this->context->acsRequest = $request;
+                break;
+
+            case Types::Download:
+                $request = new DownloadRequest($this->context);
+                $this->context->acsRequest = $request;
+                break;
+
+            case Types::TransferCompleteResponse:
+                $response = new TransferCompleteResponse($this->context);
+                $this->context->acsResponse = $response;
                 break;
 
             case Types::RunScript:
@@ -206,6 +292,13 @@ class ControllerLogic
                 break;
         }
 
+        $task->done();
+
+    }
+
+    private function processGetRPCMethodsRequest()
+    {
+        $this->context->acsResponse = new GetRPCMethodsACSResponse($this->context);
     }
 
     private function endSession()
@@ -216,4 +309,5 @@ class ControllerLogic
     private function calculatePIIValue(): int {
         return rand(10000, 40000);
     }
+
 }

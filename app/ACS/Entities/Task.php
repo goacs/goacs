@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class Task
 {
     public string $name;
-    public array $payload;
+    public array $payload = [];
     public ?Carbon $done_at = null;
 
     public function __construct(string $name) {

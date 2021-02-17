@@ -11,6 +11,8 @@ class Types
     const EMPTY = 'Empty';
     const INFORM = 'Inform';
     const INFORMResponse = 'InformResponse';
+    const GetRPCMethodsRequest = 'GetRPCMethods';
+    const GetRPCMethodsResponse = 'GetRPCMethodsResponse';
     const GetParameterNames = 'GetParameterNames';
     const GetParameterNamesResponse = 'GetParameterNamesResponse';
     const GetParameterValues = 'GetParameterValues';
@@ -25,6 +27,7 @@ class Types
     const DownloadResponse = 'DownloadResponse';
     const FaultResponse = 'Fault';
     const TransferComplete = 'TransferComplete';
+    const TransferCompleteResponse = 'TransferCompleteResponse';
 
     const RunScript = 'RunScript';
 
