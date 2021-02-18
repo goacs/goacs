@@ -35,6 +35,7 @@ class Sandbox
 
     public function getScript(): string {
         $script = $this->script;
+        $script = str_replace('<?php', '', $script);
         $script = str_replace("\n",'', $script);
         return $script;
     }

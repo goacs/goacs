@@ -52,9 +52,9 @@ class DeviceParameter extends Model
         return $this->belongsTo(Device::class);
     }
 
-    public static function setParameter(string $path, $value, string $flags = 'RWS', $type = null) {
+    public static function setParameter(int $device_id, string $path, $value, string $flags = 'RWS', $type = null) {
         $parameter = static::where(['name' => $path])->firstOrNew();
-        if($parameter->wasRecentlyCreated == true) {
+        if($parameter->exists == false) {
             //ParameterNotExist
             if($type === null) {
                 $type = XSDTypes::STRING;
@@ -63,6 +63,7 @@ class DeviceParameter extends Model
             $type = $parameter->type;
         }
 
+        $parameter->device_id = $device_id;
         $parameter->name = $path;
         $parameter->value = (string)$value;
         $parameter->type = $type;
@@ -70,8 +71,8 @@ class DeviceParameter extends Model
         $parameter->save();
     }
 
-    public static function getParameterValue($path) {
-        $parameter = static::where(['name' => $path])->first();
+    public static function getParameterValue(int $device_id, string $path) {
+        $parameter = static::where(['name' => $path, 'device_id' => $device_id])->first();
 
         //magic XD
         return $parameter?->value ?? '';

@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +49,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  */
 class Device extends Model
 {
+    use HasFactory;
+
     protected $table = 'device';
 
     protected $fillable = ['serial_number', 'oui', 'software_version', 'hardware_version',

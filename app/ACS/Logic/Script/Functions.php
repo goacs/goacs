@@ -34,10 +34,14 @@ class Functions
     }
 
     public function setParameter($path, $value, $flags = 'RWS', $type = null) {
-        DeviceParameter::setParameter($path, $value, $flags, $type);
+        DeviceParameter::setParameter($this->deviceModel->id, $path, $value, $flags, $type);
     }
 
     public function getParameterValue($path) {
-        return DeviceParameter::getParameterValue($path);
+        return DeviceParameter::getParameterValue($this->deviceModel->id, $path);
+    }
+
+    public function parameterExist($path) {
+        return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->exists();
     }
 }

@@ -48,7 +48,17 @@ class Task extends Model
 
     protected $table = 'tasks';
 
+    protected $casts = [
+        'payload' => 'array'
+    ];
+
     public function morph(): MorphTo {
         return $this->morphTo('for');
+    }
+
+    public function toACSTask(): \App\ACS\Entities\Task {
+        $task = new \App\ACS\Entities\Task($this->name);
+        $task->setPayload((array) $this->payload);
+        return $task;
     }
 }
