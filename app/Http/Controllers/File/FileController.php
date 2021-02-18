@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\File\FileStoreRequest;
 use App\Models\File;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class FileController extends Controller
 {
@@ -28,11 +29,24 @@ class FileController extends Controller
 
     public function store(FileStoreRequest $request) {
         $file = $request->file('file');
-        \Storage::disk('file_store')->putFile('/',$file);
+        $storeFilename = \Storage::disk('file_store')->putFile('/', $file);
 
+        if($storeFilename === false) {
+            return response()->json(['error' => 'File upload error'], 500);
+        }
+
+        $model = File::create([
+            'name' => $file->getClientOriginalName(),
+            'filepath' => $storeFilename,
+            'disk' => 'file_store',
+            'type' => '1 FIRMWARE',
+            'size' => $file->getSize()
+        ]);
+
+        return new JsonResource($model);
     }
 
-    public function download() {
-
+    public function download(File $file) {
+        return \Storage::disk('file_store')->download($file->filepath);
     }
 }

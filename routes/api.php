@@ -31,6 +31,7 @@ Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskContro
 Route::apiResource('template', \App\Http\Controllers\Template\TemplateController::class);
 Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);
 Route::apiResource('file', \App\Http\Controllers\File\FileController::class);
+Route::get('/file/{file}/download', [\App\Http\Controllers\File\FileController::class, 'download']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

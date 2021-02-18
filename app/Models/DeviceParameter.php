@@ -53,7 +53,7 @@ class DeviceParameter extends Model
     }
 
     public static function setParameter(int $device_id, string $path, $value, string $flags = 'RWS', $type = null) {
-        $parameter = static::where(['name' => $path])->firstOrNew();
+        $parameter = static::where(['name' => $path, 'device_id' => $device_id])->firstOrNew();
         if($parameter->exists == false) {
             //ParameterNotExist
             if($type === null) {

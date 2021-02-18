@@ -8,6 +8,7 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\ACS\Entities\ParameterInfoStruct;
+use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Task;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
@@ -26,7 +27,6 @@ use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
-use MongoDB\BSON\Type;
 
 class ControllerLogic
 {
@@ -189,10 +189,7 @@ class ControllerLogic
         }
 
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
-            DeviceParameter::setParameter(
-                $this->context->device->root.'ManagementServer.PeriodicInformInterval',
-                    $this->calculatePIIValue()
-            );
+            $this->processSetPII();
 
         }
 
@@ -308,6 +305,21 @@ class ControllerLogic
 
     private function calculatePIIValue(): int {
         return rand(10000, 40000);
+    }
+
+    private function processSetPII()
+    {
+        $pvs = new ParameterValueStruct();
+        $pvs->name = $this->context->device->root.'ManagementServer.PeriodicInformInterval';
+        $pvs->value = (string) $this->calculatePIIValue();
+
+        DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
+
+        $task = new Task(Types::SetParameterValues);
+        $task->setPayload(['parameters' => [
+            $pvs
+        ]]);
+        $this->context->tasks->addTask($task);
     }
 
 }

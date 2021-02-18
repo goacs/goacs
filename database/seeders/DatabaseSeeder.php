@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $user = \App\Models\User::updateOrCreate([
+        $user = \App\Models\User::firstOrCreate([
             'email' => 'admin@goacs.net',
         ],
         [
@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('admin'),
             'email_verified_at' => now(),
         ]);
+
+        $this->call(TaskSeeder::class);
 
     }
 }
