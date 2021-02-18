@@ -8,6 +8,7 @@ use App\ACS\Context;
 use App\ACS\Entities\Device;
 use App\ACS\Logic\Script\Functions;
 use App\ACS\Logic\Script\Sandbox;
+use App\ACS\XML\XSDTypes;
 use App\Models\DeviceParameter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -62,6 +63,43 @@ class FunctionsTest extends TestCase
         $context->deviceModel->parameters()->forceDelete();
         $context->deviceModel->forceDelete();
     }
+
+    public function test_provision() {
+        $context = $this->newContext();
+        DeviceParameter::setParameter($context->deviceModel->id, 'InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.MACAddress', '00:11:22:33:44:55', 'RWS', XSDTypes::STRING);
+        DeviceParameter::setParameter($context->deviceModel->id, 'InternetGatewayDevice.ManagementServer.ConnectionRequestUsername', '', 'RWS', XSDTypes::STRING);
+        DeviceParameter::setParameter($context->deviceModel->id, 'InternetGatewayDevice.ManagementServer.ConnectionRequestPassword', '', 'RWS', XSDTypes::STRING);
+        DeviceParameter::setParameter($context->deviceModel->id, 'InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID', 'BASE_SSID', 'RWS', XSDTypes::STRING);
+        DeviceParameter::setParameter($context->deviceModel->id, 'InternetGatewayDevice.ManagementServer.PeriodicInformInterval', '30', 'RWS', XSDTypes::UINTEGER);
+
+        $sandbox = $this->newSandbox($context, file_get_contents(__DIR__.'/scripts/provision.php'));
+        $sandbox->run();
+
+        $this->assertDatabaseHas('device_parameters',[
+            'device_id' => $context->deviceModel->id,
+            'name' => 'InternetGatewayDevice.ManagementServer.PeriodicInformInterval',
+            'value' => '600'
+        ]);
+        $this->assertDatabaseHas('device_parameters',[
+            'device_id' => $context->deviceModel->id,
+            'name' => 'InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID',
+            'value' => 'Multiplay_4455'
+        ]);
+        $this->assertDatabaseHas('device_parameters',[
+            'device_id' => $context->deviceModel->id,
+            'name' => 'InternetGatewayDevice.ManagementServer.ConnectionRequestUsername',
+            'value' => 'ACS'
+        ]);
+        $this->assertDatabaseHas('device_parameters',[
+            'device_id' => $context->deviceModel->id,
+            'name' => 'InternetGatewayDevice.ManagementServer.ConnectionRequestPassword',
+            'value' => 'XD'.$context->deviceModel->serial_number
+        ]);
+
+        $context->deviceModel->parameters()->forceDelete();
+        $context->deviceModel->forceDelete();
+    }
+
 
     private function newSandbox(Context $context, string $script) {
         return new Sandbox($context, $script);

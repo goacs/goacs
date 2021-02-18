@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+use App\ACS\Entities\TaskCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -46,6 +47,8 @@ class Task extends Model
 {
     use SoftDeletes;
 
+    const TYPE_GLOBAL = 'global';
+
     protected $table = 'tasks';
 
     protected $casts = [
@@ -60,5 +63,16 @@ class Task extends Model
         $task = new \App\ACS\Entities\Task($this->name);
         $task->setPayload((array) $this->payload);
         return $task;
+    }
+
+    public static function loadGlobalTasks(?string $name = null): TaskCollection {
+        $tasksCollection = new TaskCollection();
+
+        static::when($name !== null, fn($query) => $query->where('name', $name))
+            ->where('for_type', static::TYPE_GLOBAL)
+            ->get()
+            ->each(fn(Task $task) => $tasksCollection->addTask($task->toACSTask()));
+
+        return $tasksCollection;
     }
 }

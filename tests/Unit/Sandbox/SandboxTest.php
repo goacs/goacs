@@ -17,23 +17,20 @@ class SandboxTest extends TestCase
         $script = '
 $test = "123";
 $ret = $test;
-$ret .= $obj->dupa;
-$obj->dupa = "555";
-$ret .= $obj->dupa;
+$ret .= $obj->value;
+$obj->value = "555";
+$ret .= $obj->value;
 return $ret;';
 
         $obj = new \stdClass();
-        $obj->dupa = "33333";
+        $obj->value = "33333";
         $sandbox = $this->newSandbox($script);
         $sandbox->addVariable('obj', $obj);
         $ret = $sandbox->run();
         $this->assertEquals('12333333555', $ret);
-        $this->assertEquals('555', $obj->dupa);
+        $this->assertEquals('555', $obj->value);
     }
 
-    public function test_device_save() {
-
-    }
 
     private function newSandbox(string $script) {
         return new Sandbox(new Context(new Request(), new Response()), $script);
