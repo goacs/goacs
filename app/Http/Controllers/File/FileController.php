@@ -49,4 +49,9 @@ class FileController extends Controller
     public function download(File $file) {
         return \Storage::disk('file_store')->download($file->filepath);
     }
+
+    public function destroy(File $file) {
+        \Storage::disk('file_store')->delete($file->filepath);
+        $file->delete();
+    }
 }
