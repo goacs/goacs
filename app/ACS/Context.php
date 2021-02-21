@@ -54,17 +54,19 @@ class Context
 
     public ?DeviceModel $deviceModel;
 
-    public string $bodyType;
-
-    public string $cwmpVersion;
-
     public ParameterInfoCollection $parameterInfos;
 
     public ParameterValuesCollection $parameterValues;
 
     public TaskCollection $tasks;
 
+    public string $bodyType;
+
+    public string $cwmpVersion;
+
     public bool $boot = false;
+
+    public bool $new = false;
 
     public string $requestId = '';
 
@@ -165,6 +167,10 @@ class Context
         if($this->device->serialNumber !== "") {
             $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
         }
+
+        foreach ($this->session()->get('this', []) as $prop => $value) {
+            $this->{$prop} = $value;
+        }
     }
 
     public function storeToSession() {
@@ -172,6 +178,10 @@ class Context
         $this->session()->put('parameterNames', $this->parameterInfos);
         $this->session()->put('parameterValues', $this->parameterValues);
         $this->session()->put('tasks', $this->tasks);
+        $this->session()->put('this', [
+            'new' => $this->new,
+            'boot' => $this->boot,
+        ]);
     }
 
 }

@@ -26,6 +26,8 @@ class XMLParser
 
     public string $requestId = '';
 
+    private array $reverseNamespaces = [];
+
 
     public function __construct(string $reqBodyContent) {
         $this->xml = $reqBodyContent;
@@ -49,11 +51,13 @@ class XMLParser
         foreach($this->lookupNamespaces() as $namespace)
         {
             $xml->registerNamespace($namespace[1], $namespace[2]);
+            $this->reverseNamespaces[$namespace[2]] = $namespace[1];
         }
 
         try {
-            $this->header = $xml->evaluate('/SOAP-ENV:Envelope/SOAP-ENV:Header')->getNode(0);
-            $this->body = $xml->evaluate('/SOAP-ENV:Envelope/SOAP-ENV:Body')->children()->getNode(0);
+            $soapEnvNs = $this->reverseNamespaces['http://schemas.xmlsoap.org/soap/envelope/'];
+            $this->header = $xml->evaluate("/${soapEnvNs}:Envelope/${soapEnvNs}:Header")->getNode(0);
+            $this->body = $xml->evaluate("/${soapEnvNs}:Envelope/${soapEnvNs}:Body")->children()->getNode(0);
         } catch (\Exception $exception) {
             dump($exception->getMessage());
             throw new ACSException("INVALID XML");

@@ -79,6 +79,15 @@ class DeviceParameter extends Model
     }
 
     public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {
+        $currentParameters = (new ParameterValuesCollection())
+            ->merge(
+                $device->parameters()->get()
+            );
+
+
+
+
+
         foreach($parameterValuesCollection->chunk(300) as $chunk) {
 
             $values = collect();

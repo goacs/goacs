@@ -8,6 +8,7 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\ACS\Entities\ParameterInfoStruct;
+use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Task;
 use App\ACS\Logic\Script\Sandbox;
@@ -112,13 +113,13 @@ class ControllerLogic
             ]
         );
 
-        $this->context->device->new = true;
+        $this->context->new = true;
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
     }
 
     private function processEmptyResponse()
     {
-        if($this->context->device->new === true || $this->context->boot === true) {
+        if($this->context->new === true || $this->context->boot === true) {
             $task = new Task(Types::GetParameterNames);
             $task->setPayload([
                 'parameter' => $this->context->device->root
@@ -168,7 +169,7 @@ class ControllerLogic
 
     private function processGetParametersValuesResponse()
     {
-        if($this->context->device->new) {
+        if($this->context->new) {
             //Save Parameters in db
             DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
 
@@ -181,12 +182,17 @@ class ControllerLogic
             }
         }
 
+        if($this->context->boot) {
+            $this->compareAndProcessObjectParameters();
+        }
+
         if($this->context->tasks->prevTask()?->name === Types::AddObject) {
             DeviceParameter::massUpdateOrInsert(
                 $this->context->deviceModel,
                 $this->context->cpeResponse->parameters
             );
         }
+
 
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
             $this->processSetPII();
@@ -196,6 +202,19 @@ class ControllerLogic
         /*
          * Przemyśleć, czy nie wykonywać tutaj skryptów
          */
+    }
+
+    private function compareAndProcessObjectParameters() {
+        $dbParameters = (new ParameterValuesCollection())->push($this->context->deviceModel->parameters()->get());
+        $sessionParameters = $this->context->parameterValues;
+
+        $parametersToAdd = $dbParameters->diff($sessionParameters)->filterByFlag('object');
+        /** @var ParameterValueStruct $parameter */
+        foreach ($parametersToAdd as $parameter) {
+            $task = new Task(Types::AddObject);
+            $task->setPayload(['parameter' => $parameter->name]);
+            $this->context->tasks->addTask($task);
+        }
     }
 
     private function processAddObjectResponse()

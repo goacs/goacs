@@ -18,6 +18,16 @@ class ParameterValuesCollection extends Collection
         });
     }
 
+    public function filterEndsWithDot(): ParameterValuesCollection {
+        return $this->filter(function(ParameterValueStruct $item) {
+            return Str::endsWith($item->name, '.');
+        });
+    }
+
+    public function filterByFlag(string $flag): ParameterValuesCollection {
+        return $this->filter(fn(ParameterValueStruct $parameterValueStruct) => $parameterValueStruct->flag->{$flag} === true);
+    }
+
     public function assignDefaultFlags(Collection $parameterInfoCollection) {
         /**
          * @var string $key
@@ -27,15 +37,38 @@ class ParameterValuesCollection extends Collection
             /** @var ParameterInfoStruct $parameterInfo */
             if($parameterInfo = $parameterInfoCollection->get($item->name)) {
                 $flag = new Flag();
-                if($parameterInfo->writable && Str::endsWith($parameterInfo->name,'.')) {
-                    $this->items[$key]->type = 'object';
-                    $flag->object = true;
+                if($parameterInfo->writable) {
                     $flag->write = true;
-                } else if ($parameterInfo->writable) {
-                    $flag->write = true;
+
+                    if(Str::endsWith($item->name,'.')) {
+                        $flag->object = true;
+                        $this->items[$key]->type = 'object';
+                    }
                 }
                 $this->items[$key]->flag = $flag;
             }
         }
+    }
+
+    public function diff($items)
+    {
+        $diff = new ParameterValuesCollection();
+        /** @var ParameterValueStruct $item */
+        foreach($this->items as $item) {
+            $exist = false;
+            /** @var ParameterValueStruct $othItem */
+            foreach ($items as $othItem) {
+                if($item->name === $othItem->name && $item->value !== $othItem->value) {
+                    $exist = true;
+                    $diff->put($item->name, $item);
+                }
+            }
+
+            if($exist === false) {
+                $diff->put($item->name, $item);
+            }
+        }
+
+        return $diff;
     }
 }
