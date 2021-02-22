@@ -33,11 +33,11 @@ class ParameterInfoCollection extends Collection
             $parameterValueStruct->flag = new Flag();
             if($item->writable) {
                 $parameterValueStruct->flag->write = true;
+            }
 
-                if(Str::endsWith($item->name,'.')) {
-                    $parameterValueStruct->flag->object = true;
-                    $parameterValueStruct->type = 'object';
-                }
+            if(Str::endsWith($item->name,'.') && $parameterValueStruct->flag->write === true) {
+                $parameterValueStruct->flag->object = true;
+                $parameterValueStruct->type = 'object';
             }
             $collection->put($item->name, $parameterValueStruct);
         }

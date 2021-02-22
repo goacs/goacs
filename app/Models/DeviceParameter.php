@@ -78,17 +78,23 @@ class DeviceParameter extends Model
         return $parameter?->value ?? '';
     }
 
+    public function toParamaterValueStruct(): ParameterValueStruct {
+        $obj = new ParameterValueStruct();
+        $obj->name = $this->name;
+        $obj->type = $this->type;
+        $obj->value = $this->value;
+        $obj->flag = $this->flags;
+        return $obj;
+    }
+
     public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {
-        $currentParameters = (new ParameterValuesCollection())
-            ->merge(
-                $device->parameters()->get()
-            );
+        $currentDBParameters = ParameterValuesCollection::fromEloquent($device->parameters()->get());
+        $diffParameters = $parameterValuesCollection->diff($currentDBParameters);
+        $diffParameters2 = $currentDBParameters->diff($parameterValuesCollection);
+//        dump("Diff resp->db: ".$diffParameters->count());
+//        dump("Diff db->resp: ".$diffParameters2->count());
 
-
-
-
-
-        foreach($parameterValuesCollection->chunk(300) as $chunk) {
+        foreach($diffParameters->chunk(300) as $chunk) {
 
             $values = collect();
             /** @var ParameterValueStruct $item */

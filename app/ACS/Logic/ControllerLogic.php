@@ -205,15 +205,18 @@ class ControllerLogic
     }
 
     private function compareAndProcessObjectParameters() {
-        $dbParameters = (new ParameterValuesCollection())->push($this->context->deviceModel->parameters()->get());
+        $dbParameters = ParameterValuesCollection::fromEloquent($this->context->deviceModel->parameters()->get());
         $sessionParameters = $this->context->parameterValues;
 
         $parametersToAdd = $dbParameters->diff($sessionParameters)->filterByFlag('object');
+        dump("db param: ".$dbParameters->get('InternetGatewayDevice.LANDevice.1.WLANConfiguration.'));
+        dump("Sess param: ".$sessionParameters->get('InternetGatewayDevice.LANDevice.1.WLANConfiguration.'));
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
-            $task = new Task(Types::AddObject);
-            $task->setPayload(['parameter' => $parameter->name]);
-            $this->context->tasks->addTask($task);
+            dump("AddObject Parameter: ".$parameter->name);
+//            $task = new Task(Types::AddObject);
+//            $task->setPayload(['parameter' => $parameter->name]);
+//            $this->context->tasks->addTask($task);
         }
     }
 

@@ -114,6 +114,7 @@ class Context
             case Types::GetParameterNamesResponse:
                 $this->cpeResponse = new GetParameterNamesResponse($parser->body);
                 $this->parameterInfos = $this->parameterInfos->merge($this->cpeResponse->parameters);
+                $this->parameterValues = $this->parameterValues->merge($this->parameterInfos->toParameterValuesCollecton());
                 break;
 
             case Types::GetParameterValuesResponse:
@@ -171,6 +172,8 @@ class Context
         foreach ($this->session()->get('this', []) as $prop => $value) {
             $this->{$prop} = $value;
         }
+
+        $this->boot = true;
     }
 
     public function storeToSession() {

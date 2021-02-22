@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\ACS\Entities;
 
 
+use App\Models\DeviceParameter;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -39,12 +40,13 @@ class ParameterValuesCollection extends Collection
                 $flag = new Flag();
                 if($parameterInfo->writable) {
                     $flag->write = true;
-
-                    if(Str::endsWith($item->name,'.')) {
-                        $flag->object = true;
-                        $this->items[$key]->type = 'object';
-                    }
                 }
+
+                if(Str::endsWith($item->name,'.') && $flag->write === true) {
+                    $flag->object = true;
+                    $this->items[$key]->type = 'object';
+                }
+
                 $this->items[$key]->flag = $flag;
             }
         }
@@ -70,5 +72,14 @@ class ParameterValuesCollection extends Collection
         }
 
         return $diff;
+    }
+
+    public static function fromEloquent(Collection $collection) {
+        $parameterCollection = new ParameterValuesCollection();
+        $collection->each(function(DeviceParameter $parameter) use ($parameterCollection) {
+            $parameterCollection->put($parameter->name, $parameter->toParamaterValueStruct());
+        });
+
+        return $parameterCollection;
     }
 }

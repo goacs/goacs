@@ -54,42 +54,51 @@ class ParameterValueCollectionTest extends TestCase
     }
 
     public function test_diff() {
-        $collection1 = new ParameterValuesCollection();
+        $dbParams = new ParameterValuesCollection();
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1.Tree2.Test.Test2";
+        $parameter->name = "A.B";
         $parameter->value = "1";
-        $collection1->add($parameter);
+        $dbParams->add($parameter);
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1";
+        $parameter->name = "A.B.C";
         $parameter->value = "2";
-        $collection1->add($parameter);
+        $dbParams->add($parameter);
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1.Tree3.Test.Test2.Test3";
+        $parameter->name = "A.B.C.D";
         $parameter->value = "3";
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1.Tree3.Test.Test2.Test2";
+        $parameter->name = "A.B.C.D.E";
         $parameter->value = "5";
-        $collection1->add($parameter);
+        $dbParams->add($parameter);
 
-        $collection2 = new ParameterValuesCollection();
+        $cpeParams = new ParameterValuesCollection();
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1.Tree2.Test.Test2";
+        $parameter->name = "A.B";
         $parameter->value = "2";
-        $collection2->add($parameter);
+        $cpeParams->add($parameter);
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1";
+        $parameter->name = "A.B.C";
         $parameter->value = "1";
-        $collection2->add($parameter);
+        $cpeParams->add($parameter);
         $parameter = new ParameterValueStruct();
-        $parameter->name = "InternetGatewayDevice.Tree1.Tree3.Test.Test2.Test3";
+        $parameter->name = "A.B.C.D";
         $parameter->value = "3";
-        $collection2->add($parameter);
+        $cpeParams->add($parameter);
+        $parameter->name = "A.B.C.D.F";
+        $parameter->value = "3";
+        $cpeParams->add($parameter);
 
-        $diff = $collection1->diff($collection2);
+        $diff = $dbParams->diff($cpeParams);
+        $diff2 = $cpeParams->diff($dbParams);
 
         $this->assertCount(3, $diff);
-        $this->assertEquals("1", $diff['InternetGatewayDevice.Tree1.Tree2.Test.Test2']->value);
-        $this->assertEquals("2", $diff['InternetGatewayDevice.Tree1']->value);
-        $this->assertEquals("5", $diff['InternetGatewayDevice.Tree1.Tree3.Test.Test2.Test2']->value);
+        $this->assertEquals("1", $diff['A.B']->value);
+        $this->assertEquals("2", $diff['A.B.C']->value);
+        $this->assertEquals("5", $diff['A.B.C.D.E']->value);
+
+        $this->assertCount(3, $diff2);
+        $this->assertEquals("2", $diff2['A.B']->value);
+        $this->assertEquals("1", $diff2['A.B.C']->value);
+        $this->assertEquals("3", $diff2['A.B.C.D.F']->value);
     }
 }
