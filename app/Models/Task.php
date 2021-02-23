@@ -55,13 +55,30 @@ class Task extends Model
         'payload' => 'array'
     ];
 
+    public static function booted()
+    {
+        static::creating(function(self $model) {
+            $model->infinite = false;
+            $model->not_before = now();
+        });
+    }
+
     public function morph(): MorphTo {
         return $this->morphTo('for');
     }
 
     public function toACSTask(): \App\ACS\Entities\Task {
         $task = new \App\ACS\Entities\Task($this->name);
+        $task->onRequest = $this->on_request;
         $task->setPayload((array) $this->payload);
+        return $task;
+    }
+
+    public static function fromACSTask(\App\ACS\Entities\Task $acsTask): static {
+        $task = new static();
+        $task->payload = $acsTask->payload;
+        $task->name = $acsTask->name;
+        $task->on_request = $acsTask->onRequest;
         return $task;
     }
 

@@ -25,6 +25,7 @@ Route::prefix('dashboard')->group(function() {
 });
 
 Route::apiResource('device', \App\Http\Controllers\Device\DeviceController::class)->only(['index', 'show', 'destroy']);
+Route::post('device/{device}/addobject', [\App\Http\Controllers\Device\DeviceController::class, 'addObject']);
 Route::apiResource('device.parameters', \App\Http\Controllers\Device\DeviceParameterController::class);
 Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTemplateController::class)->only(['index', 'store', 'destroy']);
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);

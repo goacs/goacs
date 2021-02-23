@@ -11,6 +11,7 @@ use Carbon\Carbon;
 class Task
 {
     public string $name;
+    public string $onRequest = '';
     public array $payload = [];
     public ?Carbon $done_at = null;
 

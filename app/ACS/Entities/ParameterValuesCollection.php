@@ -25,9 +25,14 @@ class ParameterValuesCollection extends Collection
         });
     }
 
-    public function filterByFlag(string $flag): ParameterValuesCollection {
-        return $this->filter(fn(ParameterValueStruct $parameterValueStruct) => $parameterValueStruct->flag->{$flag} === true);
+    public function filterByFlag(string $flag, bool $condition = true): ParameterValuesCollection {
+        return $this->filter(fn(ParameterValueStruct $parameterValueStruct) => $parameterValueStruct->flag->{$flag} === $condition);
     }
+
+    public function filterCanInstance(): ParameterValuesCollection {
+        return $this->filter(fn(ParameterValueStruct $parameterValueStruct) => ParameterValueStruct::isInstancePath($parameterValueStruct->name) === false);
+    }
+
 
     public function assignDefaultFlags(Collection $parameterInfoCollection) {
         /**
@@ -60,9 +65,11 @@ class ParameterValuesCollection extends Collection
             $exist = false;
             /** @var ParameterValueStruct $othItem */
             foreach ($items as $othItem) {
-                if($item->name === $othItem->name && $item->value !== $othItem->value) {
+                if($item->name === $othItem->name) {
                     $exist = true;
-                    $diff->put($item->name, $item);
+                    if($item->value !== $othItem->value) {
+                        $diff->put($item->name, $item);
+                    }
                 }
             }
 
@@ -82,4 +89,5 @@ class ParameterValuesCollection extends Collection
 
         return $parameterCollection;
     }
+
 }

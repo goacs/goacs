@@ -4,11 +4,15 @@
 namespace App\Http\Controllers\Device;
 
 
+use App\ACS\Types;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Device\DeviceAddObjectRequest;
 use App\Http\Requests\Device\DeviceUpdateRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
+use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class DeviceController extends Controller
 {
@@ -32,5 +36,17 @@ class DeviceController extends Controller
             return response()->json();
         }
         return  response()->json(null,500);
+    }
+
+    public function addObject(DeviceAddObjectRequest $request, Device $device) {
+        $acsTask = new \App\ACS\Entities\Task(Types::AddObject);
+        $acsTask->setPayload(['parameter' => $request->name]);
+        $task = Task::fromACSTask($acsTask);
+        $task->on_request = Types::EMPTY;
+        $task->infinite = false;
+        $task = $device->tasks()->save(
+            $task
+        );
+        return new JsonResource($task);
     }
 }

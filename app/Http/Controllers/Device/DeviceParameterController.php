@@ -24,16 +24,16 @@ class DeviceParameterController extends Controller
         return $query->paginate(25);
     }
 
-    public function show(DeviceParameter $parameter) {
+    public function show(Device $device, DeviceParameter $parameter) {
         return new DeviceParameterResource($parameter);
     }
 
-    public function store(DeviceParameter $parameter, DeviceParameterStoreRequest $request) {
+    public function store(Device $device, DeviceParameter $parameter, DeviceParameterStoreRequest $request) {
         $parameter->fill($request->validated())->save();
         return new DeviceParameterResource($parameter);
     }
 
-    public function update(DeviceParameter $parameter, DeviceParameterStoreRequest $request) {
+    public function update(Device $device, DeviceParameter $parameter, DeviceParameterStoreRequest $request) {
         $parameter->fill($request->validated())->save();
         return new DeviceParameterResource($parameter);
     }

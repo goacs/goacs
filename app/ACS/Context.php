@@ -68,6 +68,8 @@ class Context
 
     public bool $new = false;
 
+    public bool $newSession = true;
+
     public string $requestId = '';
 
     public function __construct(Request $request, Response $response)
@@ -184,6 +186,7 @@ class Context
         $this->session()->put('this', [
             'new' => $this->new,
             'boot' => $this->boot,
+            'newSession' => false,
         ]);
     }
 

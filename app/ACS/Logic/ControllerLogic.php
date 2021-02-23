@@ -28,6 +28,7 @@ use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
+use MongoDB\BSON\Type;
 
 class ControllerLogic
 {
@@ -43,9 +44,11 @@ class ControllerLogic
     }
 
     public function process() {
+
         switch ($this->context->bodyType) {
             case Types::INFORM:
                 $this->processInformRequest();
+                $this->loadTasks();
                 break;
 
             case Types::GetRPCMethodsRequest:
@@ -73,17 +76,11 @@ class ControllerLogic
                 break;
 
         }
-        //Może zamiast wysyłać acsReq z taska, to lepiej sterować w context acsRequest a następnie zrobić tak:
-        /*
-         * if(context->cpeRequest) {
-         *      send response and return
-         * } else if(context->acsRequest) {
-         *      send request and return
-         * }
-         */
+
         $this->runTasks();
 
         if($this->context->cpeRequest !== null) {
+            dump("Sending response: ".get_class($this->context->acsResponse));
             $this->context
                 ->response
                 ->setContent(
@@ -91,6 +88,7 @@ class ControllerLogic
                 )
                 ->send();
         } else if($this->context->acsRequest !== null) {
+            dump("Sending request: ".get_class($this->context->acsRequest));
             $this->context->response
                 ->setContent(
                     $this->context->acsRequest->getBody()
@@ -113,7 +111,7 @@ class ControllerLogic
             ]
         );
 
-        $this->context->new = true;
+        $this->context->new = $this->context->deviceModel->wasRecentlyCreated;
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
     }
 
@@ -143,10 +141,6 @@ class ControllerLogic
         //TODO: add to check BOOT/BOOTSTRAP flags
 
         $task = new Task(Types::INFORMResponse);
-        $task->setPayload([
-            'parameter' => $this->context->device->root
-        ]);
-
         $this->context->tasks->addTask($task);
     }
 
@@ -196,7 +190,7 @@ class ControllerLogic
 
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
             $this->processSetPII();
-
+            $this->compareAndProcessSetParameters();
         }
 
         /*
@@ -208,20 +202,21 @@ class ControllerLogic
         $dbParameters = ParameterValuesCollection::fromEloquent($this->context->deviceModel->parameters()->get());
         $sessionParameters = $this->context->parameterValues;
 
-        $parametersToAdd = $dbParameters->diff($sessionParameters)->filterByFlag('object');
-        dump("db param: ".$dbParameters->get('InternetGatewayDevice.LANDevice.1.WLANConfiguration.'));
-        dump("Sess param: ".$sessionParameters->get('InternetGatewayDevice.LANDevice.1.WLANConfiguration.'));
+        $parametersToAdd = $dbParameters->diff($sessionParameters)->filterByFlag('object')->filterCanInstance();
+
+//        dump("AddObject count: ".$parametersToAdd->count());
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
             dump("AddObject Parameter: ".$parameter->name);
-//            $task = new Task(Types::AddObject);
-//            $task->setPayload(['parameter' => $parameter->name]);
-//            $this->context->tasks->addTask($task);
+            $task = new Task(Types::AddObject);
+            $task->setPayload(['parameter' => $parameter->name]);
+            $this->context->tasks->addTask($task);
         }
     }
 
     private function processAddObjectResponse()
     {
+        dump("AddObject Response");
         $prevTask = $this->context->tasks->prevTask();
         if($prevTask->name !== Types::AddObject) {
             //log
@@ -276,7 +271,9 @@ class ControllerLogic
                 break;
 
             case Types::SetParameterValues:
-                $request = new SetParameterValuesRequest($this->context);
+                dump("Task parameters");
+                dump($task->payload['parameters']);
+                $request = new SetParameterValuesRequest($this->context, $task->payload['parameters']);
                 $this->context->acsRequest = $request;
                 break;
 
@@ -331,17 +328,38 @@ class ControllerLogic
 
     private function processSetPII()
     {
-        $pvs = new ParameterValueStruct();
-        $pvs->name = $this->context->device->root.'ManagementServer.PeriodicInformInterval';
-        $pvs->value = (string) $this->calculatePIIValue();
+        if($pvs = $this->context->parameterValues->get($this->context->device->root.'ManagementServer.PeriodicInformInterval')) {
+            $pvs->value = (string)$this->calculatePIIValue();
+            DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
 
-        DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
+            $task = new Task(Types::SetParameterValues);
+            $task->setPayload(['parameters' => new ParameterValuesCollection([$pvs])]);
+            $this->context->tasks->addTask($task);
+        }
+    }
 
-        $task = new Task(Types::SetParameterValues);
-        $task->setPayload(['parameters' => [
-            $pvs
-        ]]);
-        $this->context->tasks->addTask($task);
+    private function loadTasks()
+    {
+        $tasks = $this->context->deviceModel->tasks;
+        foreach ($tasks as $task) {
+            $this->context->tasks->addTask($task->toACSTask());
+            $task->delete();
+        }
+    }
+
+    private function compareAndProcessSetParameters()
+    {
+        $dbParameters = ParameterValuesCollection::fromEloquent($this->context->deviceModel->parameters()->get());
+        $sessionParameters = $this->context->parameterValues;
+
+        $diffParameters = $dbParameters->diff($sessionParameters)->filterByFlag('send')->filterByFlag('object', false);
+
+        foreach($diffParameters->chunk(10) as $chunk) {
+            $task = new Task(Types::SetParameterValues);
+            $task->setPayload(['parameters' => $chunk]);
+
+            $this->context->tasks->addTask($task);
+        }
     }
 
 }
