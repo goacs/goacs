@@ -52,7 +52,9 @@ class Task extends Model
     protected $table = 'tasks';
 
     protected $casts = [
-        'payload' => 'array'
+        'infinite' => 'bool',
+        'payload' => 'array',
+        'not_before' => 'date',
     ];
 
     public static function booted()

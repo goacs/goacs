@@ -26,6 +26,10 @@ class TaskSeeder extends Seeder
 
         $task = new Task();
         $task->for_type = Task::TYPE_GLOBAL;
+        $task->for_id = 0;
+        $task->on_request = Types::GetParameterValuesResponse;
+        $task->name = Types::RunScript;
+        $task->infinite = true;
         $task->payload = ['script' => '
 $mac = $func->getParameterValue("InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.MACAddress");
 $mac4 = substr(str_replace(":","", $mac), 8, 12);
@@ -38,13 +42,10 @@ if ($func->parameterExist("InternetGatewayDevice.DeviceInfo.X_ZTE-COM_AdminAccou
     $func->setParameter("InternetGatewayDevice.DeviceInfo.X_ZTE-COM_AdminAccount.Password", "CHANGEME");
 }
 $func->setParameter("InternetGatewayDevice.ManagementServer.ConnectionRequestUsername", "ACS");
-$func->setParameter("InternetGatewayDevice.ManagementServer.ConnectionRequestPassword", "XD".$deviceModel->serial_number);
-$func->setParameter("InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.SSID", $ssid);
-$func->setParameter("InternetGatewayDevice.ManagementServer.PeriodicInformInterval", "600");
+$func->setParameter("InternetGatewayDevice.ManagementServer.ConnectionRequestPassword", "ACS");
         '];
 
-        $task->name = Types::GetParameterValues;
 
-
+        $task->save();
     }
 }

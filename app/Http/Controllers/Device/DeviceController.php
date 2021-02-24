@@ -11,6 +11,7 @@ use App\Http\Requests\Device\DeviceUpdateRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
 use App\Models\Task;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -48,5 +49,18 @@ class DeviceController extends Controller
             $task
         );
         return new JsonResource($task);
+    }
+
+    public function kick(Device $device) {
+        $client = new Client();
+        $response = $client->get($device->connection_request_url, ['auth' =>
+            [$device->connection_request_user, $device->connection_request_password]
+        ]);
+
+        if(in_array($response->getStatusCode(), [200, 201])) {
+            return new JsonResource([]);
+        }
+
+        return response()->json(['error' => 'Kick failed'], 503);
     }
 }

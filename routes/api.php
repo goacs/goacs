@@ -31,6 +31,10 @@ Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTempla
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
 Route::apiResource('template', \App\Http\Controllers\Template\TemplateController::class);
 Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);
+Route::prefix('settings')->group(function() {
+    Route::apiResource('tasks', \App\Http\Controllers\Settings\Tasks\TaskController::class);
+});
+
 Route::apiResource('file', \App\Http\Controllers\File\FileController::class);
 Route::get('/file/{file}/download', [\App\Http\Controllers\File\FileController::class, 'download']);
 

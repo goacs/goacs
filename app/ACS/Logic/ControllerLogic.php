@@ -28,7 +28,6 @@ use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
-use MongoDB\BSON\Type;
 
 class ControllerLogic
 {
@@ -48,7 +47,7 @@ class ControllerLogic
         switch ($this->context->bodyType) {
             case Types::INFORM:
                 $this->processInformRequest();
-                $this->loadTasks();
+                $this->loadDeviceTasks();
                 break;
 
             case Types::GetRPCMethodsRequest:
@@ -176,10 +175,6 @@ class ControllerLogic
             }
         }
 
-        if($this->context->boot) {
-            $this->compareAndProcessObjectParameters();
-        }
-
         if($this->context->tasks->prevTask()?->name === Types::AddObject) {
             DeviceParameter::massUpdateOrInsert(
                 $this->context->deviceModel,
@@ -189,6 +184,8 @@ class ControllerLogic
 
 
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
+            $this->loadGlobalTasks(Types::GetParameterValuesResponse);
+            $this->compareAndProcessObjectParameters();
             $this->processSetPII();
             $this->compareAndProcessSetParameters();
         }
@@ -332,13 +329,15 @@ class ControllerLogic
             $pvs->value = (string)$this->calculatePIIValue();
             DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
 
+
+            /* Next task after this are compare params to generate spv tasks...
             $task = new Task(Types::SetParameterValues);
             $task->setPayload(['parameters' => new ParameterValuesCollection([$pvs])]);
-            $this->context->tasks->addTask($task);
+            $this->context->tasks->addTask($task);*/
         }
     }
 
-    private function loadTasks()
+    private function loadDeviceTasks()
     {
         $tasks = $this->context->deviceModel->tasks;
         foreach ($tasks as $task) {
@@ -359,6 +358,21 @@ class ControllerLogic
             $task->setPayload(['parameters' => $chunk]);
 
             $this->context->tasks->addTask($task);
+        }
+    }
+
+    private function loadGlobalTasks(string $on_request)
+    {
+        $tasks = \App\Models\Task::where([
+            'for_type' => \App\Models\Task::TYPE_GLOBAL,
+            'on_request' => $on_request
+        ])->get();
+
+        foreach ($tasks as $task) {
+            $this->context->tasks->addTask($task->toACSTask());
+            if($task->infinite === false) {
+                $task->delete();
+            }
         }
     }
 
