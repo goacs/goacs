@@ -21,6 +21,7 @@ use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Response\AddObjectResponse;
+use App\ACS\Response\FaultResponse;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\GetRPCMethodsACSResponse;
 use App\ACS\Response\InformResponse;
@@ -28,6 +29,7 @@ use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
+use App\Models\Fault;
 
 class ControllerLogic
 {
@@ -72,6 +74,10 @@ class ControllerLogic
 
             case Types::DeleteObjectResponse:
                 $this->processDeleteObjectResponse();
+                break;
+
+            case Types::FaultResponse:
+                $this->processFault();
                 break;
 
         }
@@ -374,6 +380,13 @@ class ControllerLogic
                 $task->delete();
             }
         }
+    }
+
+    private function processFault()
+    {
+        /** @var FaultResponse $response */
+        $response = $this->context->cpeResponse;
+        Fault::fromFaultResponse($this->context->deviceModel, $response);
     }
 
 }

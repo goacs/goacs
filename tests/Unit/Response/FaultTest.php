@@ -23,6 +23,7 @@ class FaultTest extends TestCase
         $parser = new XMLParser((string)$xml);
         $response = new FaultResponse($parser);
 
+        $this->assertEquals("Fault", $parser->bodyType);
         $this->assertEquals("Client", $response->faultCode);
         $this->assertEquals("CWMP fault", $response->faultString);
     }
@@ -32,6 +33,7 @@ class FaultTest extends TestCase
         $parser = new XMLParser((string)$xml);
         $response = new FaultResponse($parser);
 
+        $this->assertEquals("Fault", $parser->bodyType);
         $this->assertEquals("Client", $response->faultCode);
         $this->assertEquals("CWMP fault", $response->faultString);
         $this->assertCount(2, $response->detail->spvfault);

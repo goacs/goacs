@@ -20,6 +20,8 @@ class FaultResponse extends CPEResponse
     public string $faultCode = '';
     public string $faultString = '';
 
+    public string $fullXML = '';
+
     public function __construct(XMLParser $parser) {
         parent::__construct($parser->body);
         $this->parser = $parser;
@@ -29,12 +31,12 @@ class FaultResponse extends CPEResponse
 
     private function readValues()
     {
+        $this->fullXML = (string) $this->body->ownerDocument->saveXML();
         $xpath = new \DOMXPath($this->body->ownerDocument);
         $soapEnvNs = $this->parser->getReverseNamespaces()['http://schemas.xmlsoap.org/soap/envelope/'];
         /** @var \DOMElement $statusElement */
         $this->faultCode = $xpath->query("//$soapEnvNs:Fault/faultcode")->item(0)->nodeValue;
         $this->faultString = $xpath->query("//$soapEnvNs:Fault/faultstring")->item(0)->nodeValue;
-        $detail = $xpath->query("//$soapEnvNs:Fault/detail")->item(0);
         $this->readDetails($xpath);
     }
 

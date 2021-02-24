@@ -14,7 +14,7 @@ class TaskCollection extends Collection
 
     public function isNextTask(string $type): bool {
         /** @var Task $task */
-        $task = $this->first();
+        $task = $this->nextTask();
         if($task === null) {
             return false;
         }

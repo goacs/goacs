@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|File whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|File whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string $name
+ * @method static \Illuminate\Database\Eloquent\Builder|File whereName($value)
  */
 class File extends Model
 {

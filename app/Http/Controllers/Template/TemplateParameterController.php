@@ -19,7 +19,7 @@ class TemplateParameterController extends Controller
     }
 
     public function index(Request $request, Template $template) {
-        $query = $template->parameters();
+        $query = $template->parameters()->orderBy('name');
         $this->prepareFilter($request, $query);
         return $query->paginate(25);
     }

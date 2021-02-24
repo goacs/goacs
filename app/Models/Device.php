@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -67,5 +68,22 @@ class Device extends Model
 
     public function tasks(): MorphMany {
         return $this->morphMany(Task::class, 'for');
+    }
+
+    public function parametersWithTemplates() {
+        //always refresh object
+        $deviceParameters = $this->parameters()->get();
+        $templatesParameters = $this->getTemplatesParameters();
+
+    }
+
+    public function getTemplatesParameters() {
+        $templatesWithParameters = $this
+            ->templates()
+            ->orderByPivot('priority')
+            ->with('parameters')
+            ->get();
+
+        return $templatesWithParameters->pluck('parameters')->flatten(1);
     }
 }

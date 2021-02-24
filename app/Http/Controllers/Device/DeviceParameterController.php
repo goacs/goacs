@@ -19,7 +19,7 @@ class DeviceParameterController extends Controller
     }
 
     public function index(Request $request, Device $device) {
-        $query = $device->parameters();
+        $query = $device->parameters()->orderBy('name');
         $this->prepareFilter($request, $query);
         return $query->paginate(25);
     }
