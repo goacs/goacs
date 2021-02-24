@@ -24,6 +24,8 @@ class XMLParser
 
     public string $cwmpVersion = '1.0';
 
+    public string $cwmpUri = '';
+
     public string $requestId = '';
 
     private array $reverseNamespaces = [];
@@ -64,7 +66,8 @@ class XMLParser
         }
 
         $this->bodyType = $this->body->localName;
-        $this->fillCwmpVersion($this->body->namespaceURI);
+        $this->cwmpUri = (string)$this->body->lookupNamespaceURI('cwmp');
+        $this->fillCwmpVersion($this->cwmpUri);
         $this->extractRequestId();
     }
 
@@ -76,6 +79,16 @@ class XMLParser
 
         return [];
     }
+
+    /**
+     * @return array
+     */
+    public function getReverseNamespaces(): array
+    {
+        return $this->reverseNamespaces;
+    }
+
+
 
     private function fillCwmpVersion(string $uri) {
         switch ($uri) {

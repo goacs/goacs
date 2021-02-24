@@ -20,6 +20,7 @@ use App\ACS\Response\AddObjectResponse;
 use App\ACS\Response\CPEResponse;
 use App\ACS\Response\DeleteObjectResponse;
 use App\ACS\Response\DownloadResponse;
+use App\ACS\Response\FaultResponse;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\GetParameterValuesResponse;
 use App\ACS\Response\SetParameterValuesResponse;
@@ -146,7 +147,7 @@ class Context
                 break;
 
             case Types::FaultResponse:
-
+                $this->cpeResponse = new FaultResponse($parser);
                 break;
 
         }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+    <SOAP-ENV:Header>
+        <cwmp:ID
+            SOAP-ENV:mustUnderstand="1">
+            1613234170798113
+        </cwmp:ID>
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body
+        SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+        <SOAP-ENV:Fault>
+            <faultcode>Client</faultcode>
+            <faultstring>CWMP fault</faultstring>
+            <detail>
+                <cwmp:Fault>
+                    <FaultCode>9003</FaultCode>
+                    <FaultString>Invalid arguments</FaultString>
+                    <SetParameterValuesFault>
+                        <ParameterName>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</ParameterName>
+                        <FaultCode>9008</FaultCode>
+                        <FaultString>Attempt to set a non-writable parameter</FaultString>
+                    </SetParameterValuesFault>
+                    <SetParameterValuesFault>
+                        <ParameterName>InternetGatewayDevice.ManagementServer.ConnectionRequestPassword</ParameterName>
+                        <FaultCode>9008</FaultCode>
+                        <FaultString>Attempt to set a non-writable parameter</FaultString>
+                    </SetParameterValuesFault>
+                </cwmp:Fault>
+            </detail>
+        </SOAP-ENV:Fault>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
