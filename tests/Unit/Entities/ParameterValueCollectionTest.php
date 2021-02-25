@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Entities;
+namespace Tests\Unit\Entities;
 
 
 use App\ACS\Entities\ParameterInfoCollection;

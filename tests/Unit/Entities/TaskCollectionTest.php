@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Entities;
+namespace Tests\Unit\Entities;
 
 
 use App\ACS\Entities\Task;

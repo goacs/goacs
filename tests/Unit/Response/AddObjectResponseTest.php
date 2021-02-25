@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Response;
+namespace Tests\Unit\Response;
 
 
 use App\ACS\Entities\ParameterInfoStruct;
