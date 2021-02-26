@@ -18,8 +18,14 @@ class ParameterValueStruct
         $this->flag = new Flag();
     }
 
-    public function setName(string $name) {
+    public function setName(string $name): self {
         $this->name = $name;
+        return $this;
+    }
+
+    public function setFlag(Flag $flag): self {
+        $this->flag = $flag;
+        return $this;
     }
 
     public static function isInstancePath(string $path) {

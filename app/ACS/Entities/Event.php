@@ -27,7 +27,7 @@ class Event
 
     public function extractNumberFromCode(string $code): int {
         $chunks = explode(' ', $code);
-        if(count($chunks) > 1 && is_int($chunks[0])) {
+        if(count($chunks) > 1 && is_numeric($chunks[0])) {
             return (int) $chunks[0];
         }
 

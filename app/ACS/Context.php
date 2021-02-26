@@ -175,8 +175,6 @@ class Context
         foreach ($this->session()->get('this', []) as $prop => $value) {
             $this->{$prop} = $value;
         }
-
-        $this->boot = true;
     }
 
     public function storeToSession() {

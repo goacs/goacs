@@ -44,7 +44,7 @@ class XMLParser
         }
 
         $dom = new \DOMDocument();
-        $dom->preserveWhiteSpace = false;
+        $dom->preserveWhiteSpace = true;
         $dom->loadXml($this->xml);
         $this->xml = $dom->saveXML();
         unset($dom);

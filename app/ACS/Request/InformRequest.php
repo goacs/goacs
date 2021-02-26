@@ -71,14 +71,8 @@ class InformRequest extends CPERequest
         /** @var \DOMElement $param */
         foreach ($xpath->query("//Event/EventStruct") as $param) {
             $event = new Event();
-            switch ($param->nodeName) {
-                case 'EventCode':
-                    $event->setCode($param->firstChild->nodeValue);
-                    break;
-                case 'CommandKey':
-                    $event->key = $param->firstChild->nodeValue;
-                    break;
-            }
+            $event->setCode($param->getElementsByTagName('EventCode')->item(0)->nodeValue);
+            $event->key = $param->getElementsByTagName('CommandKey')->item(0)->nodeValue;
             $this->events[] = $event;
         }
     }

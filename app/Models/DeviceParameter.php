@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @mixin \Eloquent
  * @property-read \App\Models\Device $device
  */
-class DeviceParameter extends Model
+class DeviceParameter extends Model implements ParameterInterface
 {
     protected $table = 'device_parameters';
 

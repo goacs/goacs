@@ -70,12 +70,6 @@ class Device extends Model
         return $this->morphMany(Task::class, 'for');
     }
 
-    public function parametersWithTemplates() {
-        //always refresh object
-        $deviceParameters = $this->parameters()->get();
-        $templatesParameters = $this->getTemplatesParameters();
-
-    }
 
     public function getTemplatesParameters() {
         $templatesWithParameters = $this

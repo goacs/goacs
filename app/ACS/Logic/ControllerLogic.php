@@ -30,6 +30,7 @@ use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
 use App\Models\Fault;
+use Illuminate\Support\Collection;
 
 class ControllerLogic
 {
@@ -85,7 +86,6 @@ class ControllerLogic
         $this->runTasks();
 
         if($this->context->cpeRequest !== null) {
-            dump("Sending response: ".get_class($this->context->acsResponse));
             $this->context
                 ->response
                 ->setContent(
@@ -93,7 +93,6 @@ class ControllerLogic
                 )
                 ->send();
         } else if($this->context->acsRequest !== null) {
-            dump("Sending request: ".get_class($this->context->acsRequest));
             $this->context->response
                 ->setContent(
                     $this->context->acsRequest->getBody()
@@ -202,11 +201,16 @@ class ControllerLogic
     }
 
     private function compareAndProcessObjectParameters() {
-        $dbParameters = ParameterValuesCollection::fromEloquent($this->context->deviceModel->parameters()->get());
+        dump("comparing object params");
+//        $dbParameters = ParameterValuesCollection::fromEloquent($this->context->deviceModel->parameters()->get());
+        $parameterService = new DeviceParametersLogic($this->context->deviceModel);
+        $dbParameters = $parameterService->combinedDeviceParametersWithTemplates();
         $sessionParameters = $this->context->parameterValues;
 
-        $parametersToAdd = $dbParameters->diff($sessionParameters)->filterByFlag('object')->filterCanInstance();
+//        $parametersToAdd = $dbParameters->diff($sessionParameters)->filterByFlag('object')->filterCanInstance();
+//        $parametersToAdd2 = $dbParameters->diff($sessionParameters)->filterByFlag('object')->filterInstances();
 
+        $parametersToAdd = $parameterService->getParametersToCreateInstance($sessionParameters, $dbParameters);
 //        dump("AddObject count: ".$parametersToAdd->count());
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
@@ -233,9 +237,9 @@ class ControllerLogic
 
         $gpvTask->setPayload(
             [
-                'parameters' => [
+                'parameters' => new Collection([
                     (new ParameterInfoStruct())->name => $path.".".$addObjectResponse->getInstanceNumber()."."
-                ]
+                ]),
             ]
         );
 
@@ -274,8 +278,6 @@ class ControllerLogic
                 break;
 
             case Types::SetParameterValues:
-                dump("Task parameters");
-                dump($task->payload['parameters']);
                 $request = new SetParameterValuesRequest($this->context, $task->payload['parameters']);
                 $this->context->acsRequest = $request;
                 break;
@@ -354,7 +356,8 @@ class ControllerLogic
 
     private function compareAndProcessSetParameters()
     {
-        $dbParameters = ParameterValuesCollection::fromEloquent($this->context->deviceModel->parameters()->get());
+        $parameterService = new DeviceParametersLogic($this->context->deviceModel);
+        $dbParameters = $parameterService->combinedDeviceParametersWithTemplates();
         $sessionParameters = $this->context->parameterValues;
 
         $diffParameters = $dbParameters->diff($sessionParameters)->filterByFlag('send')->filterByFlag('object', false);
@@ -362,7 +365,6 @@ class ControllerLogic
         foreach($diffParameters->chunk(10) as $chunk) {
             $task = new Task(Types::SetParameterValues);
             $task->setPayload(['parameters' => $chunk]);
-
             $this->context->tasks->addTask($task);
         }
     }

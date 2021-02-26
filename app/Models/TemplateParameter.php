@@ -7,6 +7,7 @@ namespace App\Models;
 
 
 use App\ACS\Entities\Flag;
+use App\ACS\Entities\ParameterValueStruct;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TemplateParameter whereValue($value)
  */
-class TemplateParameter extends Model
+class TemplateParameter extends Model implements ParameterInterface
 {
     protected $table = 'templates_parameters';
 
@@ -48,5 +49,14 @@ class TemplateParameter extends Model
 
     public function template(): BelongsTo {
         return $this->belongsTo(Template::class);
+    }
+
+    public function toParamaterValueStruct(): ParameterValueStruct {
+        $obj = new ParameterValueStruct();
+        $obj->name = $this->name;
+        $obj->type = $this->type;
+        $obj->value = $this->value;
+        $obj->flag = $this->flags;
+        return $obj;
     }
 }

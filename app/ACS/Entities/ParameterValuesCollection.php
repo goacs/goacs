@@ -7,11 +7,13 @@ namespace App\ACS\Entities;
 
 
 use App\Models\DeviceParameter;
+use App\Models\ParameterInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ParameterValuesCollection extends Collection
 {
+
     public function filterByChunkCount(int $minCount = 1, int $maxCount = 99) {
         return $this->filter(function (ParameterValueStruct $item) use ($minCount, $maxCount) {
             $count = count(array_filter(explode('.', $item->name)));
@@ -31,6 +33,10 @@ class ParameterValuesCollection extends Collection
 
     public function filterCanInstance(): ParameterValuesCollection {
         return $this->filter(fn(ParameterValueStruct $parameterValueStruct) => ParameterValueStruct::isInstancePath($parameterValueStruct->name) === false);
+    }
+
+    public function filterInstances(): ParameterValuesCollection {
+        return $this->filter(fn(ParameterValueStruct $parameterValueStruct) => ParameterValueStruct::isInstancePath($parameterValueStruct->name) === true);
     }
 
 
@@ -83,7 +89,7 @@ class ParameterValuesCollection extends Collection
 
     public static function fromEloquent(Collection $collection) {
         $parameterCollection = new ParameterValuesCollection();
-        $collection->each(function(DeviceParameter $parameter) use ($parameterCollection) {
+        $collection->each(function(ParameterInterface $parameter) use ($parameterCollection) {
             $parameterCollection->put($parameter->name, $parameter->toParamaterValueStruct());
         });
 
