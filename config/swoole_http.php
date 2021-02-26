@@ -50,7 +50,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'websocket' => [
-        'enabled' => env('SWOOLE_HTTP_WEBSOCKET', false),
+        'enabled' => env('SWOOLE_HTTP_WEBSOCKET', true),
     ],
 
     /*
