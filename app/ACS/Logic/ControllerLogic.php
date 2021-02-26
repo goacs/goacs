@@ -66,7 +66,11 @@ class ControllerLogic
                 break;
 
             case Types::GetParameterValuesResponse:
-                $this->processGetParametersValuesResponse();
+                $this->processGetParameterValuesResponse();
+                break;
+
+            case Types::SetParameterValuesResponse:
+                $this->processSetParameterValuesResponse();
                 break;
 
             case Types::AddObjectResponse:
@@ -165,7 +169,7 @@ class ControllerLogic
         }
     }
 
-    private function processGetParametersValuesResponse()
+    private function processGetParameterValuesResponse()
     {
         if($this->context->new) {
             //Save Parameters in db
@@ -324,7 +328,16 @@ class ControllerLogic
 
     private function endSession()
     {
-        //End session end response empty
+        $root = $this->context->device->root;
+        if($param = $this->context->parameterValues->get($root.'ManagementServer.ConnectionRequestUsername')?->value) {
+            $this->context->deviceModel->connection_request_user = $param;
+        }
+
+        if($param = $this->context->parameterValues->get($root.'ManagementServer.ConnectionRequestPassword')?->value) {
+            $this->context->deviceModel->connection_request_password = $param;
+        }
+
+        $this->context->deviceModel->save();
     }
 
     private function calculatePIIValue(): int {
@@ -389,6 +402,18 @@ class ControllerLogic
         /** @var FaultResponse $response */
         $response = $this->context->cpeResponse;
         Fault::fromFaultResponse($this->context->deviceModel, $response);
+    }
+
+    private function processSetParameterValuesResponse()
+    {
+        $prevTask = $this->context->tasks->prevTask();
+        if($prevTask !== null && $prevTask->name === Types::SetParameterValues) {
+            $parameters = $prevTask->payload['parameters'];
+            /** @var ParameterValueStruct $parameter */
+            foreach ($parameters as $parameter) {
+                $this->context->parameterValues->put($parameter->name, $parameter);
+            }
+        }
     }
 
 }
