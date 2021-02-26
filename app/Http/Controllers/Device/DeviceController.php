@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Device;
 
 
+use App\ACS\Context;
 use App\ACS\Types;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Device\DeviceAddObjectRequest;
@@ -73,7 +74,8 @@ class DeviceController extends Controller
     }
 
     public function lookup(Device $device) {
-
+        \Cache::put(Context::LOOKUP_PARAMS_ENABLED_PREFIX.$device->serial_number, true, now()->addMinutes(5));
+        dump(\Cache::get(Context::LOOKUP_PARAMS_ENABLED_PREFIX.$device->serial_number));
         return $this->kick($device);
     }
 }

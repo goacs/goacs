@@ -4,12 +4,17 @@
 namespace App\Http\Controllers\Device;
 
 
+use App\ACS\Context;
+use App\ACS\Entities\ParameterValuesCollection;
+use App\ACS\Entities\ParameterValueStruct;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Device\DeviceParameterStoreRequest;
 use App\Http\Resource\Device\DeviceParameterResource;
 use App\Models\Device;
 use App\Models\DeviceParameter;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class DeviceParameterController extends Controller
 {
@@ -21,7 +26,20 @@ class DeviceParameterController extends Controller
     public function index(Request $request, Device $device) {
         $query = $device->parameters()->orderBy('name');
         $this->prepareFilter($request, $query);
-        return $query->paginate(25);
+        /** @var LengthAwarePaginator $paginator */
+        $paginator = $query->paginate(25);
+        /** @var ParameterValuesCollection $cachedItems */
+        $cachedItems = \Cache::get(Context::LOOKUP_PARAMS_PREFIX.$device->serial_number, false);
+        if($cachedItems) {
+            $paginator->getCollection()->transform(function(DeviceParameter $parameter) use ($cachedItems) {
+                $parameter->cached = $cachedItems->get($parameter->name)?->value;
+                return $parameter;
+            });
+        }
+
+        return (new JsonResource($paginator))->additional([
+            'has_cached_items' => $cachedItems !== false
+        ]);
     }
 
     public function show(Device $device, DeviceParameter $parameter) {

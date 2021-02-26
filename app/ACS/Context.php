@@ -34,6 +34,9 @@ use function Symfony\Component\Translation\t;
 
 class Context
 {
+    const LOOKUP_PARAMS_PREFIX = 'LOOKUP_';
+    const LOOKUP_PARAMS_ENABLED_PREFIX = 'LOOKUP_ENABLED_';
+
     /**
      * @var Request
      */
@@ -65,7 +68,9 @@ class Context
 
     public string $cwmpVersion;
 
-    public bool $boot = false;
+    public bool $provision = false;
+
+    public bool $lookupParameters = false;
 
     public bool $new = false;
 
@@ -109,8 +114,9 @@ class Context
             case Types::INFORM:
                 $this->cpeRequest = new InformRequest($parser->body);
                 $this->device = $this->cpeRequest->device;
-                if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1)) {
-                    $this->boot = true;
+                $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX.$this->device->serialNumber, false);
+                if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1) || $this->lookupParameters) {
+                    $this->provision = true;
                 }
                 break;
 
@@ -178,14 +184,16 @@ class Context
     }
 
     public function storeToSession() {
+        \Cache::put("SESSID_".$this->device->serialNumber, $this->session()->getId(),(5*60));
         $this->session()->put('device', $this->device);
         $this->session()->put('parameterNames', $this->parameterInfos);
         $this->session()->put('parameterValues', $this->parameterValues);
         $this->session()->put('tasks', $this->tasks);
         $this->session()->put('this', [
             'new' => $this->new,
-            'boot' => $this->boot,
+            'provision' => $this->provision,
             'newSession' => false,
+            'lookupParameters' => $this->lookupParameters,
         ]);
     }
 
