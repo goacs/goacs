@@ -22,6 +22,6 @@ class InformRequestTest extends TestCase
         $xml = file_get_contents(__DIR__.'/informrequest.xml');
         $parser = new XMLParser((string)$xml);
         $response = new InformRequest($parser->body);
-        dump($response->events);
+        dump($response->device);
     }
 }

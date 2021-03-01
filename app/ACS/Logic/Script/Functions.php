@@ -8,6 +8,7 @@ use App\ACS\Context;
 use App\ACS\Entities\Device;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;
+use App\Models\Template;
 
 class Functions
 {
@@ -43,5 +44,19 @@ class Functions
 
     public function parameterExist($path) {
         return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->exists();
+    }
+
+    public function assignTemplateByName($name, int $priority = 100) {
+        $template = Template::where('name', $name)->first();
+
+        if($template !== null) {
+            $this->assignTemplateById($template->id, $priority);
+        }
+    }
+
+    public function assignTemplateById($id, int $priority = 100) {
+        if($this->deviceModel->templates()->find($id) === null) {
+            $this->deviceModel->templates()->attach($id, ['priority' => $priority]);
+        }
     }
 }

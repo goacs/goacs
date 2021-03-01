@@ -53,6 +53,11 @@ class DeviceController extends Controller
         return new JsonResource($task);
     }
 
+    public function provision(Device $device) {
+        \Cache::put(Context::PROVISION_PREFIX.$device->serial_number, true, now()->addMinutes(5));
+        return $this->kick($device);
+    }
+
     public function kick(Device $device) {
         $client = new Client();
         $auth = [$device->connection_request_user, $device->connection_request_password];
@@ -75,7 +80,6 @@ class DeviceController extends Controller
 
     public function lookup(Device $device) {
         \Cache::put(Context::LOOKUP_PARAMS_ENABLED_PREFIX.$device->serial_number, true, now()->addMinutes(5));
-        dump(\Cache::get(Context::LOOKUP_PARAMS_ENABLED_PREFIX.$device->serial_number));
         return $this->kick($device);
     }
 }

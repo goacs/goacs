@@ -118,9 +118,11 @@ class ControllerLogic
 
     private function runTasks()
     {
+        dump($this->context->tasks);
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
+            dump("There is no tasks :(");
             $this->endSession();
             return;
         }
@@ -172,10 +174,13 @@ class ControllerLogic
                 $sandbox = new Sandbox($this->context, $task->payload['script']);
                 try {
                     $sandbox->run();
+
                 } catch (SandboxException $exception) {
                     //TODO Save to db as fault
+                    dump($exception);
                 }
-
+                $task->done();
+                $this->runTasks();
                 break;
         }
 
@@ -201,7 +206,7 @@ class ControllerLogic
 
     private function processEmptyResponse()
     {
-        if($this->context->new === true || $this->context->provision === true) {
+        if($this->context->new === true || $this->context->provision === true || $this->context->lookupParameters) {
             $task = new Task(Types::GetParameterNames);
             $task->setPayload([
                 'parameter' => $this->context->device->root
@@ -268,6 +273,7 @@ class ControllerLogic
 
 
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
+            dump("PROVSION MODE", $this->context->provision);
             if($this->context->lookupParameters === true) {
                 \Cache::put(
                     Context::LOOKUP_PARAMS_PREFIX.$this->context->device->serialNumber,
@@ -296,7 +302,11 @@ class ControllerLogic
         $sessionParameters = $this->context->parameterValues;
 
 
-        $parametersToAdd = $parameterService->getParametersToCreateInstance($sessionParameters, $dbParameters);
+        $parametersToAdd = $parameterService
+            ->getParametersToCreateInstance($sessionParameters, $dbParameters)
+            ->sortBy('name');
+
+        dump("Object params to add", $parametersToAdd);
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
             $task = new Task(Types::AddObject);
@@ -325,6 +335,7 @@ class ControllerLogic
             ]
         );
 
+        //TODO Add to task list...
 
     }
 
@@ -361,12 +372,6 @@ class ControllerLogic
         if($pvs = $this->context->parameterValues->get($this->context->device->root.'ManagementServer.PeriodicInformInterval')) {
             $pvs->value = (string)$this->calculatePIIValue();
             DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
-
-
-            /* Next task after this are compare params to generate spv tasks...
-            $task = new Task(Types::SetParameterValues);
-            $task->setPayload(['parameters' => new ParameterValuesCollection([$pvs])]);
-            $this->context->tasks->addTask($task);*/
         }
     }
 
@@ -385,7 +390,13 @@ class ControllerLogic
         $dbParameters = $parameterService->combinedDeviceParametersWithTemplates();
         $sessionParameters = $this->context->parameterValues;
 
-        $diffParameters = $dbParameters->diff($sessionParameters)->filterByFlag('send')->filterByFlag('object', false);
+        $diffParameters = $dbParameters
+            ->diff($sessionParameters)
+            ->filterByFlag('send')
+            ->filterByFlag('object', false)
+            ->sortBy('name');
+
+        dump("Diff params to set", $diffParameters);
 
         foreach($diffParameters->chunk(10) as $chunk) {
             $task = new Task(Types::SetParameterValues);

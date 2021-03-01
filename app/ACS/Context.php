@@ -36,6 +36,7 @@ class Context
 {
     const LOOKUP_PARAMS_PREFIX = 'LOOKUP_';
     const LOOKUP_PARAMS_ENABLED_PREFIX = 'LOOKUP_ENABLED_';
+    const PROVISION_PREFIX = 'PROVISION_';
 
     /**
      * @var Request
@@ -115,7 +116,8 @@ class Context
                 $this->cpeRequest = new InformRequest($parser->body);
                 $this->device = $this->cpeRequest->device;
                 $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX.$this->device->serialNumber, false);
-                if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1) || $this->lookupParameters) {
+                $this->provision = \Cache::get(self::PROVISION_PREFIX.$this->device->serialNumber, false);
+                if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1)) {
                     $this->provision = true;
                 }
                 break;
@@ -173,7 +175,6 @@ class Context
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
         $this->tasks = $this->session()->get('tasks', new TaskCollection());
-
         if($this->device->serialNumber !== "") {
             $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
         }

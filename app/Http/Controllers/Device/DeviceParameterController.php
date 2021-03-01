@@ -42,6 +42,11 @@ class DeviceParameterController extends Controller
         ]);
     }
 
+    public function cached(Request $request, Device $device) {
+        $cachedItems = \Cache::get(Context::LOOKUP_PARAMS_PREFIX.$device->serial_number, []);
+        return new JsonResource($cachedItems);
+    }
+
     public function show(Device $device, DeviceParameter $parameter) {
         return new DeviceParameterResource($parameter);
     }

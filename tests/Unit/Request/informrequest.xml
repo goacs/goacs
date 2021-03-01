@@ -14,18 +14,10 @@
     <SOAP-ENV:Body>
         <cwmp:Inform>
             <DeviceId>
-                <Manufacturer>
-                    ECONET
-                </Manufacturer>
-                <OUI>
-                    F4D9C6
-                </OUI>
-                <ProductClass>
-                    UM806
-                </ProductClass>
-                <SerialNumber>
-                    ZNTSA01C5008
-                </SerialNumber>
+                <Manufacturer>ECONET</Manufacturer>
+                <OUI>F4D9C6</OUI>
+                <ProductClass>UM806</ProductClass>
+                <SerialNumber>ZNTSA01C5008</SerialNumber>
             </DeviceId>
             <Event
                 xsi:type="SOAP-ENC:Array"
