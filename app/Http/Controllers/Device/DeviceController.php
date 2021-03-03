@@ -16,6 +16,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class DeviceController extends Controller
 {
@@ -25,8 +27,13 @@ class DeviceController extends Controller
     }
 
     public function index(Request $request) {
-        $query = Device::query();
-        $this->prepareFilter($request, $query);
+        $query = QueryBuilder::for(Device::class, $request)
+            ->allowedFilters([
+                'id',
+                'serial_number',
+                'serial_alt',
+                AllowedFilter::scope('created_after')
+            ]);
         return $query->paginate(25);
     }
 

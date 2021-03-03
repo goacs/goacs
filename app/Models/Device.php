@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property string $oui
  * @property string|null $software_version
  * @property string|null $hardware_version
+ * @property string $product_class
  * @property string $connection_request_url
  * @property string|null $connection_request_user
  * @property string|null $connection_request_password
@@ -56,7 +59,7 @@ class Device extends Model
 
     protected $fillable = ['serial_number', 'oui', 'software_version', 'hardware_version',
         'connection_request_url', 'connection_request_user', 'connection_request_password',
-        'updated_at'];
+        'updated_at', 'product_class'];
 
     public function parameters(): HasMany {
         return $this->hasMany(DeviceParameter::class);
@@ -68,6 +71,10 @@ class Device extends Model
 
     public function tasks(): MorphMany {
         return $this->morphMany(Task::class, 'for');
+    }
+
+    public function scopeCreatedAfter(Builder $query, $date) {
+        return $query->where('created_at', '>=', $date);
     }
 
 

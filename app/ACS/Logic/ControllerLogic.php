@@ -118,11 +118,11 @@ class ControllerLogic
 
     private function runTasks()
     {
-        dump($this->context->tasks);
+//        dump($this->context->tasks);
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
-            dump("There is no tasks :(");
+//            dump("There is no tasks :(");
             $this->endSession();
             return;
         }
@@ -177,7 +177,7 @@ class ControllerLogic
 
                 } catch (SandboxException $exception) {
                     //TODO Save to db as fault
-                    dump($exception);
+//                    dump($exception);
                 }
                 $task->done();
                 $this->runTasks();
@@ -273,7 +273,7 @@ class ControllerLogic
 
 
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
-            dump("PROVSION MODE", $this->context->provision);
+//            dump("PROVSION MODE", $this->context->provision);
             if($this->context->lookupParameters === true) {
                 \Cache::put(
                     Context::LOOKUP_PARAMS_PREFIX.$this->context->device->serialNumber,
@@ -306,7 +306,7 @@ class ControllerLogic
             ->getParametersToCreateInstance($sessionParameters, $dbParameters)
             ->sortBy('name');
 
-        dump("Object params to add", $parametersToAdd);
+//        dump("Object params to add", $parametersToAdd);
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
             $task = new Task(Types::AddObject);
@@ -360,6 +360,18 @@ class ControllerLogic
             $this->context->deviceModel->connection_request_password = $param;
         }
 
+        if($param = $this->context->parameterValues->get($root.'DeviceInfo.ProductClass')?->value) {
+            $this->context->deviceModel->product_class = $param;
+        }
+
+        if($param = $this->context->parameterValues->get($root.'DeviceInfo.SoftwareVersion')?->value) {
+            $this->context->deviceModel->software_version = $param;
+        }
+
+        if($param = $this->context->parameterValues->get($root.'DeviceInfo.HardwareVersion')?->value) {
+            $this->context->deviceModel->hardware_version = $param;
+        }
+
         $this->context->deviceModel->save();
     }
 
@@ -396,7 +408,7 @@ class ControllerLogic
             ->filterByFlag('object', false)
             ->sortBy('name');
 
-        dump("Diff params to set", $diffParameters);
+//        dump("Diff params to set", $diffParameters);
 
         foreach($diffParameters->chunk(10) as $chunk) {
             $task = new Task(Types::SetParameterValues);

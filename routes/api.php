@@ -29,6 +29,7 @@ Route::post('device/{device}/addobject', [\App\Http\Controllers\Device\DeviceCon
 Route::get('device/{device}/provision', [\App\Http\Controllers\Device\DeviceController::class, 'provision']);
 Route::get('device/{device}/lookup', [\App\Http\Controllers\Device\DeviceController::class, 'lookup']);
 Route::get('/device/{device}/parameters/cached', [\App\Http\Controllers\Device\DeviceParameterController::class, 'cached']);
+Route::patch('/device/{device}/parameters/patch', [\App\Http\Controllers\Device\DeviceParameterController::class, 'patchParameters']);
 Route::apiResource('device.parameters', \App\Http\Controllers\Device\DeviceParameterController::class);
 Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTemplateController::class)->only(['index', 'store', 'destroy']);
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
