@@ -195,6 +195,7 @@ class ControllerLogic
             ],
             [
                 'oui' => $this->context->device->oui,
+                'product_class' => $this->context->parameterValues->get($this->context->device->root . "DeviceInfo.ProductClass")?->value ?? '',
                 'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
                 'updated_at' => now(),
             ]
