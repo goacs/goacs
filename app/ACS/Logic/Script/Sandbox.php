@@ -18,6 +18,7 @@ class Sandbox
     public function __construct(Context $context, string $script) {
         $this->script = $script;
         $this->context = $context;
+        $this->addVariable('isNewDevice', $this->context->new);
         $this->addVariable('deviceModel', $this->context->deviceModel);
         $this->addVariable('device', $this->context->device);
         $this->addVariable('root', $this->context->device->root);
