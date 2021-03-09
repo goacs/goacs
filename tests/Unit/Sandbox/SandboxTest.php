@@ -6,6 +6,7 @@ namespace Tests\Unit\Sandbox;
 
 use App\ACS\Context;
 use App\ACS\Logic\Script\Sandbox;
+use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Tests\TestCase;
@@ -33,6 +34,8 @@ return $ret;';
 
 
     private function newSandbox(string $script) {
-        return new Sandbox(new Context(new Request(), new Response()), $script);
+        $context = new Context(new Request(), new Response());
+        $context->deviceModel = Device::factory()->create();
+        return new Sandbox($context, $script);
     }
 }
