@@ -8,6 +8,9 @@ on:
 
 jobs:
   laravel-tests:
+    env:
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
 
     runs-on: ubuntu-latest
 
@@ -37,7 +40,4 @@ jobs:
         php artisan migrate:install
         php artisan migrate
     - name: Execute tests (Unit and Feature tests) via PHPUnit
-      env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
       run: vendor/bin/phpunit
