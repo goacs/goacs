@@ -14,7 +14,7 @@ class AddDetailColumnToFaults extends Migration
     public function up()
     {
         Schema::table('faults', function (Blueprint $table) {
-            $table->json('detail')->after('message');
+            $table->json('detail')->default(json_encode([]))->after('message');
         });
     }
 
