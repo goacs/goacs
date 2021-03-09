@@ -14,14 +14,15 @@ use Tests\TestCase;
 class DeviceParametersLogicTest extends TestCase
 {
     public function test_device_parameters_with_templates() {
-        $device = Device::find(27); //TODO: make faker
+        $device = Device::factory()->create();
 
         $deviceParameters = new DeviceParametersLogic($device);
         $parameters = $deviceParameters->combinedDeviceParametersWithTemplates();
+        $this->markTestIncomplete('Incomplete device templates parameters test');
     }
 
     public function test_getParametersToCreateInstance() {
-        $device = Device::find(27); //TODO: make faker
+        $device = Device::factory()->create();
         $deviceParameters = new DeviceParametersLogic($device);
         $flag = new Flag(true, true, true);
 
