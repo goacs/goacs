@@ -37,7 +37,7 @@ Vue.mixin(errorsMixin);
 
 const authPluginOptions = { ...DEFAULT_OPTIONS,
   ...{
-    authRedirect: '/api/auth/login',
+    authRedirect: '/auth/login',
     loginData: {
       url: '/api/auth/login',
       method: 'POST',
@@ -48,9 +48,9 @@ const authPluginOptions = { ...DEFAULT_OPTIONS,
     },
   },
   logoutData: {
-    url: '/api/auth/logout',
+    url: '/auth/logout',
     method: 'POST',
-    redirect: '/api/auth/login',
+    redirect: '/auth/login',
     makeRequest: false,
   },
 }

@@ -1,151 +1,93 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Parameters
-      </p>
-      <div class="card-header-icon" aria-label="more options">
-        <b-button
-                size="is-small"
-                @click="addDialog = true"
-        >
-          <b-icon
-                  icon="plus"
-                  size="is-small"
-          >
-
-          </b-icon>
-          Add
-        </b-button>
-
-      </div>
-    </header>
-    <div class="card-content">
-      <div>
+  <CCard>
+    <CCardHeader>
+      <strong>Parameters</strong>
+    </CCardHeader>
+    <CCardBody>
         <PaginatedTable
                 :action="action"
-                :headers="headers"
-                :autoload="false"
-                :dense="true"
-                detailed
-                detail-key="name"
-                :show-detail-icon="false"
+                :columnFilter='{ external: true, lazy: true }'
+                :fields="fields"
                 ref="table"
-                :row-class="setColorOnDiff"
                 @items:loaded="toggleLookup"
 
         >
-          <b-table-column field="name" label="Name" searchable>
-            <template
-                    slot="searchable"
-                    slot-scope="props">
-              <b-input
-                      v-model="props.filters[props.column.field]"
-                      placeholder="Search..."
-                      icon="magnify"
-                      size="is-small" />
-            </template>
-            <template v-slot="props">
-            {{ props.row.name }}
-            </template>
-          </b-table-column>
-
-          <b-table-column field="type" label="Type" searchable>
-            <template
-                slot="searchable"
-                slot-scope="props">
-              <b-input
-                  v-model="props.filters[props.column.field]"
-                  placeholder="Search..."
-                  icon="magnify"
-                  size="is-small" />
-            </template>
-            <template v-slot="props">
-              {{ props.row.type }}
-            </template>
-          </b-table-column>
-
-          <b-table-column field="value" label="Value" searchable>
-            <template
-                    slot="searchable"
-                    slot-scope="props">
-              <b-input
-                      v-model="props.filters[props.column.field]"
-                      placeholder="Search..."
-                      icon="magnify"
-                      size="is-small" />
-            </template>
-            <template v-slot="props">
-              <template v-if="props.row.value.length > 50">
-                {{ stripString(props, 50) }}
-                <b-button
-                @click="$refs.table.$refs.basetable.toggleDetails(props.row)"
-                size="is-small"
-                type="is-primary"
+          <template #value="{ item, index }">
+            <td>
+              <template v-if="item.value.length > 50">
+                {{ stripString(item, 50) }}
+                <CButton
+                @click="$refs.table.toggleDetails(item, index)"
+                size="sm"
+                color="primary"
                 >
-                  ...
-                </b-button>
+                  {{Boolean(item._toggled) ? 'Collapse' : 'Expand'}}
+                </CButton>
               </template>
               <template v-else>
-                {{ props.row.value }}
+                {{ item.value }}
               </template>
-            </template>
-          </b-table-column>
-
-          <b-table-column field="flag" label="Flag">
-
-            <template v-slot="props">
-              {{ parseFlag(props.row.flags) }}
-            </template>
-          </b-table-column>
-
-          <b-table-column field="actions" label="Actions" v-slot="props">
-            <section class="b-tooltips">
-              <b-tooltip label="New instance" type="is-dark" v-if="props.row.flags.object === true">
-                <b-button type="is-primary" size='is-small' @click="addObject(props.row)">
-                  <b-icon icon="plus" size="is-small"></b-icon>
-                </b-button>
-              </b-tooltip>
-              <b-tooltip label="Edit parameter" type="is-dark">
-              <b-button type="is-primary" size='is-small' @click="editItem(props.row)">
-                <b-icon icon="pencil" size="is-small"></b-icon>
-              </b-button>
-              </b-tooltip>
-            </section>
-          </b-table-column>
-          <b-table-column field="lookup" label="Lookup" v-if="lookup">
-
-            <template v-slot="props">
-              <template v-if="props.row.cached && props.row.cached.length > 50">
-                {{ stripString(props, 50) }}
-                <b-button
-                    @click="$refs.table.$refs.basetable.toggleDetails(props.row)"
-                    size="is-small"
-                    type="is-primary"
-                >
-                  ...
-                </b-button>
-              </template>
-              <template v-else-if="props.row.cached">
-                {{ props.row.cached }}
-              </template>
-            </template>
-          </b-table-column>
-          <template slot="detail"  slot-scope="props">
-            <article class="media">
-              <div class="media-content">
-                <div class="content">
-                  <pre class="parameter">{{ props.row.value }}</pre>
-                </div>
-              </div>
-            </article>
+            </td>
           </template>
+
+          <template #flags="{item}">
+            <td>{{ parseFlag(item.flags) }}</td>
+          </template>
+          <template #flags-filter="{item}">
+            filter
+          </template>
+
+          <template #actions="{item}">
+            <td>
+              <CButton
+                v-if="item.flags.object === true"
+                size="sm"
+                color="primary"
+                variant="ghost"
+              >
+                <CIcon name="cil-plus"/>
+              </CButton>
+              <CButton
+                v-if="item.flags.write === true"
+                size="sm"
+                color="primary"
+                variant="ghost"
+              >
+                <CIcon name="cil-pencil"/>
+              </CButton>
+            </td>
+          </template>
+          <template #details="{item}">
+            <CCollapse :show="Boolean(item._toggled)" style="max-width: 100em">
+              {{item.value}}
+            </CCollapse>
+          </template>
+
+<!--          <b-table-column field="lookup" label="Lookup" v-if="lookup">-->
+
+<!--            <template v-slot="props">-->
+<!--              <template v-if="props.row.cached && props.row.cached.length > 50">-->
+<!--                {{ stripString(props, 50) }}-->
+<!--                <b-button-->
+<!--                    @click="$refs.table.$refs.basetable.toggleDetails(props.row)"-->
+<!--                    size="is-small"-->
+<!--                    type="is-primary"-->
+<!--                >-->
+<!--                  ...-->
+<!--                </b-button>-->
+<!--              </template>-->
+<!--              <template v-else-if="props.row.cached">-->
+<!--                {{ props.row.cached }}-->
+<!--              </template>-->
+<!--            </template>-->
+<!--          </b-table-column>-->
+
         </PaginatedTable>
-      </div>
-    </div>
+    </CCardBody>
     <ParameterDialog v-model="addDialog" :item="addingItem" @onSave="storeParameter"></ParameterDialog>
     <ParameterDialog v-model="editDialog" :item="editedItem" :isNew="false" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>
-  </div>
+  </CCard>
+
 </template>
 
 <script>
@@ -159,27 +101,27 @@
     data() {
       return {
         lookup: false,
-        headers: [
+        fields: [
           {
-            text: 'Name',
-            value: 'name',
-            searchable: true,
+            label: 'Name',
+            key: 'name',
           },
           {
-            text: 'Type',
-            value: 'type',
+            label: 'Type',
+            key: 'type',
           },
           {
-            text: 'Value',
-            value: 'value'
+            label: 'Value',
+            key: 'value',
           },
           {
-            text: 'Flag',
-            value: 'flag',
+            label: 'Flags',
+            key: 'flags',
           },
           {
-            text: 'Actions',
-            value: 'actions'
+            label: '',
+            key: 'actions',
+            filter: false,
           }
         ],
         flagSelection: [
@@ -227,6 +169,7 @@
       }),
     },
     methods: {
+
       setColorOnDiff(row) {
         if(!row['cached']) {
           return '';
@@ -271,12 +214,7 @@
           this.addDialog = false
           await this.$refs.table.fetchItems()
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Cannot save parameter: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
         }
         this.addingItem = {
           name: "",
@@ -294,12 +232,7 @@
           await this.$refs.table.fetchItems()
         } catch (e) {
           console.log(e)
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Cannot save parameter: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
         }
       },
       async deleteParameter(item) {
@@ -312,16 +245,11 @@
           await this.$refs.table.fetchItems()
         } catch (e) {
           console.log(e)
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Cannot delete parameter: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
         }
       },
       stripString(prop, len) {
-        return prop.row.value.substr(0, len);
+        return prop.value.substr(0, len);
       },
     },
     beforeDestroy() {

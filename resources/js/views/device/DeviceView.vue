@@ -1,20 +1,20 @@
 <template>
   <div v-if="device.id">
-    <div class="columns">
-      <div class="column is-half">
+    <CRow>
+      <CCol sm="12" lg="6">
         <DeviceInfo></DeviceInfo>
-      </div>
-      <div class="column is-half">
+      </CCol>
+      <CCol sm="12" lg="6">
         <DeviceQueuedTasks></DeviceQueuedTasks>
         <DeviceTemplates></DeviceTemplates>
         <DeviceLogs></DeviceLogs>
-      </div>
-    </div>
-    <div class="columns">
-      <div class="column">
+      </CCol>
+    </CRow>
+    <CRow>
+      <CCol lg="12">
         <DeviceParameterList></DeviceParameterList>
-      </div>
-    </div>
+      </CCol>
+    </CRow>
   </div>
 </template>
 

@@ -1,87 +1,30 @@
 <template>
-  <div class="columns">
-    <div class="column">
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">
-            Devices
-          </p>
-          <div class="card-header-icon" aria-label="more options">
-            <b-button
-                    size="is-small"
-            >
-              <b-icon
-                      icon="plus"
-                      size="is-small"
-              >
-
-              </b-icon>
-              New
-            </b-button>
-          </div>
-        </header>
-        <div class="card-content">
-        <PaginatedTable
-          action="device/list"
-          :autoload="false"
-          :dense="true"
-          ref="table"
-        >
-          <b-table-column field="id" label="ID" searchable>
-            <template
-                    slot="searchable"
-                    slot-scope="props">
-              <b-input
-                      v-model="props.filters[props.column.field]"
-                      placeholder="Search..."
-                      icon="magnify"
-                      size="is-small" />
-            </template>
-            <template v-slot="props">
-              {{ props.row.id }}
-            </template>
-          </b-table-column>
-
-          <b-table-column field="serial_number" label="Serial Number" searchable>
-            <template
-                    slot="searchable"
-                    slot-scope="props">
-              <b-input
-                      v-model="props.filters[props.column.field]"
-                      placeholder="Search..."
-                      icon="magnify"
-                      size="is-small" />
-            </template>
-            <template v-slot="props">
-              {{ props.row.serial_number }}
-            </template>
-          </b-table-column>
-
-          <b-table-column field="software_version" label="Software Version" v-slot="props">
-            {{ props.row.software_version }}
-          </b-table-column>
-
-          <b-table-column field="updated_at" label="Last connection time" v-slot="props">
-            {{ props.row.updated_at | moment }}
-          </b-table-column>
-
-          <b-table-column field="actions" label="Actions" v-slot="props">
-            <b-button
-                    tag="router-link" :to="{ name: 'devices-view', params: { id: props.row.id } }"
-                    size="is-small"
-            >
-              <b-icon
-                      icon="magnify"
-                      size="is-small"
-              >
-              </b-icon>
-            </b-button>
-          </b-table-column>
-        </PaginatedTable>
-        </div>
-      </div>
-    </div>
-  </div>
+  <CCard>
+    <CCardHeader>
+        <strong>Device list</strong>
+    </CCardHeader>
+  <CCardBody>
+    <PaginatedTable
+      :fields="fields"
+      :columnFilter='{ external: true, lazy: true }'
+      action="device/list"
+      :autoload="false"
+      :dense="true"
+      ref="table"
+    >
+      <template #updated_at="{ item }">
+        <td>{{ item.updated_at | moment }}</td>
+      </template>
+      <template #actions="{ item }">
+        <td>
+        <CButton variant="outline" shape="pill" color="primary" :to="{ name: 'devices-view', params: { id: item.id}}">
+          <CIcon name="cil-arrow-right"/>
+        </CButton>
+        </td>
+      </template>
+    </PaginatedTable>
+  </CCardBody>
+  </CCard>
 </template>
 
 <script>
@@ -91,7 +34,33 @@ export default {
   components: {PaginatedTable},
   data() {
     return {
-
+      fields: [
+        {
+          key: 'id',
+          label: 'ID',
+        },
+        {
+          key: 'serial_number',
+          label: 'Serial Number'
+        },
+        {
+          key: 'product_class',
+          label: 'Product Class'
+        },
+        {
+          key: 'software_version',
+          label: 'Software'
+        },
+        {
+          key: 'updated_at',
+          label: 'Last inform'
+        },
+        {
+          key: 'actions',
+          label: '',
+          filter: false,
+        }
+      ]
     };
   },
   methods: {

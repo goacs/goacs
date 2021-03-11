@@ -5,11 +5,11 @@ import {filterToQueryString} from "../../helpers/URL";
 export default {
   async list(context, parameters) {
     const filterStr = filterToQueryString(parameters.filter)
-    return await this._vm.$http.get(`/device?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
+    return await this._vm.$http.get(`/api/device?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
   },
   async fetchDevice({ commit }, id) {
     try {
-      const response = await this._vm.$http.get(`/device/${id}`)
+      const response = await this._vm.$http.get(`/api/device/${id}`)
       commit('setDevice', response.data.data)
     } catch (e) {
       console.error("Cannot fetch device")
@@ -18,7 +18,7 @@ export default {
   async fetchParameters({ commit }, parameters) {
     const filterStr = filterToQueryString(parameters.filter)
     try {
-      const response = await this._vm.$http.get(`/device/${parameters.id}/parameters?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
+      const response = await this._vm.$http.get(`/api/device/${parameters.id}/parameters?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
       commit('setParameters', response.data.data)
       commit('hasCachedParams', response.data.has_cached_items)
       return response
@@ -28,7 +28,7 @@ export default {
   },
   async fetchCachedParameters({ commit }, device_id) {
     try {
-      const response = await this._vm.$http.get(`/device/${device_id}/parameters/cached`)
+      const response = await this._vm.$http.get(`/api/device/${device_id}/parameters/cached`)
       commit('setCachedParameters', response.data.data)
       return response
     } catch (e) {
@@ -36,27 +36,27 @@ export default {
     }
   },
   async storeParameter(context, data) {
-    return await this._vm.$http.post(`/device/${data.device_id}/parameters`, {
+    return await this._vm.$http.post(`/api/device/${data.device_id}/parameters`, {
       ...data
     })
   },
   async updateParameters(context, data) {
-    return await this._vm.$http.put(`/device/${data.device_id}/parameters/${data.id}`, {
+    return await this._vm.$http.put(`/api/device/${data.device_id}/parameters/${data.id}`, {
       ...data
     })
   },
   async deleteParameter(context, data) {
-    return await this._vm.$http.delete(`/device/${data.device_id}/parameters/${data.id}`)
+    return await this._vm.$http.delete(`/api/device/${data.device_id}/parameters/${data.id}`)
   },
   async kickDevice(context, id) {
-    return await this._vm.$http.get(`/device/${id}/provision`)
+    return await this._vm.$http.get(`/api/device/${id}/provision`)
   },
   async deleteDevice(context, id) {
-    return await this._vm.$http.delete(`/device/${id}`)
+    return await this._vm.$http.delete(`/api/device/${id}`)
   },
   async addObject(context, params) {
     const {id, name, key} = params
-    return await this._vm.$http.post(`/device/${id}/addobject`, {
+    return await this._vm.$http.post(`/api/device/${id}/addobject`, {
       name,
       key,
     })

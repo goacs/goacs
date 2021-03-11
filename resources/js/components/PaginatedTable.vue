@@ -1,29 +1,21 @@
 <template>
   <div>
-    <b-table
-            :data="items"
+    <CDataTable
+            :items="items"
             :loading="loading"
-            paginated
-            :total="total"
-            :per-page="options.itemsPerPage"
-            :current-page="options.page"
-            @page-change="pageChanged"
-            @filters-change="filterChanged"
-            aria-next-label="Next page"
-            aria-previous-label="Previous page"
-            aria-page-label="Page"
-            aria-current-label="Current page"
+            :itemsPerPageSelect="itemsPerPageOptions"
+            :items-per-page="25"
+            @pagination-change="paginationChanged"
+            @update:column-filter-value="filterChanged"
             v-bind="Object.assign($attrs, $props)"
-            backend-pagination
-            backend-filtering
-            backend-sorting
-            :debounce-search="500"
             ref="basetable"
     >
       <slot></slot>
-      <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope"><slot :name="slot" v-bind="scope"/></template>
-
-    </b-table>
+      <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+        <slot :name="slot" v-bind="scope"/>
+      </template>
+    </CDataTable>
+    <CPagination :active-page="pagination.activePage" :pages="pagination.pages" @update:activePage="pageChanged"></CPagination>
   </div>
 </template>
 
@@ -47,19 +39,24 @@ export default {
     return {
       items: [],
       filter: {},
-      total: 0,
       meta: {},
-      footerOptions: {itemsPerPageOptions: [25, 50, 100, 300]},
-      options: {
+      collapseDuration: 0,
+      itemsPerPageOptions: { values: [25, 50, 100, 300]},
+      pagination: {
         itemsPerPage: 25,
-        page: 1,
+        activePage: 1,
+        pages: 0,
       },
       loading: false,
     };
   },
   methods: {
+    paginationChanged(number) {
+      this.pagination.itemsPerPage = number;
+      this.fetchItems();
+    },
     pageChanged(pageNumber) {
-      this.options.page = pageNumber
+      this.pagination.activePage = pageNumber;
       this.fetchItems();
     },
     filterChanged(filter) {
@@ -69,12 +66,17 @@ export default {
     getMeta() {
       return this.meta
     },
+    toggleDetails(item, index) {
+      this.$set(this.items[index], '_toggled', !item._toggled)
+      this.collapseDuration = 300
+      this.$nextTick(() => { this.collapseDuration = 0})
+    },
     async fetchItems() {
       try {
         this.loading = true;
         const response = await this.$store.dispatch(this.actionData.name, this.actionData.parameters)
         this.items = response.data.data ?? []
-        this.total = response.data.total ?? 0
+        this.pagination.pages = response.data.last_page ?? 0
         // eslint-disable-next-line no-unused-vars
         const {data, ...meta} = response.data
         this.meta = meta;
@@ -92,8 +94,8 @@ export default {
         return {
           name: this.action,
           parameters: {
-            page: this.options.page,
-            perPage: this.options.itemsPerPage,
+            page: this.pagination.activePage,
+            perPage: this.pagination.itemsPerPage,
             filter: this.filter
           }
         }
@@ -102,8 +104,8 @@ export default {
         name: this.action.name,
         parameters: {
           ...this.action.parameters,
-          page: this.options.page,
-          perPage: this.options.itemsPerPage,
+          page: this.pagination.activePage,
+          perPage: this.pagination.itemsPerPage,
           filter: this.filter
         }
       }

@@ -2,7 +2,13 @@
   <div>
     <CRow>
       <CCol sm="12" lg="4">
-        <DashboardWidget icon="cil-gauge" inverse header="Devices count" text="1000" color="primary"/>
+        <DashboardWidget icon="cil-gauge" inverse header="Last 24h informs" text="1000" color="success"/>
+      </CCol>
+      <CCol sm="12" lg="4">
+        <DashboardWidget icon="cil-gauge" inverse header="Last 24h faults" text="1000" color="danger"/>
+      </CCol>
+      <CCol sm="12" lg="4">
+        <DashboardWidget icon="cil-gauge" inverse header="Devices count" text="1000" color="info"/>
       </CCol>
     </CRow>
   </div>

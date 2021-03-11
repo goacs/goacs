@@ -34,7 +34,7 @@ class DeviceController extends Controller
                 'serial_alt',
                 AllowedFilter::scope('created_after')
             ]);
-        return $query->paginate(25);
+        return $query->paginate($request->per_page ?: 25);
     }
 
     public function show(Device $device) {

@@ -1,28 +1,12 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Device Info
-      </p>
+  <CCard>
+    <CCardHeader>
+       Device Info
       <div class="card-header-icon" aria-label="more options">
-        <b-button
-                type="is-danger"
-                size="is-small"
-                @click="deleteDevice"
-        >
-          <b-icon
-                  icon="delete"
-                  size="is-small"
-          >
-
-          </b-icon>
-          Delete
-        </b-button>
       </div>
-    </header>
-    <div class="card-content">
-      <div class="table-container">
-      <table class="table is-fullwidth is-striped">
+    </CCardHeader>
+    <CCardBody>
+      <table class="table table-sm table-borderless table-hover">
         <tbody>
         <tr>
           <th>UUID</th>
@@ -58,28 +42,36 @@
         </tr>
         </tbody>
       </table>
-      </div>
-      <div class="buttons">
-        <b-button
+    </CCardBody>
+    <CCardFooter>
+      <CButton
+        size="sm"
+        color="dark"
+        class="shadow-sm"
         @click="kick"
-        >
-          Provision
-        </b-button>
-        <b-button
-                @click="lookup"
-        >
-          Lookup parameters
-        </b-button>
-        <b-button
-            v-if="hasCachedParams"
-            @click="cached"
-        >
-          Cached parameters
-        </b-button>
-      </div>
-    </div>
-  <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>
-  </div>
+      >
+        Provision
+      </CButton>
+      <CButton
+        size="sm"
+        color="dark"
+        class="shadow-sm"
+        @click="lookup"
+      >
+        Lookup parameters
+      </CButton>
+      <CButton
+          v-if="hasCachedParams"
+          size="sm"
+          color="dark"
+          class="shadow-sm"
+          @click="cached"
+      >
+        Cached parameters
+      </CButton>
+    </CCardFooter>
+<!--  <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>-->
+  </CCard>
 </template>
 
 <script>
