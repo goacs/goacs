@@ -2,12 +2,12 @@
 
 export default {
   async fetchTasks() {
-    return await this._vm.$http.get('/settings/tasks')
+    return await this._vm.$http.get('/api/settings/tasks')
   },
   async storeTask(context, data) {
-    return await this._vm.$http.post('/settings/tasks', data)
+    return await this._vm.$http.post('/api/settings/tasks', data)
   },
   async updateTask(context, data) {
-    return await this._vm.$http.put(`/settings/tasks/${data.id}`, data)
+    return await this._vm.$http.put(`/api/settings/tasks/${data.id}`, data)
   }
 }

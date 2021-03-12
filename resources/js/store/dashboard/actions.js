@@ -3,7 +3,7 @@
 export default {
   async fetchDashboard({ commit }) {
     try {
-      const response = await this._vm.$http.get(`/dashboard`)
+      const response = await this._vm.$http.get(`/api/dashboard`)
       commit('setDashboard', response.data)
     } catch (e) {
       console.error("Cannot fetch dashboard data")
