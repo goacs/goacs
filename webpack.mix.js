@@ -19,5 +19,4 @@ mix.js('resources/js/app.js', 'public/js')
       '~': path.join(__dirname, '/resources/js/assets/sass'),
       '@components': path.join(__dirname, '/resources/js/components'),
     })
-
     ;

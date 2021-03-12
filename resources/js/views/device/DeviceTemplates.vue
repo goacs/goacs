@@ -2,31 +2,30 @@
   <CCard>
     <CCardHeader>
       <strong>Device templates</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addTemplate">
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Assign</CButton>
     </CCardHeader>
     <CCardBody>
-      <CButton v-for="template in templates" :key="template.id" type="button" color="primary">
+      <CButton v-for="template in templates" :key="template.id" type="button" color="primary" size="sm" @click="editTemplate(template)">
         {{ template.name }} <CBadge color="light" class="ml-2 position-static">{{ template.pivot.priority }}</CBadge>
       </CButton>
     </CCardBody>
+    <TemplateDialog v-model="templateDialog" ref="dialog"></TemplateDialog>
   </CCard>
 </template>
 
 <script>
   import {mapGetters} from "vuex";
-  import EditDialog from "./template/EditDialog";
-  import AddDialog from "./template/AddDialog";
+  import TemplateDialog from "./template/TemplateDialog";
 
   export default {
     name: "DeviceTemplates",
     components: {
-      AddDialog,
-      EditDialog
+      TemplateDialog,
     },
     data() {
       return {
-        addDialog: false,
-        editDialog: false,
-        editedItem: {},
+        templateDialog: false,
       };
     },
     computed:{
@@ -37,12 +36,16 @@
     },
     methods: {
       addTemplate() {
-        console.log("add templ")
-        this.addDialog = true;
+        this.templateDialog = true;
+        this.$refs.dialog.setItem({
+            template_id: 0,
+            priority: 100,
+            device_id: 0,
+        });
       },
       editTemplate(template) {
-        this.editedItem = Object.assign({}, template); //clone item, not reference
-        this.editDialog = true;
+        this.templateDialog = true;
+        this.$refs.dialog.setItem(template.pivot);
       },
 
     },

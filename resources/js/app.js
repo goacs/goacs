@@ -2,6 +2,7 @@ import CoreuiVue from '@coreui/vue'
 import { freeSet as icons } from "@coreui/icons";
 import axios from 'axios';
 import VueAxios from 'vue-axios'
+import vSelect from 'vue-select'
 import VueAuth, { DEFAULT_OPTIONS } from '@d0whc3r/vue-auth-plugin';
 import VueRouter from 'vue-router';
 import {ValidationObserver, ValidationProvider, extend} from 'vee-validate'
@@ -25,6 +26,7 @@ Vue.use(CoreuiVue)
 Vue.use(VueRouter);
 Vue.use(require('vue-moment'), { moment })
 Vue.use(VueAxios, axios);
+Vue.component('v-select', vSelect)
 
 Object.keys(rules).forEach(rule => {
   extend(rule, rules[rule]);
