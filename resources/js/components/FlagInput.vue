@@ -1,19 +1,21 @@
 <template>
-  <b-taginput
+  <Multiselect
+    :options="flags"
+    label="name"
+    track-by="value"
+    multiple
     v-model="selectedFlags"
-    :data="flags"
-    :allow-new="false"
-    :allow-duplicates="false"
-    :open-on-focus="true"
-    autocomplete
-    field="name"
+    variant="dark"
+    placeholder="Select flags"
   >
-  </b-taginput>
+  </Multiselect>
 </template>
 
 <script>
+  import Multiselect from "./Multiselect";
   export default {
     name: "FlagInput",
+    components: {Multiselect},
     props: {
       value: {
         type: Object,

@@ -62,11 +62,11 @@ export default {
     })
   },
   async lookup(context, id) {
-    return await this._vm.$http.get(`/device/${id}/lookup`)
+    return await this._vm.$http.get(`/api/device/${id}/lookup`)
   },
   async fetchQueuedTasks({ commit }, id) {
     try {
-      const response = await this._vm.$http.get(`/device/${id}/tasks`)
+      const response = await this._vm.$http.get(`/api/device/${id}/tasks`)
       commit('setQueuedTasks', response.data.data)
       return response
     } catch (e) {
@@ -75,7 +75,7 @@ export default {
   },
   async fetchDeviceTemplates({ commit }, id) {
     try {
-      const response = await this._vm.$http.get(`/device/${id}/templates`)
+      const response = await this._vm.$http.get(`/api/device/${id}/templates`)
       commit('setDeviceTemplates', response.data.data)
       return response
     } catch (e) {
@@ -83,16 +83,16 @@ export default {
     }
   },
   async assignTemplate(context, params) {
-    return await this._vm.$http.post(`/device/${params.device_id}/templates`, {
+    return await this._vm.$http.post(`/api/device/${params.device_id}/templates`, {
       template_id: params.template_id,
       priority: params.priority,
     })
   },
   async unAssignTemplate(context, params) {
-    return await this._vm.$http.delete(`/device/${params.device_id}/templates/${params.template_id}`)
+    return await this._vm.$http.delete(`/api/device/${params.device_id}/templates/${params.template_id}`)
   },
 
   async addTask(context, params) {
-    return await this._vm.$http.post(`/device/${params.id}/tasks`, params.task)
+    return await this._vm.$http.post(`/api/device/${params.id}/tasks`, params.task)
   }
 }

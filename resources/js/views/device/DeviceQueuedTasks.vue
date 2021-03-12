@@ -1,47 +1,24 @@
 <template>
-  <div>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Queued Tasks
-      </p>
-      <div class="card-header-icon" aria-label="more options">
-        <b-button
-          size="is-small"
-          @click="addDialog = true"
-        >
-          <b-icon
-                  icon="plus"
-                  size="is-small"
-          >
-
-          </b-icon>
-          Add
-        </b-button>
-      </div>
-    </header>
-    <div class="content">
-      <a v-for="task in tasks" :key="task.id" class="panel-block is-active">
-        <span class="panel-icon">
-          <b-tooltip
-                  v-if="task.infinite"
-                  label="Infinite task"
-          >
-            <b-icon
-
-                    icon="infinity"
-                    size="is-small"
-            ></b-icon>
-          </b-tooltip>
-
-        </span>
-        {{ task.task }}
-        <span class="script-description has-text-grey-light">{{task.script}}</span>
-      </a>
-    </div>
-  </div>
-    <TaskDialog v-model="addDialog" is-new @onSave="saveTask"></TaskDialog>
-  </div>
+  <CCard>
+    <CCardHeader>
+      <strong>Queued Tasks</strong>
+    </CCardHeader>
+    <CCardBody>
+      <CListGroup>
+        <CListGroupItem href='#' @click.prevent="" class="flex-column align-items-start" v-for="task in tasks" :key="task.id">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ task.name }}</h5>
+            <small>{{ task.created_at | duration('humanize') }}</small>
+          </div>
+          <p class="mb-1 h5">
+            <CBadge color="primary">On request: {{ task.on_request }}</CBadge>
+            <CBadge :color="task.infinite ? 'danger' : 'success'">Infinite: {{ task.infinite }}</CBadge>
+          </p>
+        </CListGroupItem>
+      </CListGroup>
+    </CCardBody>
+  </CCard>
+<!--    <TaskDialog v-model="addDialog" is-new @onSave="saveTask"></TaskDialog>-->
 </template>
 
 <script>
@@ -79,12 +56,6 @@
           this.fetchTasks()
           this.addDialog = false;
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Error. Cannot add task: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
         }
       }
     },

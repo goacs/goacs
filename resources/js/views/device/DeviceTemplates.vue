@@ -1,38 +1,14 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Device templates
-      </p>
-      <div class="card-header-icon" aria-label="more options">
-        <b-button size="is-small" @click="addTemplate">
-          <b-icon
-                  icon="plus"
-                  size="is-small"
-          ></b-icon>
-          Assign
-        </b-button>
-      </div>
-    </header>
-    <div class="card-content">
-      <div class="field is-grouped is-grouped-multiline">
-        <template v-for="template in templates">
-          <div class="control is-clickable" :key="template.id" @click="editTemplate(template)">
-            <b-taglist attached>
-                  <b-tag type="is-black" size="is-medium" ellipsis>{{ template.name }}</b-tag>
-                  <b-tag type="is-info" size="is-medium">{{ template.pivot.priority }}</b-tag>
-            </b-taglist>
-          </div>
-        </template>
-      </div>
-
-      <span class="is-small has-text-grey-light">
-        Higher order priority
-      </span>
-    </div>
-    <AddDialog v-model="addDialog"></AddDialog>
-    <EditDialog v-model="editDialog" :item="editedItem"></EditDialog>
-  </div>
+  <CCard>
+    <CCardHeader>
+      <strong>Device templates</strong>
+    </CCardHeader>
+    <CCardBody>
+      <CButton v-for="template in templates" :key="template.id" type="button" color="primary">
+        {{ template.name }} <CBadge color="light" class="ml-2 position-static">{{ template.pivot.priority }}</CBadge>
+      </CButton>
+    </CCardBody>
+  </CCard>
 </template>
 
 <script>

@@ -34,7 +34,7 @@
             <td>{{ parseFlag(item.flags) }}</td>
           </template>
           <template #flags-filter="{item}">
-            filter
+            <FlagInput class='slim-select' v-model="flagFilter" @input="propagateFlagFilter"></FlagInput>
           </template>
 
           <template #actions="{item}">
@@ -84,8 +84,8 @@
 
         </PaginatedTable>
     </CCardBody>
-    <ParameterDialog v-model="addDialog" :item="addingItem" @onSave="storeParameter"></ParameterDialog>
-    <ParameterDialog v-model="editDialog" :item="editedItem" :isNew="false" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>
+<!--    <ParameterDialog v-model="addDialog" :item="addingItem" @onSave="storeParameter"></ParameterDialog>-->
+<!--    <ParameterDialog v-model="editDialog" :item="editedItem" :isNew="false" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>-->
   </CCard>
 
 </template>
@@ -95,9 +95,11 @@
   import {mapGetters} from "vuex";
   import {FlagParser} from "../../helpers/FlagParser";
   import ParameterDialog from "../../components/ParameterDialog";
+  import Multiselect from "../../components/Multiselect";
+  import FlagInput from "../../components/FlagInput";
   export default {
     name: "DeviceParameterList",
-    components: {ParameterDialog, PaginatedTable },
+    components: {FlagInput, Multiselect, ParameterDialog, PaginatedTable },
     data() {
       return {
         lookup: false,
@@ -124,20 +126,6 @@
             filter: false,
           }
         ],
-        flagSelection: [
-          {
-            value: 'r',
-            text: 'Read',
-          },
-          {
-            value: 'w',
-            text: 'Write',
-          },
-          {
-            value: 'a',
-            text: 'Object',
-          }
-        ],
         action: {
           name: 'device/fetchParameters',
           parameters: {
@@ -160,6 +148,7 @@
         },
         editedIndex: -1,
         saving: false,
+        flagFilter: {},
       }
     },
     computed: {
@@ -169,7 +158,10 @@
       }),
     },
     methods: {
-
+      propagateFlagFilter(data) {
+        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'input')
+        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'change')
+      },
       setColorOnDiff(row) {
         if(!row['cached']) {
           return '';
@@ -258,23 +250,14 @@
   }
 </script>
 
-<style lang="scss" >
-
-  .is-info {
-    background: #f5f5f5;
+<style lang="scss">
+.slim-select {
+  .multiselect-tags {
+    min-height: calc(1.5em + 2px);
   }
 
-  .b-tooltips {
-    .b-tooltip:not(:last-child) {
-      margin-right: .5em
-    }
+  .multiselect-tags-list {
+    padding: 0.0875em 0.375em;
   }
-
-  pre.parameter {
-    white-space: pre-wrap;       /* Since CSS 2.1 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-  }
+}
 </style>

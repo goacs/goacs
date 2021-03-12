@@ -1,7 +1,7 @@
 <template>
   <CCard>
     <CCardHeader>
-       Device Info
+      <strong>Device Info</strong>
       <div class="card-header-icon" aria-label="more options">
       </div>
     </CCardHeader>
@@ -9,12 +9,12 @@
       <table class="table table-sm table-borderless table-hover">
         <tbody>
         <tr>
-          <th>UUID</th>
+          <th>ID</th>
           <td>{{ device.id }}</td>
         </tr>
         <tr>
-          <th>Manufacturer</th>
-          <td>{{ device.manufacturer }}</td>
+          <th>Product Class</th>
+          <td>{{ device.product_class }}</td>
         </tr>
         <tr>
           <th>OUI</th>
