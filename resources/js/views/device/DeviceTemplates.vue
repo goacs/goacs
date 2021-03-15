@@ -48,10 +48,9 @@
         this.templateDialog = true;
         this.$refs.dialog.setItem(template.pivot);
       },
-
     },
-    mounted() {
-      this.$store.dispatch('device/fetchDeviceTemplates', this.device.id)
+    async beforeMount() {
+      await this.$store.dispatch('device/fetchDeviceTemplates', this.device.id)
     }
   }
 </script>
