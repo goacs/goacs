@@ -21,44 +21,9 @@
       v-model="item.priority"
     >
     </CInput>
-  </CModal>
-<!--  <b-modal-->
-<!--          v-model="value"-->
-<!--          has-modal-card-->
-<!--          :canCancel="false"-->
-<!--  >-->
-<!--    <form>-->
-<!--      <div class="modal-card">-->
-<!--        <header class="modal-card-head">-->
-<!--          <p class="modal-card-title">Assign template</p>-->
+    <CElementCover v-if="saving" :opacity="0.8"/>
 
-<!--        </header>-->
-<!--        <section class="modal-card-body">-->
-<!--          <b-field label="Assign Template">-->
-<!--            <b-autocomplete-->
-<!--                    @typing="getItems"-->
-<!--                    field="name"-->
-<!--                    :data="filteredDataArray"-->
-<!--                    open-on-focus-->
-<!--                    @select="option => selectedItem = option">-->
-<!--              <template slot="empty">No results found</template>-->
-<!--            </b-autocomplete>-->
-<!--          </b-field>-->
-<!--          <b-field label="Priority" label-position="on-border">-->
-<!--            <b-input-->
-<!--                    type="text"-->
-<!--                    v-model.number="item.priority"-->
-<!--                    placeholder="Priority">-->
-<!--            </b-input>-->
-<!--          </b-field>-->
-<!--        </section>-->
-<!--        <footer class="modal-card-foot">-->
-<!--          <b-button @click="$emit('input', false)">Close</b-button>-->
-<!--          <b-button type="is-primary" class="is-align-content-end" @click="save" :loading="saving">Save</b-button>-->
-<!--        </footer>-->
-<!--      </div>-->
-<!--    </form>-->
-<!--  </b-modal>-->
+  </CModal>
 </template>
 
 <script>
@@ -71,6 +36,7 @@
     },
     data() {
       return {
+        saving: false,
         page: 1,
         totalPages: 1,
         items: [],
@@ -120,7 +86,12 @@
           this.fetchingItems = false;
         }
       },
-      onModalClose() {
+      async onModalClose(_, event, accept) {
+        if(accept) {
+          await this.save();
+          return;
+        }
+
         this.$emit('input', false);
       },
       setItem(item) {

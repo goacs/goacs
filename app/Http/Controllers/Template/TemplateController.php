@@ -31,4 +31,9 @@ class TemplateController extends Controller
         $template = Template::create($request->validated());
         return new JsonResource($template);
     }
+
+    public function update(Template $template, TemplateStoreRequest $request) {
+        $template->fill($request->validated())->save();
+        return new JsonResource($template);
+    }
 }

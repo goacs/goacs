@@ -1,116 +1,73 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Parameters
-      </p>
-      <div class="card-header-icon" aria-label="more options">
-        <b-button
-                size="is-small"
-                @click="addItem"
-        >
-          <b-icon
-                  icon="plus"
-                  size="is-small"
-          >
+  <CCard>
+    <CCardHeader>
+      <strong>Parameters</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addItem">
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon>Add
+      </CButton>
+    </CCardHeader>
+    <CCardBody>
+      <PaginatedTable
+        :action="action"
+        :columnFilter='{ external: true, lazy: true }'
+        :fields="fields"
+        ref="table"
 
-          </b-icon>
-          New
-        </b-button>
-      </div>
-    </header>
-    <div class="card-content">
-      <div>
-        <PaginatedTable
-                :action="action"
-                :headers="headers"
-                :autoload="false"
-                :dense="true"
-                detailed
-                detail-key="name"
-                :show-detail-icon="false"
-                ref="table"
-
-        >
-          <b-table-column field="name" label="Name" searchable>
-            <template
-                    slot="searchable"
-                    slot-scope="props">
-              <b-input
-                      v-model="props.filters[props.column.field]"
-                      placeholder="Search..."
-                      icon="magnify"
-                      size="is-small" />
+      >
+        <template #value="{ item, index }">
+          <td>
+            <template v-if="item.value.length > 50">
+              {{ stripString(item, 50) }}
+              <CButton
+                @click="$refs.table.toggleDetails(item, index)"
+                size="sm"
+                color="primary"
+              >
+                {{Boolean(item._toggled) ? 'Collapse' : 'Expand'}}
+              </CButton>
             </template>
-            <template v-slot="props">
-            {{ props.row.name }}
+            <template v-else>
+              {{ item.value }}
             </template>
-          </b-table-column>
+          </td>
+        </template>
 
-          <b-table-column field="type" label="Type">
-            <template v-slot="props">
-              {{ props.row.type }}
-            </template>
-          </b-table-column>
+        <template #flags="{item}">
+          <td>{{ parseFlag(item.flags) }}</td>
+        </template>
+        <template #flags-filter="{item}">
+          <FlagInput class='slim-select' v-model="flagFilter" @input="propagateFlagFilter"></FlagInput>
+        </template>
 
-          <b-table-column field="value" label="Value" searchable>
-            <template
-                    slot="searchable"
-                    slot-scope="props">
-              <b-input
-                      v-model="props.filters[props.column.field]"
-                      placeholder="Search..."
-                      icon="magnify"
-                      size="is-small" />
-            </template>
-            <template v-slot="props">
-              <template v-if="props.row.value.length > 50">
-                {{ stripString(props, 50) }}
-                <b-button
-                @click="$refs.table.$refs.basetable.toggleDetails(props.row)"
-                size="is-small"
-                type="is-primary"
-                >
-                  ...
-                </b-button>
-              </template>
-              <template v-else>
-                {{ props.row.value }}
-              </template>
-            </template>
-          </b-table-column>
-
-          <b-table-column field="flag" label="Flag">
-
-            <template v-slot="props">
-              {{ parseFlag(props.row.flags) }}
-            </template>
-          </b-table-column>
-
-          <b-table-column field="actions" label="Actions" v-slot="props">
-            <section class="b-tooltips">
-              <b-tooltip label="Edit parameter" type="is-dark">
-              <b-button type="is-primary" size='is-small' @click="editItem(props.row)">
-                <b-icon icon="pencil" size="is-small"></b-icon>
-              </b-button>
-              </b-tooltip>
-            </section>
-          </b-table-column>
-          <template slot="detail"  slot-scope="props">
-            <article class="media">
-              <div class="media-content">
-                <div class="content">
-                  <pre>{{ props.row.value }}</pre>
-                </div>
-              </div>
-            </article>
-          </template>
-        </PaginatedTable>
-      </div>
-    </div>
+        <template #actions="{item}">
+          <td>
+            <CButton
+              v-if="item.flags.object === true"
+              size="sm"
+              color="primary"
+              variant="ghost"
+            >
+              <CIcon name="cil-plus"/>
+            </CButton>
+            <CButton
+              size="sm"
+              color="primary"
+              variant="ghost"
+            >
+              <CIcon name="cil-pencil"/>
+            </CButton>
+          </td>
+        </template>
+        <template #details="{item}">
+          <CCollapse :show="Boolean(item._toggled)" style="max-width: 100em">
+            {{item.value}}
+          </CCollapse>
+        </template>
+      </PaginatedTable>
+    </CCardBody>
     <ParameterDialog v-model="addDialog" :item="addingItem" is-new @onSave="storeParameter"></ParameterDialog>
     <ParameterDialog v-model="editDialog" :item="editedItem" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>
-  </div>
+  </CCard>
 </template>
 
 <script>
@@ -118,9 +75,10 @@
   import {mapGetters} from "vuex";
   import {FlagParser} from "../../helpers/FlagParser";
   import ParameterDialog from "../../components/ParameterDialog";
+  import FlagInput from "../../components/FlagInput";
   export default {
     name: "TemplateParameterList",
-    components: {ParameterDialog, PaginatedTable },
+    components: {FlagInput, ParameterDialog, PaginatedTable },
     data() {
       return {
         headers: [
@@ -146,6 +104,30 @@
             value: 'actions'
           }
         ],
+        fields: [
+          {
+            label: 'Name',
+            key: 'name',
+          },
+          {
+            label: 'Type',
+            key: 'type',
+          },
+          {
+            label: 'Value',
+            key: 'value',
+          },
+          {
+            label: 'Flags',
+            key: 'flags',
+          },
+          {
+            label: '',
+            key: 'actions',
+            filter: false,
+          }
+        ],
+        flagFilter: {},
         flagSelection: [
           {
             value: 'r',
@@ -184,6 +166,10 @@
       }),
     },
     methods: {
+      propagateFlagFilter(data) {
+        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'input')
+        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'change')
+      },
       parseFlag(flag) {
         const parser = new FlagParser(flag)
         return parser.toString()

@@ -1,24 +1,17 @@
 <template>
-  <Multiselect
+  <v-select
+    v-model="selectedFlags"
     :options="flags"
     label="name"
-    track-by="value"
     multiple
-    v-model="selectedFlags"
-    variant="dark"
-    placeholder="Select flags"
-  >
-  </Multiselect>
+  ></v-select>
 </template>
 
 <script>
-  import Multiselect from "./Multiselect";
   export default {
     name: "FlagInput",
-    components: {Multiselect},
     props: {
       value: {
-        type: Object,
         required: true,
       },
     },
@@ -74,6 +67,9 @@
         })
         this.$emit('input', flagsObject)
       },
+    },
+    value() {
+      this.initializeFlag();
     }
   }
 </script>

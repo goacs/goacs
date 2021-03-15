@@ -1,11 +1,12 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Template Info
-      </p>
-    </header>
-    <div class="card-content">
+  <CCard>
+    <CCardHeader>
+      <strong>Template Info</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="dialog = true">
+        <CIcon name="cil-pencil" class="btn-icon mt-0" size="sm"></CIcon> Edit
+      </CButton>
+    </CCardHeader>
+    <CCardBody>
       <table class="table is-fullwidth is-striped">
         <tbody>
         <tr>
@@ -22,8 +23,22 @@
         </tr>
         </tbody>
       </table>
-    </div>
-  </div>
+    </CCardBody>
+    <CModal
+      title="Edit template"
+      color="dark"
+      centered
+      :show="dialog"
+      @update:show="onModalClose"
+    >
+      <CInput
+        label="Name"
+        v-model="template.name"
+      >
+      </CInput>
+      <CElementCover v-if="saving" :opacity="0.8"/>
+    </CModal>
+  </CCard>
 </template>
 
 <script>
@@ -31,14 +46,42 @@
 
   export default {
     name: "TemplateInfo",
+    data() {
+      return {
+        dialog: false,
+        saving: false,
+      };
+    },
     computed: {
       ...mapGetters({
-        template: 'template/getTemplate',
       }),
-    },
-    mounted() {
+      template: {
+        get() {
+          return this.$store.state.template.template;
+        },
+        set(value) {
+          this.$store.commit('template/setTemplate', value);
+        }
+      }
     },
     methods: {
+      onModalClose(_, event, accept) {
+        if(accept) {
+          this.save();
+          return;
+        }
+
+        this.dialog = false;
+      },
+      async save() {
+        try {
+          await this.$store.dispatch('template/updateTemplate', this.template)
+        } catch (e) {
+
+        } finally {
+          this.dialog = false;
+        }
+      }
     }
   }
 </script>

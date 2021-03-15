@@ -9,7 +9,7 @@ export default {
     return await this._vm.$http.get(`/api/file?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
   },
   async all({ commit }) {
-    const response = await this._vm.$http.get('/file')
+    const response = await this._vm.$http.get('/api/file')
     commit('setFilesList', response.data.data)
     return response
   },

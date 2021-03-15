@@ -1,56 +1,47 @@
 <template>
-  <div class="columns">
-    <div class="column">
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">
-            Templates
-          </p>
-          <div class="card-header-icon" aria-label="more options">
-            <b-button
-                    size="is-small"
-                    @click="addDialog = true"
-            >
-              <b-icon
-                      icon="plus"
-                      size="is-small"
-              >
-
-              </b-icon>
-              New
-            </b-button>
-          </div>
-        </header>
-        <div class="card-content">
-          <PaginatedTable
-                  action="template/list"
-                  :autoload="false"
-                  :dense="true"
-                  ref="table"
-          >
-            <b-table-column field="id" label="ID" v-slot="props">
-              {{ props.row.id }}
-            </b-table-column>
-
-            <b-table-column field="name" label="Name" v-slot="props">
-              {{ props.row.name }}
-            </b-table-column>
-
-            <b-table-column field="parameter_count" label="Parameter count" v-slot="props">
-              {{ props.row.parameters_count }}
-            </b-table-column>
-
-            <b-table-column field="actions" label="Actions" v-slot="props">
-              <b-button tag="router-link" type="is-primary" :to="{ name: 'template-view', params: { id: props.row.id } }">
-                <b-icon icon="magnify"></b-icon>
-              </b-button>
-            </b-table-column>
-          </PaginatedTable>
-        </div>
-      </div>
-    </div>
-    <TemplateDialog is-new v-model="addDialog" @onSave="save"></TemplateDialog>
-  </div>
+  <CCard>
+    <CCardHeader>
+      <strong>Template list</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="dialog = true">
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon>Add
+      </CButton>
+    </CCardHeader>
+    <CCardBody>
+      <PaginatedTable
+        :fields="fields"
+        :columnFilter='{ external: true, lazy: true }'
+        action="template/list"
+        :autoload="false"
+        :dense="true"
+        ref="table"
+      >
+        <template #updated_at="{ item }">
+          <td>{{ item.updated_at | moment }}</td>
+        </template>
+        <template #actions="{ item }">
+          <td>
+            <CButton variant="outline" shape="pill" color="primary" :to="{ name: 'template-view', params: { id: item.id}}">
+              <CIcon name="cil-arrow-right"/>
+            </CButton>
+          </td>
+        </template>
+      </PaginatedTable>
+    </CCardBody>
+    <CModal
+      title="Add template"
+      color="dark"
+      centered
+      :show="dialog"
+      @update:show="onModalClose"
+    >
+      <CInput
+        label="Name"
+        v-model="template.name"
+      >
+      </CInput>
+      <CElementCover v-if="saving" :opacity="0.8"/>
+    </CModal>
+  </CCard>
 </template>
 
 <script>
@@ -61,23 +52,54 @@
     components: {TemplateDialog, PaginatedTable},
     data() {
       return {
-        addDialog: false
+        dialog: false,
+        saving: false,
+        template: {
+          name: ''
+        },
+        fields: [
+          {
+            key: 'id',
+            label: 'ID',
+          },
+          {
+            key: 'name',
+            label: 'Name'
+          },
+          {
+            key: 'parameters_count',
+            label: 'Parameters count',
+          },
+          {
+            key: 'updated_at',
+            label: 'Updated at'
+          },
+          {
+            key: 'actions',
+            label: '',
+            filter: false,
+          }
+        ]
       };
     },
     methods: {
-      save(template) {
-        try {
-          this.$store.dispatch('template/addTemplate', template)
-          this.addDialog = false;
-        } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Error. Cannot add template: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+      onModalClose(_, event, accept) {
+        if(accept) {
+          this.save();
+          return;
         }
-        this.$refs.table.fetchItems()
+
+        this.dialog = false;
+      },
+      async save() {
+        try {
+          await this.$store.dispatch('template/addTemplate', this.template)
+        } catch (e) {
+
+        } finally {
+          this.dialog = false;
+          this.$refs.table.fetchItems()
+        }
       }
     }
   }

@@ -1,15 +1,15 @@
 <template>
   <div v-if="template.id">
-    <div class="columns">
-      <div class="column is-half">
+    <CRow>
+      <CCol sm="12" lg="6">
         <TemplateInfo></TemplateInfo>
-      </div>
-    </div>
-    <div class="columns">
-      <div class="column">
+      </CCol>
+    </CRow>
+    <CRow>
+      <CCol lg="12">
         <TemplateParameterList></TemplateParameterList>
-      </div>
-    </div>
+      </CCol>
+    </CRow>
   </div>
 </template>
 

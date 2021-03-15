@@ -1,81 +1,60 @@
 <template>
-  <b-modal
-          v-model="value"
-          has-modal-card
-          scroll="keep"
-          :canCancel="false"
+  <CModal
+    :title="`${isNew ? 'Add' : 'Edit'} task`"
+    size="xl"
+    color="dark"
+    centered
+    :closeOnBackdrop="false"
+    :show="value"
+    @update:show="onModalClose"
   >
-    <form>
-      <div class="modal-card" style="width: 100%">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{ isNew ? `Add` : `Edit` }} task</p>
-          <div class="card-header-icon" aria-label="more options" v-if="isNew === false">
-            <b-button
-                    size="is-small"
-                    type="is-danger"
-                    @click="$emit('onDelete', item)"
+    <CRow>
+      <CCol lg="4" sm="12">
+    <CSelect
+      label="On Event"
+      placeholder="Select"
+      :value.sync="on_request"
+      :options="requests"
+    ></CSelect>
+      </CCol>
+      <CCol lg="4" sm="12">
+        <CSelect
+          label="Type"
+          placeholder="Select"
+          :value.sync="name"
+          :options="types"
+        ></CSelect>
+      </CCol>
+      <CCol lg="4" sm="12">
+        <div class="form-group">
+        <label>Infinite</label>
+          <div class="form-control-plaintext">
+            <CSwitch
+              v-model="infinite"
+              type="checkbox"
+              color="dark"
+              label-on="yes"
+              label-off="no"
             >
-              <b-icon
-                      size="is-small"
-                      icon="delete"
-              >
-
-              </b-icon>
-              Delete
-            </b-button>
+            </CSwitch>
           </div>
-        </header>
-        <section class="modal-card-body">
-          <div class="content">
-          <b-field label="Event" horizontal>
-            <b-select placeholder="Select event"
-                      v-model="on_request"
-            >
-              <option value="inform">Inform</option>
-<!--              <option value="empty">Empty</option>-->
-              <option value="GetParameterValuesResponse">GetParameterValues Response</option>
-            </b-select>
-          </b-field>
-          <b-field label="Type" horizontal>
-            <b-select placeholder="Select type"
-              v-model="name"
-            >
-              <option value="RunScript">Run Script</option>
-              <option value="SendParameters">Send Parameters</option>
-              <option value="Reboot">Reboot</option>
-              <option value="UploadFirmware">Upload Firmware</option>
-            </b-select>
-          </b-field>
-          <b-field label="Infinite" horizontal>
-            <b-checkbox v-model="infinite">
-              {{ infinite ? `Payload will be not deleted when executed` : `` }}
-            </b-checkbox>
-          </b-field>
-          <b-field v-if="name === 'RunScript'" label="Script" horizontal>
-            <CodeEditor v-model="script"></CodeEditor>
-<!--            <b-input type="textarea" v-model="task.script"></b-input>-->
-          </b-field>
-          <template v-if="name === 'UploadFirmware'">
-          <b-field label="Choose file" horizontal>
-              <FirmwareSelect v-model="fileName"/>
-          </b-field>
-          <b-field label="File type" horizontal>
-            <b-select placeholder="Select type" v-model="fileType">
-              <option value="1 Firmware Upgrade Image">1 Firmware Upgrade Image</option>
-              <option value="2 Web Content">2 Web Content</option>
-              <option value="3 Vendor Configuration File">3 Vendor Configuration File</option>
-            </b-select>
-          </b-field>
-          </template>
-          </div>
-        </section>
-        <footer class="modal-card-foot">
-          <b-button @click="$emit('input', false)">Close</b-button>
-          <b-button type="is-primary" class="is-align-content-end" :loading="saving" @click="save">Save</b-button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+        </div>
+      </CCol>
+    </CRow>
+    <CRow>
+      <CCol>
+        <div v-if="name === 'RunScript'">
+          <label>Script</label>
+          <CodeEditor v-model="script"></CodeEditor>
+        </div>
+        <div v-if="name === 'UploadFirmware'">
+          <label>Choose file</label>
+          <FirmwareSelect v-model="fileName"/>
+        </div>
+      </CCol>
+    </CRow>
+    <CElementCover v-if="saving" :opacity="0.8"/>
+  </CModal>
 </template>
 
 <script>
@@ -114,7 +93,31 @@
         for_id: '',
         for_name: '',
         taskid: 0,
-        newtask: new Task()
+        newtask: new Task(),
+        types: [
+          {
+            value: 'RunScript',
+            label: 'Run Script',
+          },
+          {
+            value: 'UploadFirmware',
+            label: 'Upload Firmware',
+          },
+          {
+            value: 'Reboot',
+            label: 'Reboot',
+          }
+        ],
+        requests: [
+          {
+            value: 'inform',
+            label: 'Inform',
+          },
+          {
+            value: 'GetParameterValuesResponse',
+            label: 'GetParameterValuesResponse',
+          }
+        ],
       };
     },
     methods: {
@@ -153,6 +156,14 @@
         } else if (this.name === 'DeleteObject') {
           this.path = this.task.payload.parameter
         }
+      },
+      async onModalClose(_, event, accept) {
+        if(accept) {
+          this.save();
+          return;
+        }
+
+        this.$emit('input', false);
       },
       save() {
         this.serializeTask()

@@ -93,6 +93,6 @@ export default {
   },
 
   async addTask(context, params) {
-    return await this._vm.$http.post(`/api/device/${params.id}/tasks`, params.task)
+    return await this._vm.$http.post(`/api/device/${params.device_id}/tasks`, params.task)
   }
 }

@@ -3,8 +3,9 @@
 import {filterToQueryString} from "../../helpers/URL";
 
 export default {
-  async list(context, paginationData) {
-    return await this._vm.$http.get('/api/template?page='+paginationData.page+'&per_page='+paginationData.perPage)
+  async list(context, parameters) {
+    const filterStr = filterToQueryString(parameters.filter)
+    return await this._vm.$http.get(`/api/template?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
   },
   async fetchTemplate({ commit }, templateId) {
     try {
@@ -26,6 +27,11 @@ export default {
   },
   async addTemplate(context, params) {
     return await this._vm.$http.post(`/api/template`, {
+      name: params.name,
+    })
+  },
+  async updateTemplate(context, params) {
+    return await this._vm.$http.patch(`/api/template/${params.id}`, {
       name: params.name,
     })
   },

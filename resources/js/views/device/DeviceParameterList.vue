@@ -2,6 +2,9 @@
   <CCard>
     <CCardHeader>
       <strong>Parameters</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addDialog = true">
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Add
+      </CButton>
     </CCardHeader>
     <CCardBody>
         <PaginatedTable
@@ -34,7 +37,7 @@
             <td>{{ parseFlag(item.flags) }}</td>
           </template>
           <template #flags-filter="{item}">
-            <FlagInput class='slim-select' v-model="flagFilter" @input="propagateFlagFilter"></FlagInput>
+            <FlagInput v-model="flagFilter" @input="propagateFlagFilter"></FlagInput>
           </template>
 
           <template #actions="{item}">
@@ -48,10 +51,10 @@
                 <CIcon name="cil-plus"/>
               </CButton>
               <CButton
-                v-if="item.flags.write === true"
                 size="sm"
                 color="primary"
                 variant="ghost"
+                @click="editItem(item)"
               >
                 <CIcon name="cil-pencil"/>
               </CButton>
@@ -62,30 +65,10 @@
               {{item.value}}
             </CCollapse>
           </template>
-
-<!--          <b-table-column field="lookup" label="Lookup" v-if="lookup">-->
-
-<!--            <template v-slot="props">-->
-<!--              <template v-if="props.row.cached && props.row.cached.length > 50">-->
-<!--                {{ stripString(props, 50) }}-->
-<!--                <b-button-->
-<!--                    @click="$refs.table.$refs.basetable.toggleDetails(props.row)"-->
-<!--                    size="is-small"-->
-<!--                    type="is-primary"-->
-<!--                >-->
-<!--                  ...-->
-<!--                </b-button>-->
-<!--              </template>-->
-<!--              <template v-else-if="props.row.cached">-->
-<!--                {{ props.row.cached }}-->
-<!--              </template>-->
-<!--            </template>-->
-<!--          </b-table-column>-->
-
         </PaginatedTable>
     </CCardBody>
-<!--    <ParameterDialog v-model="addDialog" :item="addingItem" @onSave="storeParameter"></ParameterDialog>-->
-<!--    <ParameterDialog v-model="editDialog" :item="editedItem" :isNew="false" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>-->
+    <ParameterDialog v-model="addDialog" :item="addingItem" @onSave="storeParameter"></ParameterDialog>
+    <ParameterDialog v-model="editDialog" :item="editedItem" :isNew="false" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>
   </CCard>
 
 </template>
@@ -138,7 +121,7 @@
           valuestruct: {
             value: ""
           },
-          flags: "",
+          flags: {},
         },
         editDialog: false,
         editedItem: {
@@ -251,13 +234,5 @@
 </script>
 
 <style lang="scss">
-.slim-select {
-  .multiselect-tags {
-    min-height: calc(1.5em + 2px);
-  }
 
-  .multiselect-tags-list {
-    padding: 0.0875em 0.375em;
-  }
-}
 </style>

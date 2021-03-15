@@ -1,67 +1,45 @@
 <template>
-  <b-autocomplete
-      v-model="typedname"
-      :data="filteredFiles"
+  <v-select
+      v-model="selected"
+      :options="files"
       placeholder="Select firmware"
-      field="filename"
-      open-on-focus
-      @select="onSelect">
+      label="name"
+      :reduce="item => item.id"
+  >
 
-    <template slot-scope="props">
-      <div class="media">
-        <div class="media-content">
-          {{ props.option.filename }}
-          <br>
-          <small>
-            Size {{ props.option.size }} bytes,
-            added at {{ props.option.mod_time | moment('YYYY-MM-DD HH:ss')}}
-          </small>
-        </div>
-      </div>
+    <template #option="item">
+      <h5 style="margin: 0">{{ item.name }}</h5>
+      <em>{{ item.type }} Size: {{ item.size }}</em>
     </template>
-  </b-autocomplete>
+  </v-select>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
   name: "FirmwareSelect",
   data() {
     return {
       selected: null,
-      typedname: '',
     };
   },
   computed: {
     ...mapGetters({
-      'files': 'file/getFilesList'
+      files: 'file/getFilesList'
     }),
-    filteredFiles() {
-      if(!this.typedname) {
-        return this.files
-      }
-
-      return this.files.filter((option) => {
-        return option
-            .filename
-            .toString()
-            .toLowerCase()
-            .indexOf(this.typedname.toLowerCase()) >= 0
-      })
-    }
   },
   mounted() {
-    this.fetchFileList()
+    this.fetchFileList();
   },
-
   methods: {
-    onSelect(option) {
-      this.selected = option
-      this.$emit('input', this.selected.filename)
-    },
-    fetchFileList() {
-      this.$store.dispatch('file/all')
+    async fetchFileList() {
+      await this.$store.dispatch('file/all');
+    }
+  },
+  watch: {
+    selected(val) {
+      this.$emit('input', val);
     }
   }
 }

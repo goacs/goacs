@@ -1,62 +1,33 @@
 <template>
-  <b-modal
-          v-model="value"
-          has-modal-card
-          :canCancel="false"
+  <CModal
+    :title="`${isNew ? 'Add' : 'Edit'} parameter`"
+    color="dark"
+    centered
+    :closeOnBackdrop="false"
+    :show="value"
+    @update:show="onModalClose"
   >
-    <form>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">{{ isNew ? `Add` : `Edit` }} parameter</p>
-          <div class="card-header-icon" aria-label="more options" v-if="isNew === false">
-            <b-button
-                    size="is-small"
-                    type="is-danger"
-                    @click="$emit('onDelete', item)"
-            >
-              <b-icon
-                      size="is-small"
-                      icon="trash-can-outline"
-              >
 
-              </b-icon>
-              Delete
-            </b-button>
-          </div>
-        </header>
-        <section class="modal-card-body">
-          <b-field label="Name" label-position="on-border">
-            <b-input
-                    type="text"
-                    v-model="item.name"
-                    placeholder="Name">
-            </b-input>
-          </b-field>
-          <b-field label="Value" label-position="on-border">
-            <b-input
-                    type="text"
-                    v-model="item.value"
-                    placeholder="Value">
-            </b-input>
-          </b-field>
-          <b-field label="Type" label-position="on-border">
-            <b-input
-                type="text"
-                v-model="item.type"
-                placeholder="Type">
-            </b-input>
-          </b-field>
-          <b-field label="Flags">
-            <FlagInput v-model="item.flags"></FlagInput>
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <b-button @click="$emit('input', false)">Close</b-button>
-          <b-button type="is-primary" class="is-align-content-end" :disabled="!canSave" @click="save" :loading="saving">Save</b-button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+    <CInput
+      label="Name"
+      v-model="item.name"
+    ></CInput>
+
+    <CInput
+      label="Type"
+      v-model="item.type"
+    ></CInput>
+
+    <CInput
+      label="Value"
+      v-model="item.value"
+    ></CInput>
+
+    <label>Flags</label>
+    <FlagInput v-model="item.flags"></FlagInput>
+
+    <CElementCover v-if="saving" :opacity="0.8"/>
+  </CModal>
 </template>
 
 <script>
@@ -89,6 +60,14 @@
       }
     },
     methods: {
+      async onModalClose(_, event, accept) {
+        if(accept) {
+          await this.save();
+          return;
+        }
+
+        this.$emit('input', false);
+      },
       save() {
         this.saving = true
         this.$emit('onSave', this.item)

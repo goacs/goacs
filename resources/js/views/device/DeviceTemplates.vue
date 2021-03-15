@@ -3,7 +3,8 @@
     <CCardHeader>
       <strong>Device templates</strong>
       <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addTemplate">
-        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Assign</CButton>
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon>Assign
+      </CButton>
     </CCardHeader>
     <CCardBody>
       <CButton v-for="template in templates" :key="template.id" type="button" color="primary" size="sm" @click="editTemplate(template)">

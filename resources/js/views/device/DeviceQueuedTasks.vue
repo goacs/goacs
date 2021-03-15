@@ -2,6 +2,9 @@
   <CCard>
     <CCardHeader>
       <strong>Queued Tasks</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="dialog = true">
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon>Add
+      </CButton>
     </CCardHeader>
     <CCardBody>
       <CListGroup>
@@ -17,8 +20,8 @@
         </CListGroupItem>
       </CListGroup>
     </CCardBody>
+    <TaskDialog v-model="dialog" is-new @onSave="saveTask"></TaskDialog>
   </CCard>
-<!--    <TaskDialog v-model="addDialog" is-new @onSave="saveTask"></TaskDialog>-->
 </template>
 
 <script>
@@ -30,7 +33,7 @@
     components: {TaskDialog},
     data() {
       return {
-        addDialog: false,
+        dialog: false,
       }
     },
     computed: {
@@ -54,7 +57,7 @@
         try {
           await this.$store.dispatch('device/addTask', params)
           this.fetchTasks()
-          this.addDialog = false;
+          this.dialog = false;
         } catch (e) {
         }
       }
