@@ -32,6 +32,7 @@ class TaskController extends Controller
     public function store(TaskStoreRequest $request) {
         $task = new Task();
         $task->forceFill($request->validated());
+        $task->for_id = 0;
         $task->for_type = Task::TYPE_GLOBAL;
         $task->save();
         return new JsonResource($task);
@@ -42,5 +43,10 @@ class TaskController extends Controller
         $task->forceFill($request->validated());
         $task->save();
         return new JsonResource($task);
+    }
+
+    public function destroy(Task $task) {
+      $task->delete();
+      return new JsonResource([]);
     }
 }

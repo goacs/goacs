@@ -30,7 +30,7 @@
         <label>Infinite</label>
           <div class="form-control-plaintext">
             <CSwitch
-              v-model="infinite"
+              :checked.sync="infinite"
               type="checkbox"
               color="dark"
               label-on="yes"
@@ -53,6 +53,11 @@
         </div>
       </CCol>
     </CRow>
+    <template #footer>
+      <CButton @click="deleteItem()" color="danger" v-if="taskid">Delete</CButton>
+      <CButton @click="hide()" color="secondary">Cancel</CButton>
+      <CButton @click="save()" color="dark">OK</CButton>
+    </template>
     <CElementCover v-if="saving" :opacity="0.8"/>
   </CModal>
 </template>
@@ -168,6 +173,16 @@
       save() {
         this.serializeTask()
         this.$emit('onSave', this.newtask)
+      },
+      deleteItem() {
+        if(confirm(`Delete item: ${this.taskid}?`) === false) {
+          return;
+        }
+
+        this.$emit('onDelete', this.taskid);
+      },
+      hide() {
+        this.$emit('input', false);
       }
     },
     watch: {

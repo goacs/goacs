@@ -24,7 +24,7 @@
       </table>
     </CCardBody>
     <TaskDialog is-new v-model="addDialog" @onSave="saveTask"></TaskDialog>
-    <TaskDialog v-model="editDialog" :task="editedTask" @onSave="updateTask"></TaskDialog>
+    <TaskDialog v-model="editDialog" :task="editedTask" @onSave="updateTask" @onDelete="deleteTask"></TaskDialog>
   </CCard>
 </template>
 
@@ -62,30 +62,31 @@
       },
       async updateTask(task) {
         try {
-          await this.$store.dispatch('tasks/updateTask', task)
-          await this.fetchTasks()
-          this.editDialog = false
+          await this.$store.dispatch('tasks/updateTask', task);
+          await this.fetchTasks();
+          this.editDialog = false;
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Error. Cannot update task: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
         }
       },
       async saveTask(task) {
         try {
-          await this.$store.dispatch('tasks/storeTask', task)
-          await this.fetchTasks()
-          this.addDialog = false;
+          await this.$store.dispatch('tasks/storeTask', task);
+          await this.fetchTasks();
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Error. Cannot add task: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
+        } finally {
+          this.addDialog = false;
+        }
+      },
+      async deleteTask(taskid) {
+        try {
+          await this.$store.dispatch('tasks/deleteTask', taskid);
+          await this.fetchTasks();
+        } catch (e) {
+
+        } finally {
+          this.editDialog = false;
         }
       }
     },

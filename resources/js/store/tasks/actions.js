@@ -9,5 +9,8 @@ export default {
   },
   async updateTask(context, data) {
     return await this._vm.$http.put(`/api/settings/tasks/${data.id}`, data)
+  },
+  async deleteTask(context, taskid) {
+    return await this._vm.$http.delete(`/api/settings/tasks/${taskid}`)
   }
 }
