@@ -26,6 +26,11 @@
     <label>Flags</label>
     <FlagInput v-model="item.flags"></FlagInput>
 
+    <template #footer>
+      <CButton @click="deleteItem()" color="danger" v-if="item.id">Delete</CButton>
+      <CButton @click="hide()" color="secondary">Cancel</CButton>
+      <CButton @click="save()" color="dark">OK</CButton>
+    </template>
     <CElementCover v-if="saving" :opacity="0.8"/>
   </CModal>
 </template>
@@ -66,11 +71,21 @@
           return;
         }
 
-        this.$emit('input', false);
+        this.hide();
       },
       save() {
         this.saving = true
         this.$emit('onSave', this.item)
+      },
+      deleteItem() {
+        if(confirm(`Delete item: ${this.item.name}?`) === false) {
+          return;
+        }
+
+        this.$emit('onDelete', this.item);
+      },
+      hide() {
+        this.$emit('input', false);
       }
     },
     watch: {
