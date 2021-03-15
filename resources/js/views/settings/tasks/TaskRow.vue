@@ -8,16 +8,14 @@
     <td>{{ stripString(task.payload, 50) }}</td>
     <td>{{ task.infinite }}</td>
     <td>
-      <b-button
-              size="is-small"
-              @click="$parent.editTask(task)"
+      <CButton
+        size="sm"
+        color="primary"
+        variant="ghost"
+        @click="$parent.editTask(task)"
       >
-        <b-icon
-                icon="magnify"
-                size="is-small"
-        >
-        </b-icon>
-      </b-button>
+        <CIcon name="cil-pencil"/>
+      </CButton>
     </td>
   </tr>
 </template>

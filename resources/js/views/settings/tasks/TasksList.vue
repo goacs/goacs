@@ -1,47 +1,31 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Tasks
-      </p>
-      <div class="card-header-icon" aria-label="more options">
-        <b-button
-                size="is-small"
-                @click="addDialog = true"
-        >
-          <b-icon
-                  icon="plus"
-                  size="is-small"
-          >
-
-          </b-icon>
-          New
-        </b-button>
-      </div>
-    </header>
-    <div class="card-content">
-      <div class="table-container">
+  <CCard>
+    <CCardHeader>Global Tasks
+    <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addDialog = true">
+      <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Add
+    </CButton>
+    </CCardHeader>
+    <CCardBody>
       <table class="table is-fullwidth is-hoverable">
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>For</th>
-            <th>On request</th>
-            <th>Task</th>
-            <th>Payload</th>
-            <th>Infinite</th>
-            <th>Actions</th>
-          </tr>
+        <tr>
+          <th>ID</th>
+          <th>For</th>
+          <th>On request</th>
+          <th>Task</th>
+          <th>Payload</th>
+          <th>Infinite</th>
+          <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-          <tr is="TaskRow" v-for="task in tasks" :key="task.id" :task="task"></tr>
+        <tr is="TaskRow" v-for="task in tasks" :key="task.id" :task="task"></tr>
         </tbody>
       </table>
-      </div>
-    </div>
+    </CCardBody>
     <TaskDialog is-new v-model="addDialog" @onSave="saveTask"></TaskDialog>
     <TaskDialog v-model="editDialog" :task="editedTask" @onSave="updateTask"></TaskDialog>
-  </div>
+  </CCard>
 </template>
 
 <script>

@@ -1,41 +1,33 @@
 <template>
-  <b-modal
-          v-model="value"
-          has-modal-card
-          :can-cancel="false"
+  <CModal
+    title="Upload file"
+    size="xl"
+    color="dark"
+    centered
+    :closeOnBackdrop="false"
+    :show="value"
+    @update:show="onModalClose"
   >
-    <form>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Upload file</p>
-        </header>
-        <section class="modal-card-body">
-          <b-field label="File type">
-            <b-select placeholder="Select" v-model="type">
-              <option selected value="1 FIRMWARE">
-                1 FIRMWARE
-              </option>
-            </b-select>
-          </b-field>
-          <b-field class="file is-primary" :class="{'has-name': !!file}">
-            <b-upload v-model="file" class="file-label" :loading="uploading" expanded>
-              <span class="file-cta">
-                <b-icon class="file-icon" icon="upload"></b-icon>
-                <span class="file-label">Click to upload</span>
-              </span>
-              <span class="file-name" v-if="file">
-                {{ file.name }}
-              </span>
-            </b-upload>
-          </b-field>
-        </section>
-        <footer class="modal-card-foot">
-          <b-button @click="$emit('input', false)">Close</b-button>
-          <b-button @click="upload" class="is-primary">Save</b-button>
-        </footer>
-      </div>
-    </form>
-  </b-modal>
+    <CRow>
+      <CCol lg="6" sm="12">
+        <CSelect
+          label="File type"
+          placeholder="Select"
+          :value.sync="type"
+          :options="types"
+        ></CSelect>
+      </CCol>
+      <CCol lg="6" sm="12">
+        <CInputFile
+          label="File"
+          @change="selectFile"
+        >
+
+        </CInputFile>
+      </CCol>
+    </CRow>
+    <CElementCover v-if="uploading" :opacity="0.8"/>
+  </CModal>
 </template>
 
 <script>
@@ -49,11 +41,28 @@
     data() {
       return {
         type: '1 FIRMWARE',
+        types: [
+          {
+            value: '1 FIRMWARE',
+            label: '1 FIRMWARE'
+          },
+        ],
         file: null,
         uploading: false,
       }
     },
     methods: {
+      async onModalClose(_, event, accept) {
+        if(accept) {
+          this.upload();
+          return;
+        }
+
+        this.$emit('input', false);
+      },
+      selectFile(files) {
+        this.file = files[0];
+      },
       upload() {
         this.uploading = true
 
@@ -64,11 +73,7 @@
           })
           setTimeout(() => this.$emit('uploaded', true), 500);
         } catch (e) {
-          this.$buefy.toast.open({
-            type: 'is-danger',
-            position: 'is-bottom',
-            message: "Cannot upload file"
-          })
+
         } finally {
           this.uploading = true
           this.$emit('input', false);

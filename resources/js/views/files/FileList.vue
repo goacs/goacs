@@ -1,90 +1,51 @@
 <template>
-    <div class="card">
-        <header class="card-header">
-            <p class="card-header-title">
-                Files
-            </p>
-            <div class="card-header-icon" aria-label="more options">
-                <b-button
-                        size="is-small"
-                        @click="uploadDialog = true"
-                >
-                    <b-icon
-                            icon="upload"
-                            size="is-small"
-                    >
-
-                    </b-icon>
-                    Upload
-                </b-button>
-                <UploadFile v-model="uploadDialog" @uploaded="refreshList"></UploadFile>
-            </div>
-        </header>
-        <div class="card-content">
-        <PaginatedTable
+  <CCard>
+    <CCardHeader>Files
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="uploadDialog = true">
+        <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Upload
+      </CButton>
+    </CCardHeader>
+    <CCardBody>
+      <PaginatedTable
                 action="file/list"
                 :autoload="false"
-                :dense="true"
                 ref="table"
-                :headers="headers"
+                :fields="fields"
         >
 
-            <b-table-column field="name" label="Name" searchable>
-              <template
-                  slot="searchable"
-                  slot-scope="props">
-                <b-input
-                    v-model="props.filters[props.column.field]"
-                    placeholder="Search..."
-                    icon="magnify"
-                    size="is-small" />
-              </template>
-              <template v-slot="props">
-                {{ props.row.name }}
-              </template>
-            </b-table-column>
 
-            <b-table-column field="type" label="Type" searchable>
-              <template
-                  slot="searchable"
-                  slot-scope="props">
-                <b-input
-                    v-model="props.filters[props.column.field]"
-                    placeholder="Search..."
-                    icon="magnify"
-                    size="is-small" />
-              </template>
-              <template v-slot="props">
-                {{ props.row.type }}
-              </template>
-            </b-table-column>
+        <template #size="{item}">
+            <td>{{ item.size }} bytes</td>
+        </template>
 
-            <b-table-column field="size" label="File size" v-slot="props">
-                {{ props.row.size }} bytes
-            </b-table-column>
+        <template #created_at="{item}">
+          <td>{{ item.created_at | moment }}</td>
+        </template>
 
-            <b-table-column field="created_at" label="Upload time" v-slot="props">
-                {{ props.row.created_at | moment }}
-            </b-table-column>
-
-            <b-table-column field="actions" label="Actions" v-slot="props">
-              <section class="b-tooltips">
-                <b-tooltip label="Download" type="is-dark">
-                  <b-button tag="a" type="is-primary" size="is-small" @click="download(props.row)">
-                      <b-icon icon="download" size="is-small"></b-icon>
-                  </b-button>
-                </b-tooltip>
-
-                <b-tooltip label="Delete" type="is-dark">
-                  <b-button type="is-primary" size='is-small' @click="deleteFile(props.row)">
-                    <b-icon icon="delete" size="is-small"></b-icon>
-                  </b-button>
-                </b-tooltip>
-              </section>
-            </b-table-column>
+        <template #actions="{item}">
+          <td>
+            <CButton
+              size="sm"
+              color="primary"
+              variant="ghost"
+              @click="download(item)"
+            >
+              <CIcon name="cil-cloud-download"/>
+            </CButton>
+            <CButton
+              size="sm"
+              color="primary"
+              variant="ghost"
+              @click="deleteFile(item)"
+            >
+              <CIcon name="cil-trash"/>
+            </CButton>
+          </td>
+        </template>
         </PaginatedTable>
-    </div>
-    </div>
+    </CCardBody>
+    <UploadFile v-model="uploadDialog" @uploaded="refreshList"></UploadFile>
+  </CCard>
 </template>
 
 <script>
@@ -96,30 +57,36 @@
         components: {UploadFile, PaginatedTable},
         data() {
             return {
-              headers: [
+              fields: [
                 {
-                  text: 'Name',
-                  value: 'name',
-                  searchable: true,
+                  label: 'Name',
+                  key: 'name',
                 },
                 {
-                  text: 'Type',
-                  value: 'type',
-                  searchable: true,
+                  label: 'Type',
+                  key: 'type',
                 },
                 {
-                  text: 'Size',
-                  value: 'size',
-                  searchable: true,
+                  label: 'Size',
+                  key: 'size',
                 },
+                {
+                  label: 'Upload date',
+                  key: 'created_at',
+                },
+                {
+                  label: '',
+                  key: 'actions',
+                  filter: false,
+                }
               ],
               uploadDialog: false,
             }
         },
         methods: {
-          download(file) {
-            const response = this.$store.dispatch('file/download', file.id)
-            saveAs(response.data, file.name)
+          async download(file) {
+            const response = await this.$store.dispatch('file/download', file.id);
+            saveAs(response.data, file.name);
           },
           async deleteFile(file) {
             if(confirm(`Delete file: ${file.name}?`) === false) {
@@ -127,20 +94,15 @@
             }
 
             try {
-              await this.$store.dispatch('file/delete', file.id)
-              this.refreshList()
+              await this.$store.dispatch('file/delete', file.id);
+              this.refreshList();
             } catch (e) {
-              this.$buefy.toast.open({
-                duration: 5000,
-                message: `Cannot delete file: ${e.response.data.message}`,
-                position: 'is-bottom',
-                type: 'is-danger'
-              })
+
             }
 
           },
           refreshList() {
-              this.$refs.table.fetchItems()
+              this.$refs.table.fetchItems();
           }
         }
     }

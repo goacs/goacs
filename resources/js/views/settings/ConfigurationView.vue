@@ -1,30 +1,50 @@
 <template>
-  <div class="card">
-    <header class="card-header">
-      <p class="card-header-title">
-        Configuration
-      </p>
-    </header>
-    <div class="card-content">
-      <b-notification
-              v-if="saved"
-              type="is-info"
-              aria-close-label="Close notification">
-        Please restart GoACS server application to load changes
-      </b-notification>
+  <CCard>
+    <CCardHeader>Configuration</CCardHeader>
+    <CCardBody>
+      <CInput
+        type="text"
+        label="Periodic Inform Interval spread"
+        v-model="config.pii"
+      >
 
-      <b-field label="Periodic Inform Interval Spread">
-        <b-input type="text" v-model="config.ppi"></b-input>
-      </b-field>
-      <b-field>
-        <p class="control">
-          <b-button class="button is-primary" :loading="saving" @click="save">
-            Save
-          </b-button>
-        </p>
-      </b-field>
-    </div>
-  </div>
+      </CInput>
+    </CCardBody>
+    <CCardFooter>
+      <CButton
+        @click="save"
+        color="dark"
+      >
+        Save
+      </CButton>
+    </CCardFooter>
+  </CCard>
+<!--  <div class="card">-->
+<!--    <header class="card-header">-->
+<!--      <p class="card-header-title">-->
+<!--        Configuration-->
+<!--      </p>-->
+<!--    </header>-->
+<!--    <div class="card-content">-->
+<!--      <b-notification-->
+<!--              v-if="saved"-->
+<!--              type="is-info"-->
+<!--              aria-close-label="Close notification">-->
+<!--        Please restart GoACS server application to load changes-->
+<!--      </b-notification>-->
+
+<!--      <b-field label="Periodic Inform Interval Spread">-->
+<!--        <b-input type="text" v-model="config.ppi"></b-input>-->
+<!--      </b-field>-->
+<!--      <b-field>-->
+<!--        <p class="control">-->
+<!--          <b-button class="button is-primary" :loading="saving" @click="save">-->
+<!--            Save-->
+<!--          </b-button>-->
+<!--        </p>-->
+<!--      </b-field>-->
+<!--    </div>-->
+<!--  </div>-->
 </template>
 
 <script>

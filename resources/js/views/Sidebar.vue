@@ -25,10 +25,20 @@
         name="Files"
         :to="{ path: '/files' }"
       />
-      <CSidebarNavItem
+      <CSidebarNavDropdown
         name="Settings"
-        :to="{ path: '/settings' }"
-      />
+      >
+        <CSidebarNavItem
+          name="Base"
+          :to="{ path: '/settings' }"
+        />
+        <CSidebarNavItem
+          name="Global tasks"
+          :to="{ path: '/settings/tasks' }"
+        >
+        </CSidebarNavItem>
+      </CSidebarNavDropdown>
+
     </CSidebarNav>
     <CSidebarMinimizer
       class="d-md-down-none"
