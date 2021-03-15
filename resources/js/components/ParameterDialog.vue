@@ -76,7 +76,7 @@
     watch: {
       value() {
         this.saving = false;
-      }
+      },
     }
   }
 </script>

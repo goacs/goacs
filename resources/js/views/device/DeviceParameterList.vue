@@ -118,16 +118,14 @@
         addDialog: false,
         addingItem: {
           name: "",
-          valuestruct: {
-            value: ""
-          },
+          value: "",
           flags: {},
         },
         editDialog: false,
         editedItem: {
-          valuestruct: {
-            value: ""
-          },
+          name: "",
+          value: "",
+          flags: {},
         },
         editedIndex: -1,
         saving: false,
@@ -194,7 +192,7 @@
         this.addingItem = {
           name: "",
           value: "",
-          flag: "",
+          flags: {},
         }
       },
       async updateParameter(item) {

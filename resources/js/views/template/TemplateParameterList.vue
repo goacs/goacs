@@ -42,17 +42,10 @@
         <template #actions="{item}">
           <td>
             <CButton
-              v-if="item.flags.object === true"
               size="sm"
               color="primary"
               variant="ghost"
-            >
-              <CIcon name="cil-plus"/>
-            </CButton>
-            <CButton
-              size="sm"
-              color="primary"
-              variant="ghost"
+              @click="editItem(item)"
             >
               <CIcon name="cil-pencil"/>
             </CButton>
@@ -152,9 +145,12 @@
         addingItem: {
           name: "",
           value: "",
+          flags: {},
         },
         editDialog: false,
-        editedItem: {},
+        editedItem: {
+          flags: {},
+        },
         editedIndex: -1,
         saving: false,
       }
@@ -171,48 +167,35 @@
         this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'change')
       },
       parseFlag(flag) {
-        const parser = new FlagParser(flag)
-        return parser.toString()
+        const parser = new FlagParser(flag);
+        return parser.toString();
       },
       addItem() {
-        this.addDialog = true
-        this.addingItem.templateId = this.$route.params.id
+        this.addDialog = true;
+        this.addingItem.templateId = this.$route.params.id;
       },
       editItem(item) {
-        this.editedIndex = this.$refs.table.items
-        this.editedItem = item
-        this.editedItem.templateId = this.$route.params.id
-        this.editDialog = true
+        this.editedItem = item;
+        this.editedItem.templateId = this.$route.params.id;
+        this.editDialog = true;
       },
       async storeParameter(savedItem) {
         try {
-          await this.$store.dispatch('template/storeParameter', savedItem)
-          this.addDialog = false
-          await this.$refs.table.fetchItems()
+          await this.$store.dispatch('template/storeParameter', savedItem);
+          this.addDialog = false;
+          await this.$refs.table.fetchItems();
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Cannot save parameter: ${e.response.data.data}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
         }
       },
       async updateParameter(savedItem) {
         console.log(savedItem)
 
         try {
-          await this.$store.dispatch('template/updateParameter', savedItem)
-          this.editDialog = false
-          await this.$refs.table.fetchItems()
+          await this.$store.dispatch('template/updateParameter', savedItem);
+          this.editDialog = false;
+          await this.$refs.table.fetchItems();
         } catch (e) {
-          console.log(e)
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Cannot save parameter: ${e.response.data.data}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
         }
       },
       async deleteParameter(savedItem) {
@@ -224,13 +207,7 @@
           this.editDialog = false
           await this.$refs.table.fetchItems()
         } catch (e) {
-          console.log(e)
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Error. Cannot delete parameter: ${e.response.data.data}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+
         }
       },
       stripString(value, len) {

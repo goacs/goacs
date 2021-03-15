@@ -1,6 +1,7 @@
 <template>
   <v-select
-    v-model="selectedFlags"
+    :value="selectedFlags"
+    @input="onFlagSelected"
     :options="flags"
     label="name"
     multiple
@@ -12,6 +13,7 @@
     name: "FlagInput",
     props: {
       value: {
+        type: Object,
         required: true,
       },
     },
@@ -43,34 +45,39 @@
       }
     },
     mounted() {
-      this.initializeFlag()
+      this.initializeFlag();
     },
     methods: {
       initializeFlag() {
         if(!this.value) {
           return
         }
-
-        const initialFlags = this.value
+        this.selectedFlags = [];
         this.flags.forEach(flag => {
-          if(initialFlags[flag.value] === true) {
+          if(this.value[flag.value] === true) {
             this.selectedFlags.push(flag)
           }
         })
-      }
-    },
-    watch: {
-      selectedFlags(val) {
+      },
+      onFlagSelected(val) {
         const flagsObject = {}
         val.forEach(item => {
           flagsObject[item.value] = true
         })
         this.$emit('input', flagsObject)
-      },
+      }
     },
-    value() {
-      this.initializeFlag();
-    }
+    watch: {
+
+      value: {
+        // deep: true,
+        handler() {
+          console.log('value changed');
+          this.initializeFlag();
+        }
+      }
+    },
+
   }
 </script>
 
