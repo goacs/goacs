@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 class TaskCollection extends Collection
 {
     public function hasTaskOfType(string $type): bool {
-        return $this->filter(fn(Task $task) => $task->name === $type)->count() > 0;
+        return $this->filter(fn(Task $task) => $task->name === $type && $task->done_at === null)->count() > 0;
     }
 
     public function isNextTask(string $type): bool {

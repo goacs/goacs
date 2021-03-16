@@ -7,7 +7,7 @@
       </CButton>
     </CCardHeader>
     <CCardBody>
-      <CButton v-for="template in templates" :key="template.id" type="button" color="primary" size="sm" @click="editTemplate(template)">
+      <CButton v-for="template in templates" :key="template.id" type="button" color="primary" size="sm" @click="editTemplate(template)" class="mr-2">
         {{ template.name }} <CBadge color="light" class="ml-2 position-static">{{ template.pivot.priority }}</CBadge>
       </CButton>
     </CCardBody>

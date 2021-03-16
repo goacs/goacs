@@ -2,13 +2,40 @@
   <CCard>
     <CCardHeader>Configuration</CCardHeader>
     <CCardBody>
-      <CInput
-        type="text"
-        label="Periodic Inform Interval spread"
-        v-model="config.pii"
-      >
-
-      </CInput>
+      <ValidationObserver ref="form" v-slot="{ passes }">
+        <CForm novalidate @submit.prevent="passes(login)">
+          <ValidationProvider vid="pii" name="Periodic Inform Interval spread"
+                              v-slot="scope">
+          <CInput
+            type="text"
+            label="Periodic Inform Interval spread"
+            v-model="config.pii"
+            :invalid-feedback="scope.errors[0]"
+            :is-valid="isvalid(scope)"
+          ></CInput>
+          </ValidationProvider>
+          <ValidationProvider vid="connection_request_username" name="Connection Request Username"
+                              v-slot="scope">
+            <CInput
+              type="text"
+              label="Connection Request Username"
+              v-model="config.connection_request_username"
+              :invalid-feedback="scope.errors[0]"
+              :is-valid="isvalid(scope)"
+            ></CInput>
+          </ValidationProvider>
+          <ValidationProvider vid="connection_request_password" name="Connection Request Password"
+                              v-slot="scope">
+            <CInput
+              type="text"
+              label="Connection Request Password"
+              v-model="config.connection_request_password"
+              :invalid-feedback="scope.errors[0]"
+              :is-valid="isvalid(scope)"
+            ></CInput>
+          </ValidationProvider>
+        </CForm>
+      </ValidationObserver>
     </CCardBody>
     <CCardFooter>
       <CButton
@@ -18,33 +45,8 @@
         Save
       </CButton>
     </CCardFooter>
+    <CElementCover v-if="saving" :opacity="0.8"/>
   </CCard>
-<!--  <div class="card">-->
-<!--    <header class="card-header">-->
-<!--      <p class="card-header-title">-->
-<!--        Configuration-->
-<!--      </p>-->
-<!--    </header>-->
-<!--    <div class="card-content">-->
-<!--      <b-notification-->
-<!--              v-if="saved"-->
-<!--              type="is-info"-->
-<!--              aria-close-label="Close notification">-->
-<!--        Please restart GoACS server application to load changes-->
-<!--      </b-notification>-->
-
-<!--      <b-field label="Periodic Inform Interval Spread">-->
-<!--        <b-input type="text" v-model="config.ppi"></b-input>-->
-<!--      </b-field>-->
-<!--      <b-field>-->
-<!--        <p class="control">-->
-<!--          <b-button class="button is-primary" :loading="saving" @click="save">-->
-<!--            Save-->
-<!--          </b-button>-->
-<!--        </p>-->
-<!--      </b-field>-->
-<!--    </div>-->
-<!--  </div>-->
 </template>
 
 <script>
@@ -54,40 +56,32 @@
       return {
         saving: false,
         saved: false,
+        errors: [],
       };
     },
     computed: {
       config: {
         get() {
-          return this.$store.getters['config/getConfig']
+          return this.$store.getters['config/getConfig'];
         },
         set(config) {
-          this.$store.commit('config/setConfig', config)
+          console.log(config);
+          this.$store.commit('config/setConfig', config);
         }
       },
     },
     methods: {
-      save() {
+      async save() {
         try {
           this.saving = true
-          this.$store.dispatch('config/saveConfig', this.config);
+          await this.$store.dispatch('config/saveConfig', this.config);
           this.saved = true
           setTimeout(() => this.saved = false, 5000);
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Cannot save config: ${e.response.data.message}`,
-            position: 'is-bottom',
-            type: 'is-danger'
-          })
+          console.log(e.response.data.errors);
+          this.$refs.form.setErrors(e.response.data.errors);
         } finally {
           this.saving = false
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: `Config saved`,
-            position: 'is-bottom',
-            type: 'is-success'
-          })
         }
       }
     },
@@ -96,12 +90,6 @@
         const response = await this.$store.dispatch('config/getConfig')
         this.$store.commit('config/setConfig', response.data.data)
       } catch (e) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: `Cannot fetch config data`,
-          position: 'is-bottom',
-          type: 'is-danger'
-        })
       }
     }
 

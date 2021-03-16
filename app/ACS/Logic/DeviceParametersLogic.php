@@ -36,6 +36,8 @@ class DeviceParametersLogic
             array_pop($chunks);
             $newName = join('.', $chunks).'.';
             for($i = $instanceNumber; $i >= 1; $i--) {
+                dump("has", $sessionParameters->has($newName.$i.'.'));
+                dump($sessionParameters->get($newName.$i.'.'));
                 if($sessionParameters->has($newName.$i.'.') === false) {
                     $parameter->name = $newName;
                     $parameter->type = 'object';

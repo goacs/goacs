@@ -63,11 +63,11 @@
       selectFile(files) {
         this.file = files[0];
       },
-      upload() {
+      async upload() {
         this.uploading = true
 
         try {
-          this.$store.dispatch('file/upload', {
+          await this.$store.dispatch('file/upload', {
             file: this.file,
             type: this.type,
           })
@@ -75,7 +75,7 @@
         } catch (e) {
 
         } finally {
-          this.uploading = true
+          this.uploading = false
           this.$emit('input', false);
         }
       }

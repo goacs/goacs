@@ -115,8 +115,12 @@
         ],
         requests: [
           {
-            value: 'inform',
+            value: 'Inform',
             label: 'Inform',
+          },
+          {
+            value: 'Empty',
+            label: 'Empty'
           },
           {
             value: 'GetParameterValuesResponse',

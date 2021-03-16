@@ -42,10 +42,10 @@ class DeviceController extends Controller
     }
 
     public function destroy(Device $device) {
-        if($device->delete()) {
-            return response()->json();
-        }
-        return  response()->json(null,500);
+        $device->templates()->sync([]);
+        $device->parameters()->delete();
+        $device->delete();
+        return new JsonResource([]);
     }
 
     public function addObject(DeviceAddObjectRequest $request, Device $device) {

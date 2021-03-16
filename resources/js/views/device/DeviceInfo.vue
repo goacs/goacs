@@ -2,8 +2,9 @@
   <CCard>
     <CCardHeader>
       <strong>Device Info</strong>
-      <div class="card-header-icon" aria-label="more options">
-      </div>
+      <CButton color="danger" class="float-right" variant="outline" size="sm" @click="deleteDevice">
+        <CIcon name="cil-trash" class="btn-icon mt-0" size="sm"></CIcon>Delete
+      </CButton>
     </CCardHeader>
     <CCardBody>
       <table class="table table-sm table-borderless table-hover">
@@ -96,6 +97,9 @@
     },
     methods: {
       async deleteDevice() {
+        if(confirm('Delete device?') === false) {
+          return;
+        }
         await this.$store.dispatch('device/deleteDevice', this.device.id)
         await this.$router.push({ name: 'devices-list'})
       },

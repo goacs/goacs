@@ -40,7 +40,9 @@ Route::prefix('settings')->group(function() {
 });
 
 Route::apiResource('file', \App\Http\Controllers\File\FileController::class);
-Route::get('/file/{file}/download', [\App\Http\Controllers\File\FileController::class, 'download']);
+Route::get('/file/{file}/download', [\App\Http\Controllers\File\FileController::class, 'download'])->name('file.download');
+
+Route::apiResource('settings', \App\Http\Controllers\Settings\SettingsController::class)->only(['index', 'store']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

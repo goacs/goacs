@@ -73,6 +73,10 @@ class Device extends Model
         return $this->morphMany(Task::class, 'for');
     }
 
+    public function faults(): HasMany {
+        return $this->hasMany(Fault::class);
+    }
+
     public function scopeCreatedAfter(Builder $query, $date) {
         return $query->where('created_at', '>=', $date);
     }

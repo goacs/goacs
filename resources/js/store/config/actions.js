@@ -2,11 +2,9 @@
 
 export default {
   async getConfig() {
-    return await this._vm.$http.get('/api/config')
+    return await this._vm.$http.get('/api/settings')
   },
   async saveConfig(context, config) {
-    return await this._vm.$http.post('/api/config', {
-      config: config
-    })
+    return await this._vm.$http.post('/api/settings', config)
   }
 }

@@ -6,6 +6,7 @@ namespace App\ACS\Logic\Script;
 
 use App\ACS\Context;
 use App\ACS\Entities\Device;
+use App\ACS\Types;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;
 use App\Models\Template;
@@ -58,5 +59,18 @@ class Functions
         if($this->deviceModel->templates()->find($id) === null) {
             $this->deviceModel->templates()->attach($id, ['priority' => $priority]);
         }
+    }
+
+    public function uploadFirmware(string $filename) {
+        $task = $this->deviceModel->tasks()->make();
+        $task->name = Types::Download;
+        $task->on_request = Types::EMPTY;
+        $task->not_before = now();
+        $task->infinite = false;
+        $task->payload = [
+            'filetype' => '1 FIRMWARE',
+            'filename' => $filename
+        ];
+        $task->save();
     }
 }

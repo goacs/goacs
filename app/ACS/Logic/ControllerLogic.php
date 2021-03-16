@@ -31,6 +31,8 @@ use App\ACS\Types;
 use App\Models\Device;
 use App\Models\DeviceParameter;
 use App\Models\Fault;
+use App\Models\File;
+use App\Models\Setting;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 
@@ -90,6 +92,14 @@ class ControllerLogic
                 $this->processDeleteObjectResponse();
                 break;
 
+            case Types::DownloadResponse:
+                $this->processDownloadResponse();
+                break;
+
+            case Types::TransferComplete:
+                $this->processTransferCompleteRequest();
+                break;
+
             case Types::FaultResponse:
                 $this->processFault();
                 break;
@@ -122,7 +132,7 @@ class ControllerLogic
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
-//            dump("There is no tasks :(");
+            dump("There is no tasks :(");
             $this->endSession();
             return;
         }
@@ -161,7 +171,8 @@ class ControllerLogic
                 break;
 
             case Types::Download:
-                $request = new DownloadRequest($this->context);
+                $fileUrl = $this->getFileURL($task->payload['filename']);
+                $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileUrl);
                 $this->context->acsRequest = $request;
                 break;
 
@@ -176,8 +187,11 @@ class ControllerLogic
                     $sandbox->run();
 
                 } catch (SandboxException $exception) {
-                    //TODO Save to db as fault
-//                    dump($exception);
+                    $fault = $this->context->deviceModel->faults()->make();
+                    $fault->full_xml = $exception->getTraceAsString();
+                    $fault->message = $exception->getMessage();
+                    $fault->code = '100020';
+                    $fault->save();
                 }
                 $task->done();
                 $this->runTasks();
@@ -206,6 +220,8 @@ class ControllerLogic
 
     private function processEmptyResponse()
     {
+        dump("EMPTY RESPONSE");
+
         if($this->context->new === true || $this->context->provision === true || $this->context->lookupParameters) {
             $task = new Task(Types::GetParameterNames);
             $task->setPayload([
@@ -285,6 +301,7 @@ class ControllerLogic
 
             if($this->context->provision === true) {
                 $this->loadGlobalTasks(Types::GetParameterValuesResponse);
+                $this->runTasks();
                 $this->compareAndProcessObjectParameters();
                 $this->processSetPII();
                 $this->compareAndProcessSetParameters();
@@ -299,14 +316,15 @@ class ControllerLogic
     private function compareAndProcessObjectParameters() {
         $parameterService = new DeviceParametersLogic($this->context->deviceModel);
         $dbParameters = $parameterService->combinedDeviceParametersWithTemplates();
+        dump("DBParams", $dbParameters->count());
         $sessionParameters = $this->context->parameterValues;
-
+        dump("session params", $sessionParameters->count());
 
         $parametersToAdd = $parameterService
             ->getParametersToCreateInstance($sessionParameters, $dbParameters)
             ->sortBy('name');
 
-//        dump("Object params to add", $parametersToAdd);
+        dump("Object params to add", $parametersToAdd);
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
             $task = new Task(Types::AddObject);
@@ -343,6 +361,14 @@ class ControllerLogic
     {
     }
 
+    private function processDownloadResponse()
+    {
+    }
+
+    private function processTransferCompleteRequest()
+    {
+        $this->context->acsResponse = new TransferCompleteResponse($this->context);
+    }
 
     private function processGetRPCMethodsRequest()
     {
@@ -376,7 +402,11 @@ class ControllerLogic
     }
 
     private function calculatePIIValue(): int {
-        return rand(10000, 40000);
+        if(($spread = Setting::getValue('pii')) !== '')
+        {
+            [$min, $max] = explode('-', $spread);
+        }
+        return rand((int)$min, (int)$max);
     }
 
     private function processSetPII()
@@ -408,7 +438,7 @@ class ControllerLogic
             ->filterByFlag('object', false)
             ->sortBy('name');
 
-//        dump("Diff params to set", $diffParameters);
+        dump("Diff params to set", $diffParameters);
 
         foreach($diffParameters->chunk(10) as $chunk) {
             $task = new Task(Types::SetParameterValues);
@@ -430,6 +460,7 @@ class ControllerLogic
                 $task->delete();
             }
         }
+        dump("Current tasks", $this->context->tasks);
     }
 
     private function processFault()
@@ -449,6 +480,11 @@ class ControllerLogic
                 $this->context->parameterValues->put($parameter->name, $parameter);
             }
         }
+    }
+
+    private function getFileURL(string $filename): string {
+        $file = File::whereName($filename)->first();
+        return route('file.download', ['file' => $file]);
     }
 
 }
