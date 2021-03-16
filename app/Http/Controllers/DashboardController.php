@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Device;
+use App\Models\Fault;
 
 class DashboardController extends Controller
 {
@@ -17,7 +18,7 @@ class DashboardController extends Controller
         return response()->json([
            'devices_count' => Device::count(),
            'informs_count' => 0,
-           'faults_count' => 0,
+           'faults_count' => Fault::last24Hours()->count(),
            'faults' => [],
         ]);
     }

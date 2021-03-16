@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 use App\ACS\Response\FaultResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -48,5 +49,9 @@ class Fault extends Model
         $fault->detail = json_decode(json_encode($faultResponse->detail), true);
         $fault->save();
         return $fault;
+    }
+
+    public function scopeLast24Hours(Builder $query) {
+      return $query->where('created_at', '>=', now()->subDay());
     }
 }

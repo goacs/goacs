@@ -22,6 +22,7 @@ class DeviceTemplateController extends Controller
     }
 
     public function store(DeviceTemplateStoreRequest $request, Device $device) {
+        $device->templates()->detach($request->template_id);
         $device->templates()->attach($request->template_id, ['priority' => $request->priority]);
         return JsonResource::collection($device->templates);
     }
