@@ -279,6 +279,8 @@ class ControllerLogic
     private function processGetParameterValuesResponse()
     {
         if($this->context->new) {
+            $root = $this->context->device->root;
+
             //Save Parameters in db
             DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
 
@@ -311,6 +313,11 @@ class ControllerLogic
             }
 
             if($this->context->provision === true) {
+                $settingsUsername = Setting::getValue('connection_request_username');
+                $settingsPassword = Setting::getValue('connection_request_password');
+                DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestUsername', $settingsUsername, 'RWS', 'xsd:string');
+                DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestPassword', $settingsPassword, 'RWS', 'xsd:string');
+
                 $this->loadGlobalTasks(Types::GetParameterValuesResponse);
                 $this->runTasks();
                 $this->compareAndProcessObjectParameters();
@@ -389,14 +396,6 @@ class ControllerLogic
     private function endSession()
     {
         $root = $this->context->device->root;
-        if($param = $this->context->parameterValues->get($root.'ManagementServer.ConnectionRequestUsername')?->value) {
-            $this->context->deviceModel->connection_request_user = $param;
-        }
-
-        if($param = $this->context->parameterValues->get($root.'ManagementServer.ConnectionRequestPassword')?->value) {
-            $this->context->deviceModel->connection_request_password = $param;
-        }
-
         if($param = $this->context->parameterValues->get($root.'DeviceInfo.ProductClass')?->value) {
             $this->context->deviceModel->product_class = $param;
         }

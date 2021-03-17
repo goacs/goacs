@@ -14,6 +14,7 @@ class DeviceResource extends JsonResource
         return [
             'id' => $this->id,
             'serial_number' => $this->serial_number,
+            'product_class' => $this->product_class,
             'oui' => $this->oui,
             'software_version' => $this->software_version,
             'hardware_version' => $this->hardware_version,
