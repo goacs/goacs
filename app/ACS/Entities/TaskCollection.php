@@ -12,6 +12,10 @@ class TaskCollection extends Collection
         return $this->filter(fn(Task $task) => $task->name === $type && $task->done_at === null)->count() > 0;
     }
 
+    public function getTaskOfType(string $type): ?Task {
+        return $this->filter(fn(Task $task) => $task->name === $type && $task->done_at === null)->first();
+    }
+
     public function isNextTask(string $type): bool {
         /** @var Task $task */
         $task = $this->nextTask();

@@ -22,6 +22,7 @@ use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Response\AddObjectResponse;
+use App\ACS\Response\DownloadResponse;
 use App\ACS\Response\FaultResponse;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\GetRPCMethodsACSResponse;
@@ -61,6 +62,7 @@ class ControllerLogic
         switch ($this->context->bodyType) {
             case Types::INFORM:
                 $this->processInformRequest();
+                $this->loadGlobalTasks(Types::INFORM);
                 $this->loadDeviceTasks();
                 break;
 
@@ -221,6 +223,15 @@ class ControllerLogic
     private function processEmptyResponse()
     {
         dump("EMPTY RESPONSE");
+
+        if($this->context->tasks->hasTaskOfType(Types::Download)) {
+            $task = $this->context->tasks->getTaskOfType(Types::Download);
+            $fileUrl = $this->getFileURL($task->payload['filename']);
+            $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileUrl);
+            $this->context->acsRequest = $request;
+            $task->done();
+            return;
+        }
 
         if($this->context->new === true || $this->context->provision === true || $this->context->lookupParameters) {
             $task = new Task(Types::GetParameterNames);
@@ -484,7 +495,7 @@ class ControllerLogic
 
     private function getFileURL(string $filename): string {
         $file = File::whereName($filename)->first();
-        return route('file.download', ['file' => $file]);
+        return \Storage::disk($file->disk)->url($file->filepath);
     }
 
 }
