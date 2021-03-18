@@ -40,11 +40,11 @@
     },
     data() {
       return {
-        type: '1 FIRMWARE',
+        type: '1 Firmware Upgrade Image',
         types: [
           {
-            value: '1 FIRMWARE',
-            label: '1 FIRMWARE'
+            value: '1 Firmware Upgrade Image',
+            label: '1 Firmware Upgrade Image'
           },
         ],
         file: null,

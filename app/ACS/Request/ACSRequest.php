@@ -13,7 +13,7 @@ abstract class ACSRequest
     /**
      * @var Context
      */
-    private Context $context;
+    protected Context $context;
 
     public function __construct(Context $context)
     {

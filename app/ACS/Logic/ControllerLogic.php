@@ -63,7 +63,7 @@ class ControllerLogic
             case Types::INFORM:
                 $this->processInformRequest();
                 $this->loadGlobalTasks(Types::INFORM);
-                $this->loadDeviceTasks();
+//                $this->loadDeviceTasks();
                 break;
 
             case Types::GetRPCMethodsRequest:
@@ -131,7 +131,7 @@ class ControllerLogic
 
     private function runTasks()
     {
-//        dump($this->context->tasks);
+        $this->loadDeviceTasks();
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
@@ -139,6 +139,10 @@ class ControllerLogic
             $this->endSession();
             return;
         }
+        if($task->isOnRequest($this->context->bodyType) === false) {
+            return;
+        }
+
 
         switch ($task->name) {
             case Types::INFORMResponse:
@@ -174,8 +178,8 @@ class ControllerLogic
                 break;
 
             case Types::Download:
-                $fileUrl = $this->getFileURL($task->payload['filename']);
-                $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileUrl);
+                $fileData = $this->getFileData($task->payload['filename']);
+                $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileData['url'], $fileData['size']);
                 $this->context->acsRequest = $request;
                 break;
 
@@ -223,16 +227,16 @@ class ControllerLogic
 
     private function processEmptyResponse()
     {
-        dump("EMPTY RESPONSE");
-
-        if($this->context->tasks->hasTaskOfType(Types::Download)) {
-            $task = $this->context->tasks->getTaskOfType(Types::Download);
-            $fileUrl = $this->getFileURL($task->payload['filename']);
-            $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileUrl);
-            $this->context->acsRequest = $request;
-            $task->done();
-            return;
-        }
+//        dump("EMPTY RESPONSE");
+//
+//        if($this->context->tasks->hasTaskOfType(Types::Download)) {
+//            $task = $this->context->tasks->getTaskOfType(Types::Download);
+//            $fileUrl = $this->getFileURL($task->payload['filename']);
+//            $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileUrl);
+//            $this->context->acsRequest = $request;
+//            $task->done();
+//            return;
+//        }
 
         if($this->context->new === true || $this->context->provision === true || $this->context->lookupParameters) {
             $task = new Task(Types::GetParameterNames);
@@ -266,6 +270,7 @@ class ControllerLogic
         $getParameterNamesResponse = $this->context->cpeResponse;
 
         if($this->context->tasks->isNextTask(Types::GetParameterNames) === false) {
+            dump("GPN CHUNKING");
             $filteredParameters = $getParameterNamesResponse->parameters->filterByChunkCount(2,2)->filterEndsWithDot();
             foreach ($filteredParameters->chunk(self::GET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
                 $task = new Task(Types::GetParameterValues);
@@ -280,8 +285,6 @@ class ControllerLogic
     private function processGetParameterValuesResponse()
     {
         if($this->context->new) {
-            $root = $this->context->device->root;
-
             //Save Parameters in db
             DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
 
@@ -314,6 +317,7 @@ class ControllerLogic
             }
 
             if($this->context->provision === true) {
+                $root = $this->context->device->root;
                 $settingsUsername = Setting::getValue('connection_request_username');
                 $settingsPassword = Setting::getValue('connection_request_password');
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestUsername', $settingsUsername, 'RWS', 'xsd:string');
@@ -430,7 +434,7 @@ class ControllerLogic
 
     private function loadDeviceTasks()
     {
-        $tasks = $this->context->deviceModel->tasks;
+        $tasks = $this->context->deviceModel->tasks()->get();
         foreach ($tasks as $task) {
             $this->context->tasks->addTask($task->toACSTask());
             $task->delete();
@@ -493,9 +497,12 @@ class ControllerLogic
         }
     }
 
-    private function getFileURL(string $filename): string {
+    private function getFileData(string $filename): array {
         $file = File::whereName($filename)->first();
-        return \Storage::disk($file->disk)->url($file->filepath);
+        return [
+            'url' => \Storage::disk($file->disk)->url($file->filepath),
+            'size' => $file->size,
+        ];
     }
 
 }

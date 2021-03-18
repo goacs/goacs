@@ -26,4 +26,12 @@ class Task
     public function done() {
         $this->done_at = now();
     }
+
+    public function isOnRequest(string $requestType) {
+        if($this->onRequest === '') {
+            return true;
+        }
+
+        return $this->onRequest === $requestType;
+    }
 }

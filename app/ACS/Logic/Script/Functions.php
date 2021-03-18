@@ -65,10 +65,10 @@ class Functions
         $task = $this->deviceModel->tasks()->make();
         $task->name = Types::Download;
         $task->on_request = Types::EMPTY;
-        $task->not_before = now();
+        $task->not_before = now()->subDay();
         $task->infinite = false;
         $task->payload = [
-            'filetype' => '1 FIRMWARE',
+            'filetype' => '1 Firmware Upgrade Image',
             'filename' => $filename
         ];
         $task->save();
