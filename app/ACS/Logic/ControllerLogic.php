@@ -71,6 +71,7 @@ class ControllerLogic
                 break;
 
             case Types::EMPTY:
+                $this->loadGlobalTasks(Types::EMPTY);
                 $this->processEmptyResponse();
                break;
 
