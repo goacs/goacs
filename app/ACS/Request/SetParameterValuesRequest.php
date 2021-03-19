@@ -26,7 +26,7 @@ class SetParameterValuesRequest extends ACSRequest
     public function getBody(): string
     {
         $body = '<cwmp:SetParameterValues>
-			<ParameterList soap:arrayType="cwmp:ParameterValueStruct['.$this->parameterValuesCollection->count().']">';
+			<ParameterList soap-enc:arrayType="cwmp:ParameterValueStruct['.$this->parameterValuesCollection->count().']">';
 
 
         foreach ($this->parameterValuesCollection as $parameter) {

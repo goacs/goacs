@@ -28,7 +28,7 @@ class GetParameterValuesRequest extends ACSRequest
             return $body;
         }
 
-        $body .= '<cwmp:GetParameterValues><ParameterNames soap:arrayType="xsd:string['.(string)$this->parameters->count().']">';
+        $body .= '<cwmp:GetParameterValues><ParameterNames soap-enc:arrayType="xsd:string['.(string)$this->parameters->count().']">';
         foreach ($this->parameters as $parameter) {
             $body .= '<string>'.$parameter->name.'</string>';
         }

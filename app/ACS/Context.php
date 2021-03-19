@@ -13,6 +13,7 @@ use App\ACS\Entities\Task;
 use App\ACS\Entities\TaskCollection;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
+use App\ACS\Request\GetRPCMethodsCPERequest;
 use App\ACS\Request\InformRequest;
 use App\ACS\Request\TransferCompleteRequest;
 use App\ACS\Response\ACSResponse;
@@ -120,6 +121,10 @@ class Context
                 if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1)) {
                     $this->provision = true;
                 }
+                break;
+
+            case Types::GetRPCMethodsRequest:
+                $this->cpeRequest = new GetRPCMethodsCPERequest($parser->body);
                 break;
 
             case Types::GetParameterNamesResponse:

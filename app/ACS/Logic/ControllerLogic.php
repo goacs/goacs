@@ -29,12 +29,14 @@ use App\ACS\Response\GetRPCMethodsACSResponse;
 use App\ACS\Response\InformResponse;
 use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
+use App\ACS\XML\XMLParser;
 use App\Models\Device;
 use App\Models\DeviceParameter;
 use App\Models\Fault;
 use App\Models\File;
 use App\Models\Setting;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 
 class ControllerLogic
@@ -57,7 +59,7 @@ class ControllerLogic
         $this->dispatcher = $dispatcher;
     }
 
-    public function process() {
+    public function process(): Response {
 
         switch ($this->context->bodyType) {
             case Types::INFORM:
@@ -115,18 +117,28 @@ class ControllerLogic
             $this->context
                 ->response
                 ->setContent(
-                    $this->context->acsResponse->getBody()
+                    XMLParser::normalize($this->context->acsResponse->getBody())
                 )
-                ->send();
+                ->header('SOAPServer', 'GoACS')
+                ->header('Server', 'GoACS')
+                ->header('Content-Type', 'text/xml; encoding="utf-8"')
+            //    ->send()
+            ;
         } else if($this->context->acsRequest !== null) {
-            $this->context->response
+            $this->context
+                ->response
                 ->setContent(
-                    $this->context->acsRequest->getBody()
+                    XMLParser::normalize($this->context->acsRequest->getBody())
                 )
-                ->send();
-        }
+                ->header('SOAPServer', 'GoACS')
+                ->header('Server', 'GoACS')
+                ->header('Content-Type', 'text/xml; encoding="utf-8"')
+            //    ->send()
+            ;
 
+        }
         $this->context->storeToSession();
+        return $this->context->response;
     }
 
     private function runTasks()

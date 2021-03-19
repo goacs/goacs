@@ -116,4 +116,12 @@ class XMLParser
             }
         }
     }
+
+    public static function normalize(string $xml): string {
+        $dom = new \DOMDocument();
+        $dom->loadXML( $xml, LIBXML_NOBLANKS | LIBXML_COMPACT );
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput  = false;
+        return $dom->saveXML();
+    }
 }

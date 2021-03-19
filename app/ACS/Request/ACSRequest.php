@@ -25,11 +25,7 @@ abstract class ACSRequest
     protected function withBaseBody(string $body): string
     {
         return '<?xml version="1.0" encoding="UTF-8"?>
-        <soapenv:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <soapenv:Header>
-        <cwmp:ID soapenv:mustUnderstand="1">' . $this->context->envelopeId() . '</cwmp:ID>
-        </soapenv:Header>
-        <soapenv:Body>' . $body . '</soapenv:Body>
-        </soapenv:Envelope>';
+<soap-env:Envelope xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+<soap-env:Header><cwmp:ID soap-env:mustUnderstand="1">' . $this->context->envelopeId() . '</cwmp:ID></soap-env:Header><soap-env:Body>' . $body . '</soap-env:Body></soap-env:Envelope>';
     }
 }

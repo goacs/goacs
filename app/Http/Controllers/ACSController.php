@@ -15,6 +15,6 @@ class ACSController extends \Illuminate\Routing\Controller
     public function process(Request $request, Response $response, Dispatcher $dispatcher) {
         $context = new Context($request, $response);
         $logic = new ControllerLogic($context, $dispatcher);
-        $logic->process();
+        return $logic->process();
     }
 }
