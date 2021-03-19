@@ -69,10 +69,10 @@ class DeviceController extends Controller
     public function kick(Device $device) {
         $client = new Client();
 
-        if(empty($device->connection_request_password) === false) {
+        if($device->connection_request_password !== null && $device->connection_request_password !== '') {
             $auth = [$device->connection_request_user, $device->connection_request_password];
         } else {
-            $auth = [Setting::getValue('connection_request_user'), Setting::getValue('connection_request_password')];
+            $auth = [Setting::getValue('connection_request_username'), Setting::getValue('connection_request_password')];
         }
 
         try {

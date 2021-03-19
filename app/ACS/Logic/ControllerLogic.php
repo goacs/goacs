@@ -147,7 +147,6 @@ class ControllerLogic
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
-            dump("There is no tasks :(");
             $this->endSession();
             return;
         }
@@ -487,7 +486,6 @@ class ControllerLogic
                 $task->delete();
             }
         }
-        dump("Current tasks", $this->context->tasks);
     }
 
     private function processFault()
