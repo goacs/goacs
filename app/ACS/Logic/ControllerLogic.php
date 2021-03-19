@@ -327,7 +327,7 @@ class ControllerLogic
                 $this->dispatcher->dispatch(new ParameterLookupDone($this->context->deviceModel, $this->context->parameterValues));
             }
 
-            if($this->context->provision === true) {
+            if($this->context->provision === true || $this->context->new === true) {
                 $root = $this->context->device->root;
                 $settingsUsername = Setting::getValue('connection_request_username');
                 $settingsPassword = Setting::getValue('connection_request_password');
