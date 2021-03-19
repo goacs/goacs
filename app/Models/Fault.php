@@ -7,6 +7,7 @@ namespace App\Models;
 use App\ACS\Response\FaultResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Fault
@@ -40,6 +41,10 @@ class Fault extends Model
         'detail' => 'array'
     ];
 
+    public function device(): BelongsTo {
+        return $this->belongsTo(Device::class);
+    }
+
     public static function fromFaultResponse(Device $device, FaultResponse $faultResponse): self {
         $fault = new static();
         $fault->device_id = $device->id;
@@ -53,5 +58,9 @@ class Fault extends Model
 
     public function scopeLast24Hours(Builder $query) {
       return $query->where('created_at', '>=', now()->subDay());
+    }
+
+    public function scopeCreatedAfter(Builder $query, $date) {
+        return $query->where('created_at', '>=', $date);
     }
 }

@@ -11,6 +11,11 @@
         <DashboardWidget icon="cil-gauge" inverse header="Devices count" :text="`${dashboard.devices_count}`" color="info"/>
       </CCol>
     </CRow>
+    <CRow>
+      <CCol sm="12">
+        <Faults></Faults>
+      </CCol>
+    </CRow>
   </div>
 </template>
 

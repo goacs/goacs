@@ -13,6 +13,7 @@ import moment from 'moment';
 import router from "./router";
 import store from "./store";
 import errorsMixin from './helpers/errors.mixin'
+import JsonTree from 'vue-json-tree'
 
 window.Vue = require('vue').default;
 
@@ -27,6 +28,8 @@ Vue.use(VueRouter);
 Vue.use(require('vue-moment'), { moment })
 Vue.use(VueAxios, axios);
 Vue.component('v-select', vSelect)
+Vue.component('json-tree', JsonTree)
+
 
 Object.keys(rules).forEach(rule => {
   extend(rule, rules[rule]);

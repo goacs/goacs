@@ -7,6 +7,7 @@ import dashboard from './dashboard'
 import template from './template'
 import tasks from './tasks'
 import file from './file'
+import faults from './faults'
 
 Vue.use(Vuex)
 
@@ -37,6 +38,7 @@ const store = new Vuex.Store({
     template,
     tasks,
     file,
+    faults,
   }
 })
 

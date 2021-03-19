@@ -3,12 +3,12 @@
     <CRow>
       <CCol sm="12" lg="6">
         <DeviceInfo></DeviceInfo>
-        <DeviceLogs></DeviceLogs>
 
       </CCol>
       <CCol sm="12" lg="6">
         <DeviceQueuedTasks></DeviceQueuedTasks>
         <DeviceTemplates></DeviceTemplates>
+        <DeviceLogs></DeviceLogs>
       </CCol>
     </CRow>
     <CRow>

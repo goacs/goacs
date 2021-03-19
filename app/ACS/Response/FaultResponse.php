@@ -46,7 +46,7 @@ class FaultResponse extends CPEResponse
 
 //        $this->detail->FaultCode = $xpath->query("//$cwmpNS:Fault");
         $this->detail->faultCode = $xpath->query("//$cwmpNS:Fault/FaultCode")->item(0)->nodeValue;
-        $this->detail->faultString = $xpath->query("//$cwmpNS:Fault/FaultCode")->item(0)->nodeValue;
+        $this->detail->faultString = $xpath->query("//$cwmpNS:Fault/FaultString")->item(0)->nodeValue;
 
         /** @var \DOMNodeList $spvFaults */
         $spvFaults = $xpath->query("//$cwmpNS:Fault/SetParameterValuesFault");
