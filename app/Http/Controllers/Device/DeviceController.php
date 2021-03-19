@@ -11,6 +11,7 @@ use App\Http\Requests\Device\DeviceAddObjectRequest;
 use App\Http\Requests\Device\DeviceUpdateRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
+use App\Models\Setting;
 use App\Models\Task;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -67,7 +68,13 @@ class DeviceController extends Controller
 
     public function kick(Device $device) {
         $client = new Client();
-        $auth = [$device->connection_request_user, $device->connection_request_password];
+
+        if(empty($device->connection_request_password) === false) {
+            $auth = [$device->connection_request_user, $device->connection_request_password];
+        } else {
+            $auth = [Setting::getValue('connection_request_user'), Setting::getValue('connection_request_password')];
+        }
+
         try {
             $response = $client->get($device->connection_request_url, ['auth' => $auth]);
 
