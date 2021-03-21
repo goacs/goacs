@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Template;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Template\TemplateStoreRequest;
+use App\Http\Resource\Template\TemplateResource;
 use App\Models\Template;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,7 +25,7 @@ class TemplateController extends Controller
     }
 
     public function show(Template $template) {
-        return new JsonResource($template);
+        return new TemplateResource($template);
     }
 
     public function store(TemplateStoreRequest $request) {

@@ -19,7 +19,11 @@
         </tr>
         <tr>
           <th>Used by</th>
-          <td>0</td>
+          <td>{{ template.devices_count }}</td>
+        </tr>
+        <tr>
+          <th>Parameters</th>
+          <td>{{ template.parameters_count }}</td>
         </tr>
         </tbody>
       </table>

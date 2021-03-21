@@ -17,7 +17,7 @@ class DashboardController extends Controller
     public function index() {
         return response()->json([
            'devices_count' => Device::count(),
-           'informs_count' => 0,
+           'informs_count' => Device::updatedLast24Hours()->count(),
            'faults_count' => Fault::last24Hours()->count(),
            'faults' => [],
         ]);

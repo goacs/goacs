@@ -91,4 +91,8 @@ class Device extends Model
 
         return $templatesWithParameters->pluck('parameters')->flatten(1);
     }
+
+    public function scopeUpdatedLast24Hours(Builder $query) {
+        return $query->where('updated_at', '>=', now()->subDay());
+    }
 }
