@@ -12,8 +12,8 @@ use Illuminate\Database\Seeder;
 class SettingsSeeder extends Seeder
 {
     public function run() {
-        Setting::setValue('pii', '36000-56000');
-        Setting::setValue('connection_request_username', 'ACS');
-        Setting::setValue('connection_request_password', 'ACS');
+        Setting::firstOrCreate(['name' => 'pii'], ['value' => '36000-56000']);
+        Setting::firstOrCreate(['name' => 'connection_request_username'], ['value' => 'ACS']);
+        Setting::firstOrCreate(['name' => 'connection_request_password'], ['value' => 'ACS']);
     }
 }
