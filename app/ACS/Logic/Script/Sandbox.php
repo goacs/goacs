@@ -31,7 +31,11 @@ class Sandbox
 
     public function run() {
         extract($this->variables);
-        $ret = eval($this->getScript());
+        try {
+            $ret = eval($this->getScript());
+        } catch (\ParseError $exception) {
+            throw new SandboxException("Sandbox exception", 100010, $exception);
+        }
         return $ret;
     }
 
