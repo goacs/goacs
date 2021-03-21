@@ -15,9 +15,10 @@
       >
         <template #device_id="{item}">
           <td>
-            <router-link :to="{name: 'devices-view', params: {id: item.device_id}}">
+            <router-link v-if="item.device" :to="{name: 'devices-view', params: {id: item.device_id}}">
               {{ item.device.serial_number }}
             </router-link>
+            <span v-else>NO DEVICE</span>
           </td>
         </template>
         <template #created_at="{item}">

@@ -6,10 +6,13 @@ namespace App\Http\Controllers\Template;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Template\TemplateParameterStoreRequest;
+use App\Models\Filters\FlagFilter;
 use App\Models\Template;
 use App\Models\TemplateParameter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class TemplateParameterController extends Controller
 {
@@ -19,8 +22,13 @@ class TemplateParameterController extends Controller
     }
 
     public function index(Request $request, Template $template) {
-        $query = $template->parameters()->orderBy('name');
-        $this->prepareFilter($request, $query);
+        $query = QueryBuilder::for($template->parameters()->orderBy('name'));
+        $query->allowedFilters([
+            'name',
+            'type',
+            'value',
+            AllowedFilter::custom('flags', new FlagFilter())
+        ]);
         return $query->paginate(25);
     }
 

@@ -163,6 +163,7 @@
     },
     methods: {
       propagateFlagFilter(data) {
+        data = JSON.stringify(data);
         this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'input')
         this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'change')
       },

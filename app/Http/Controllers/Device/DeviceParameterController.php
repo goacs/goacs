@@ -14,9 +14,11 @@ use App\Http\Requests\Device\PatchParametersRequest;
 use App\Http\Resource\Device\DeviceParameterResource;
 use App\Models\Device;
 use App\Models\DeviceParameter;
+use App\Models\Filters\FlagFilter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class DeviceParameterController extends Controller
@@ -28,7 +30,12 @@ class DeviceParameterController extends Controller
 
     public function index(Request $request, Device $device) {
         $query = QueryBuilder::for($device->parameters()->orderBy('name'));
-        $query->allowedFilters(['name', 'type', 'value']);
+        $query->allowedFilters([
+            'name',
+            'type',
+            'value',
+            AllowedFilter::custom('flags', new FlagFilter())
+        ]);
         /** @var LengthAwarePaginator $paginator */
         $paginator = $query->paginate($request->per_page ?: 25);
         /** @var ParameterValuesCollection $cachedItems */
@@ -39,7 +46,6 @@ class DeviceParameterController extends Controller
                 return $parameter;
             });
         }
-
         return (new JsonResource($paginator))->additional([
             'has_cached_items' => $cachedItems !== false
         ]);

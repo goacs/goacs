@@ -140,8 +140,9 @@
     },
     methods: {
       propagateFlagFilter(data) {
-        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'input')
-        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'change')
+        data = JSON.stringify(data);
+        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'input');
+        this.$refs.table.$refs.basetable.columnFilterEvent('flags', data, 'change');
       },
       setColorOnDiff(row) {
         if(!row['cached']) {
