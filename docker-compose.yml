@@ -10,6 +10,7 @@ services:
     ports:
       - 8085:8085
       - 9912:9912
+    restart: always
     links:
       - redis
       - mariadb
@@ -21,6 +22,7 @@ services:
     image: redis:latest
     ports:
     - 16379:6379
+    restart: always
 
 
   mariadb:
@@ -36,10 +38,19 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
     ports:
       - 3399:3306
+    restart: always
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
+
+  node:
+    image: node:14
+    working_dir: /app
+    volumes:
+    - ./:/app
+    command: bash -c "npm install && npm run prod"
+
 
 volumes:
   goacs-database-volume:
