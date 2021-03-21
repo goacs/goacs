@@ -20,8 +20,8 @@
         </template>
         <template #actions="{ item }">
           <td>
-            <CButton variant="outline" shape="pill" color="primary" :to="{ name: 'template-view', params: { id: item.id}}">
-              <CIcon name="cil-arrow-right"/>
+            <CButton color="dark" class="float-right" variant="outline" size="sm" :to="{ name: 'template-view', params: { id: item.id}}">
+              <CIcon name="cil-magnifying-glass" class="btn-icon mt-0" size="sm"></CIcon> View
             </CButton>
           </td>
         </template>

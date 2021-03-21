@@ -37,6 +37,11 @@
           :to="{ path: '/settings/tasks' }"
         >
         </CSidebarNavItem>
+        <CSidebarNavItem
+          name="Users"
+          :to="{ path: '/settings/users' }"
+        >
+        </CSidebarNavItem>
       </CSidebarNavDropdown>
 
     </CSidebarNav>

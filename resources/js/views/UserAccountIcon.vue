@@ -9,15 +9,15 @@
       <CHeaderNavLink>
         <div class="c-avatar">
           <img
-            src="img/avatars/6.jpg"
+            :src="`https://eu.ui-avatars.com/api/?background=0D8ABC&color=fff&name=${$auth.user().name}`"
             class="c-avatar-img "
           />
         </div>
       </CHeaderNavLink>
     </template>
 
-    <CDropdownItem>
-      <CIcon name="cil-lock-locked" /> Logout
+    <CDropdownItem :to="{name: 'logout'}">
+      <CIcon name="cil-lock-locked"/> Logout
     </CDropdownItem>
   </CDropdown>
 </template>

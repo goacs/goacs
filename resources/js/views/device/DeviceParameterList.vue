@@ -45,14 +45,14 @@
               <CButton
                 v-if="item.flags.object === true"
                 size="sm"
-                color="primary"
+                color="dark"
                 variant="ghost"
               >
                 <CIcon name="cil-plus"/>
               </CButton>
               <CButton
                 size="sm"
-                color="primary"
+                color="dark"
                 variant="ghost"
                 @click="editItem(item)"
               >

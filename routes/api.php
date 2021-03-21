@@ -39,6 +39,8 @@ Route::apiResource('faults', \App\Http\Controllers\Faults\FaultsController::clas
 Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);
 Route::prefix('settings')->group(function() {
     Route::apiResource('tasks', \App\Http\Controllers\Settings\Tasks\TaskController::class);
+    Route::apiResource('user', \App\Http\Controllers\Settings\Users\UserController::class);
+
 });
 
 Route::apiResource('file', \App\Http\Controllers\File\FileController::class);
@@ -46,6 +48,3 @@ Route::get('/file/{file}/download', [\App\Http\Controllers\File\FileController::
 
 Route::apiResource('settings', \App\Http\Controllers\Settings\SettingsController::class)->only(['index', 'store']);
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});

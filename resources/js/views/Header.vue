@@ -18,11 +18,11 @@
 <!--      <CBreadcrumbRouter class="border-0 mb-0"/>-->
     </CHeaderNav>
     <CHeaderNav class="mr-4">
-      <CHeaderNavItem class="d-md-down-none mx-2">
-        <CHeaderNavLink>
-          <CIcon name="cil-bell"/>
-        </CHeaderNavLink>
-      </CHeaderNavItem>
+<!--      <CHeaderNavItem class="d-md-down-none mx-2">-->
+<!--        <CHeaderNavLink>-->
+<!--          <CIcon name="cil-bell"/>-->
+<!--        </CHeaderNavLink>-->
+<!--      </CHeaderNavItem>-->
       <UserAccountIcon></UserAccountIcon>
     </CHeaderNav>
 
