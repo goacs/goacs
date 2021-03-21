@@ -20,7 +20,7 @@ class TaskSeeder extends Seeder
 
     private function GPVGlobalTask()
     {
-        if(Task::where(['for_type' => Task::TYPE_GLOBAL, 'name' => Types::GetParameterValues])->exists()) {
+        if(Task::where(['for_type' => Task::TYPE_GLOBAL, 'name' => Types::RunScript, 'on_request' => Types::GetParameterValuesResponse])->exists()) {
             return;
         }
 
