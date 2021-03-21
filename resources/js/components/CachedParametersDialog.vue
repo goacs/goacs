@@ -1,31 +1,24 @@
 <template>
-  <b-modal
-      v-model="value"
-      has-modal-card
-      full-screen
-      :canCancel="false"
+  <CModal
+    title="Lookup parameters"
+    size="xl"
+    color="dark"
+    centered
+    :closeOnBackdrop="false"
+    :show="value"
+    @update:show="onModalClose"
   >
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Cached parameters</p>
-      </header>
-      <section class="modal-card-body">
-        <table class="table">
-          <tr>
-            <th>Name</th>
-            <th>Value</th>
-          </tr>
-          <tr v-for="parameter in cachedParams" :key="parameter.name">
-            <td>{{parameter.name}}</td>
-            <td>{{parameter.value}}</td>
-          </tr>
-        </table>
-      </section>
-      <footer class="modal-card-foot">
-        <b-button @click="$emit('input', false)">Close</b-button>
-      </footer>
-    </div>
-  </b-modal>
+    <table class="table">
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+      </tr>
+      <tr v-for="parameter in cachedParams" :key="parameter.name">
+        <td>{{parameter.name}}</td>
+        <td>{{parameter.value}}</td>
+      </tr>
+    </table>
+  </CModal>
 </template>
 
 <script>
@@ -50,6 +43,11 @@ export default {
       hasCachedParams: 'device/hasCachedParams',
       cachedParams: 'device/getCachedParameters'
     }),
+  },
+  methods: {
+    async onModalClose(_, event, accept) {
+      this.$emit('input', false);
+    },
   }
 }
 </script>

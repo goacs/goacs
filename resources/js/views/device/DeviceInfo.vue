@@ -71,7 +71,8 @@
         Cached parameters
       </CButton>
     </CCardFooter>
-<!--  <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>-->
+    <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>
+    <CElementCover v-if="loading" :opacity="0.8"/>
   </CCard>
 </template>
 
@@ -81,7 +82,7 @@
 
   export default {
     name: "DeviceInfo",
-    components: {CachedParametersDialog},
+    components: { CachedParametersDialog},
     computed: {
       ...mapGetters({
         device: 'device/getDevice',
@@ -90,6 +91,7 @@
     },
     data() {
       return {
+        loading: false,
         cachedParamsDialog: false,
       };
     },
@@ -103,11 +105,21 @@
         await this.$store.dispatch('device/deleteDevice', this.device.id)
         await this.$router.push({ name: 'devices-list'})
       },
-      kick() {
-        this.$store.dispatch('device/kickDevice', this.device.id)
+      async kick() {
+        try {
+          this.loading = true;
+          await this.$store.dispatch('device/kickDevice', this.device.id)
+        } finally {
+          this.loading = false;
+        }
       },
-      lookup() {
-        this.$store.dispatch('device/lookup', this.device.id)
+      async lookup() {
+        try {
+          this.loading = true;
+          await this.$store.dispatch('device/lookup', this.device.id)
+        } finally {
+          this.loading = false;
+        }
       },
       cached() {
         this.$store.dispatch('device/fetchCachedParameters', this.device.id);
