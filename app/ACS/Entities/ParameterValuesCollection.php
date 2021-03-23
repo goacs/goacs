@@ -72,7 +72,7 @@ class ParameterValuesCollection extends Collection
             foreach ($items as $othItem) {
                 if($item->name === $othItem->name) {
                     $exist = true;
-                    if($item->value !== $othItem->value) {
+                    if($item->value !== $othItem->value || $item->type !== $othItem->type) {
                         $diff->put($item->name, $item);
                     }
                 }
