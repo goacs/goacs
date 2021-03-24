@@ -51,7 +51,7 @@ export default {
       this.$emit('input', false);
     },
     stripString(prop, len) {
-      if(prop.length < len) {
+      if(prop.value.length < len) {
         return prop;
       }
       return prop.value.substr(0, len);
