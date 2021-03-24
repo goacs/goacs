@@ -51,10 +51,10 @@ export default {
       this.$emit('input', false);
     },
     stripString(prop, len) {
-      if(prop.value.length < len) {
+      if(prop.length < len) {
         return prop;
       }
-      return prop.value.substr(0, len);
+      return prop.substr(0, len);
     },
   }
 }
