@@ -11,11 +11,13 @@
     <table class="table">
       <tr>
         <th>Name</th>
+        <th>Type</th>
         <th>Value</th>
       </tr>
       <tr v-for="parameter in cachedParams" :key="parameter.name">
-        <td>{{parameter.name}}</td>
-        <td>{{parameter.value}}</td>
+        <td>{{ parameter.name }}</td>
+        <td>{{ parameter.type }}</td>
+        <td>{{ stripString(parameter.value, 100) }}</td>
       </tr>
     </table>
   </CModal>
@@ -47,6 +49,9 @@ export default {
   methods: {
     async onModalClose(_, event, accept) {
       this.$emit('input', false);
+    },
+    stripString(prop, len) {
+      return prop.value.substr(0, len);
     },
   }
 }

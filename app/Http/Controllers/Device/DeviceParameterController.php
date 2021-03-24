@@ -60,7 +60,8 @@ class DeviceParameterController extends Controller
         return new DeviceParameterResource($parameter);
     }
 
-    public function store(Device $device, DeviceParameter $parameter, DeviceParameterStoreRequest $request) {
+    public function store(Device $device, DeviceParameterStoreRequest $request) {
+        $parameter = $device->parameters()->make();
         $parameter->fill($request->validated())->save();
         return new DeviceParameterResource($parameter);
     }
@@ -68,6 +69,11 @@ class DeviceParameterController extends Controller
     public function update(Device $device, DeviceParameter $parameter, DeviceParameterStoreRequest $request) {
         $parameter->fill($request->validated())->save();
         return new DeviceParameterResource($parameter);
+    }
+
+    public function destroy(Device $device, DeviceParameter $parameter) {
+        $parameter->delete();
+        return new JsonResource();
     }
 
     public function patchParameters(Device $device, Request $request) {
