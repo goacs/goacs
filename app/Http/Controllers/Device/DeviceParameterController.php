@@ -73,7 +73,7 @@ class DeviceParameterController extends Controller
 
     public function destroy(Device $device, DeviceParameter $parameter) {
         $parameter->delete();
-        return new JsonResource();
+        return new JsonResource([]);
     }
 
     public function patchParameters(Device $device, Request $request) {
