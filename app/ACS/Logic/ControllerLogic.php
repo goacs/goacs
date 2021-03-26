@@ -147,7 +147,7 @@ class ControllerLogic
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
-            $this->context->flushSession();
+            $this->endSession();
             return;
         }
         if($task->isOnRequest($this->context->bodyType) === false) {
