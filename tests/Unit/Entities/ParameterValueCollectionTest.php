@@ -101,4 +101,90 @@ class ParameterValueCollectionTest extends TestCase
         $this->assertEquals("1", $diff2['A.B.C']->value);
         $this->assertEquals("3", $diff2['A.B.C.D.F']->value);
     }
+
+    public function test_default_sorting() {
+        $params = [
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.MinAddress',
+                'value' => '192.168.1.2',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_Camera-MaxAddress',
+                'value' => '192.168.1.199',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_Camera-MinAddress',
+                'value' => '192.168.1.180',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_Computer-MaxAddress',
+                'value' => '192.168.1.101',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_Computer-MinAddress',
+                'value' => '192.168.1.2',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_HGW-MaxAddress',
+                'value' => '192.168.1.219',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_HGW-MinAddress',
+                'value' => '192.168.1.200',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_Phone-MaxAddress',
+                'value' => '192.168.1.169',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_Phone-MinAddress',
+                'value' => '192.168.1.150',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_STB-MaxAddress',
+                'value' => '192.168.1.139',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.X_STB-MinAddress',
+                'value' => '192.168.1.120',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DHCPConditionalServingPool.1.IPRouters',
+                'value' => '192.168.1.1',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DHCPConditionalServingPool.1.MaxAddress',
+                'value' => '192.168.1.254',
+                'type' => 'xsd:string',
+            ],
+            [
+                'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.DHCPConditionalServingPool.1.MinAddress',
+                'value' => '192.168.1.2',
+                'type' => 'xsd:string',
+            ],
+        ];
+
+        $parameterCollection = new ParameterValuesCollection();
+        foreach($params as $param) {
+            $parameter = new ParameterValueStruct();
+            $parameter->name = $param['name'];
+            $parameter->value = $param['value'];
+            $parameter->type = $param['type'];
+            $parameterCollection->put($parameter->name, $parameter);
+        }
+
+        dump($parameterCollection);
+    }
 }
