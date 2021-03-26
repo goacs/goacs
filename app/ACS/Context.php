@@ -203,4 +203,8 @@ class Context
         ]);
     }
 
+    public function flushSession() {
+        $this->session()->flush();
+    }
+
 }

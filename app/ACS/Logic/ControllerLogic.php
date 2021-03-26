@@ -147,7 +147,6 @@ class ControllerLogic
         /** @var Task $task */
         $task = $this->context->tasks->nextTask();
         if($task === null) {
-            $this->endSession();
             return;
         }
         if($task->isOnRequest($this->context->bodyType) === false) {
@@ -256,7 +255,10 @@ class ControllerLogic
             ]);
 
             $this->context->tasks->addTask($task);
+            return;
         }
+
+        $this->endSession();
     }
 
     private function processInformRequest()
@@ -425,6 +427,7 @@ class ControllerLogic
         }
 
         $this->context->deviceModel->save();
+        $this->context->flushSession();
     }
 
     private function calculatePIIValue(): int {
@@ -462,7 +465,8 @@ class ControllerLogic
             ->diff($sessionParameters)
             ->filterByFlag('send')
             ->filterByFlag('object', false)
-            ->sortBy('name');
+//            ->sortBy('name')
+        ;
 
         dump("Diff params to set", $diffParameters);
 
