@@ -74,7 +74,7 @@ class Device extends Model
     }
 
     public function faults(): HasMany {
-        return $this->hasMany(Fault::class);
+        return $this->hasMany(Log::class);
     }
 
     public function scopeCreatedAfter(Builder $query, $date) {

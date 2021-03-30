@@ -34,6 +34,22 @@
               :is-valid="isvalid(scope)"
             ></CInput>
           </ValidationProvider>
+          <ValidationProvider vid="conversation_log" name="Conversation log"
+                              v-slot="scope">
+            <div class="form-group">
+              <label>Log ACS<->DEVICE conversation (debug only)</label>
+              <div class="form-control-plaintext">
+                <CSwitch
+                  :checked.sync="config.conversation_log"
+                  type="checkbox"
+                  color="dark"
+                  label-on="yes"
+                  label-off="no"
+                >
+                </CSwitch>
+              </div>
+            </div>
+          </ValidationProvider>
         </CForm>
       </ValidationObserver>
     </CCardBody>
@@ -65,7 +81,6 @@
           return this.$store.getters['config/getConfig'];
         },
         set(config) {
-          console.log(config);
           this.$store.commit('config/setConfig', config);
         }
       },

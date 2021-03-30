@@ -15,5 +15,6 @@ class SettingsSeeder extends Seeder
         Setting::firstOrCreate(['name' => 'pii'], ['value' => '36000-56000']);
         Setting::firstOrCreate(['name' => 'connection_request_username'], ['value' => 'ACS']);
         Setting::firstOrCreate(['name' => 'connection_request_password'], ['value' => 'ACS']);
+        Setting::firstOrCreate(['name' => 'conversation_log'], ['value' => 'false']);
     }
 }

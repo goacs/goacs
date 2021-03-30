@@ -8,13 +8,14 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\SettingStoreRequest;
+use App\Http\Resource\Settings\SettingsJsonResource;
 use App\Models\Setting;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SettingsController extends Controller
 {
     public function index() {
-        return new JsonResource($this->flatSettings());
+        return new SettingsJsonResource($this->flatSettings());
     }
 
     public function store(SettingStoreRequest $request) {
@@ -22,7 +23,7 @@ class SettingsController extends Controller
             Setting::setValue($key, $value);
         }
 
-        return new JsonResource($this->flatSettings());
+        return new SettingsJsonResource($this->flatSettings());
     }
 
     private function flatSettings() {

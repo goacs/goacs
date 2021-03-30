@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Setting extends Model
 {
+    const CACHE_PREFIX = 'SETTINGS_';
+
     protected $table = 'settings';
 
     public $incrementing = false;
@@ -24,15 +26,18 @@ class Setting extends Model
     protected $fillable = ['name', 'value'];
 
     public static function setValue(string $key, $value) {
-        static::updateOrCreate(['name' => $key],['value' => $value]);
+        static::updateOrCreate(['name' => $key],['value' => (string) $value]);
+        \Cache::forget(self::CACHE_PREFIX.$key);
     }
 
     public static function getValue(string $key): mixed {
-        $data = static::where('name', $key)->first();
-        if($data !== null) {
-            return $data->value;
-        }
+        return \Cache::remember(self::CACHE_PREFIX.$key, 3600, function() use ($key) {
+            $data = static::where('name', $key)->first();
+            if($data !== null) {
+                return $data->value;
+            }
 
-        return '';
+            return '';
+        });
     }
 }

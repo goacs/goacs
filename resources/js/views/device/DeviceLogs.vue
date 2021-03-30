@@ -2,7 +2,7 @@
   <CCard>
     <CCardHeader>
       <strong>Logs</strong>
-      <CButton color="dark" class="float-right" variant="outline" size="sm">
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="modalDialog = true">
         <CIcon name="cil-magnifying-glass" class="btn-icon mt-0" size="sm"></CIcon> All
       </CButton>
     </CCardHeader>
@@ -37,17 +37,21 @@
         <json-tree :data="details.json"></json-tree>
       </CModal>
     </CCardBody>
+    <LogsModal v-if="device" v-model="modalDialog"></LogsModal>
   </CCard>
 </template>
 
 <script>
   import {mapGetters} from "vuex";
+  import LogsModal from "./logs/LogsModal";
 
   export default {
     name: "DeviceLogs",
+    components: {LogsModal},
     data() {
       return {
         lastFaults: [],
+        modalDialog: false,
         details: {
           dialog: false,
           json: '',
@@ -66,7 +70,7 @@
       },
       async loadLastFaults() {
         try {
-          const response = await this.$store.dispatch('device/listFaults', {
+          const response = await this.$store.dispatch('device/listLogs', {
             page: 1,
             filter: [],
             perPage: 5,

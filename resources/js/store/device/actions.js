@@ -95,8 +95,8 @@ export default {
   async addTask(context, params) {
     return await this._vm.$http.post(`/api/device/${params.device_id}/tasks`, params.task)
   },
-  async listFaults(context, parameters) {
+  async listLogs(context, parameters) {
     const filterStr = filterToQueryString(parameters.filter)
-    return await this._vm.$http.get(`/api/device/${parameters.device_id}/faults?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
+    return await this._vm.$http.get(`/api/device/${parameters.device_id}/logs?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
   },
 }

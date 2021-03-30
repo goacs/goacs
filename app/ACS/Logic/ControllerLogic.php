@@ -32,7 +32,7 @@ use App\ACS\Types;
 use App\ACS\XML\XMLParser;
 use App\Models\Device;
 use App\Models\DeviceParameter;
-use App\Models\Fault;
+use App\Models\Log;
 use App\Models\File;
 use App\Models\Setting;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -111,6 +111,12 @@ class ControllerLogic
 
         }
 
+        Log::logConversation($this->context->deviceModel,
+            'device',
+            $this->context->bodyType,
+            (string) $this->context->request->getContent(),
+        );
+
         $this->runTasks();
 
         if($this->context->cpeRequest !== null) {
@@ -124,6 +130,13 @@ class ControllerLogic
                 ->header('Content-Type', 'text/xml; encoding="utf-8"')
             //    ->send()
             ;
+
+            Log::logConversation($this->context->deviceModel,
+                'acs',
+                $this->context->acsResponse->getBaseName(),
+                (string) $this->context->acsResponse->getBody(),
+            );
+
         } else if($this->context->acsRequest !== null) {
             $this->context
                 ->response
@@ -136,7 +149,13 @@ class ControllerLogic
             //    ->send()
             ;
 
+            Log::logConversation($this->context->deviceModel,
+                'acs',
+                $this->context->acsRequest->getBaseName(),
+                (string) $this->context->acsRequest->getBody(),
+            );
         }
+
         $this->context->storeToSession();
         return $this->context->response;
     }
@@ -150,6 +169,7 @@ class ControllerLogic
             $this->endSession();
             return;
         }
+
         if($task->isOnRequest($this->context->bodyType) === false) {
             return;
         }
@@ -203,7 +223,11 @@ class ControllerLogic
                 $sandbox = new Sandbox($this->context, $task->payload['script']);
                 try {
                     $sandbox->run();
-
+                    Log::logConversation($this->context->deviceModel,
+                        'acs',
+                        'Run Script',
+                        (string) $task->payload['script'],
+                    );
                 } catch (SandboxException $exception) {
                     $fault = $this->context->deviceModel->faults()->make();
                     $fault->full_xml = $exception->getTraceAsString();
@@ -496,7 +520,7 @@ class ControllerLogic
     {
         /** @var FaultResponse $response */
         $response = $this->context->cpeResponse;
-        Fault::fromFaultResponse($this->context->deviceModel, $response);
+        Log::fromFaultResponse($this->context->deviceModel, $response);
     }
 
     private function processSetParameterValuesResponse()

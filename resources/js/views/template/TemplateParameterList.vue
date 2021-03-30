@@ -211,8 +211,8 @@
 
         }
       },
-      stripString(value, len) {
-        return value.row.value.substr(0, len);
+      stripString(prop, len) {
+        return prop.value.substr(0, len);
       },
     },
     beforeDestroy() {

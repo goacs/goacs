@@ -33,7 +33,7 @@ export default {
     autoload: {
       type: Boolean,
       default: () => true,
-    }
+    },
   },
   data() {
     return {

@@ -33,7 +33,7 @@ Route::patch('/device/{device}/parameters/patch', [\App\Http\Controllers\Device\
 Route::apiResource('device.parameters', \App\Http\Controllers\Device\DeviceParameterController::class);
 Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTemplateController::class)->only(['index', 'store', 'destroy']);
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
-Route::apiResource('device.faults', \App\Http\Controllers\Device\DeviceFaultsController::class)->only(['index']);
+Route::apiResource('device.logs', \App\Http\Controllers\Device\DeviceLogsController::class)->only(['index']);
 Route::apiResource('template', \App\Http\Controllers\Template\TemplateController::class);
 Route::apiResource('faults', \App\Http\Controllers\Faults\FaultsController::class)->only(['index']);
 Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);

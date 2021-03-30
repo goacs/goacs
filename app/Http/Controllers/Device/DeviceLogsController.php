@@ -11,7 +11,7 @@ use App\Http\Requests\Device\DeviceAddObjectRequest;
 use App\Http\Requests\Device\DeviceUpdateRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
-use App\Models\Fault;
+use App\Models\Log;
 use App\Models\Task;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -20,7 +20,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class DeviceFaultsController extends Controller
+class DeviceLogsController extends Controller
 {
     public function __construct()
     {
@@ -28,7 +28,7 @@ class DeviceFaultsController extends Controller
     }
 
     public function index(Device $device, Request $request) {
-        $query = QueryBuilder::for(Fault::class, $request)
+        $query = QueryBuilder::for(Log::class, $request)
             ->where('device_id', $device->id)
             ->orderByDesc('created_at')
             ->allowedFilters([
