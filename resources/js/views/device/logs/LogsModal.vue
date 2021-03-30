@@ -37,7 +37,6 @@
       <CTextarea
         class="mt-3"
         label="Data"
-        size="lg"
         rows="20"
         v-model="details.xml"
       >
