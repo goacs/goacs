@@ -43,6 +43,8 @@ class Log extends Model
 
     protected $fillable = ['from', 'type', 'full_xml', 'code', 'message', 'detail'];
 
+    protected $dateFormat = 'Y-m-d H:i:s.u';
+
     protected $casts = [
         'detail' => 'array'
     ];

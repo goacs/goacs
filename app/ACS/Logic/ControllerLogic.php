@@ -250,6 +250,7 @@ class ControllerLogic
                 'serial_number' => $this->context->device->serialNumber,
             ],
             [
+                'product_class' => $this->context->device->productClass,
                 'oui' => $this->context->device->oui,
                 'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
                 'updated_at' => now(),
