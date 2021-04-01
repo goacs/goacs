@@ -47,6 +47,31 @@ class Flag implements CastsAttributes
         return $flagObject;
     }
 
+    public function toString(): string {
+        $str = '';
+        if($this->read === true) {
+            $str .= 'R';
+        }
+
+        if($this->write === true) {
+            $str .= 'W';
+        }
+
+        if($this->object === true) {
+            $str .= 'A';
+        }
+
+        if($this->send === true) {
+            $str .= 'S';
+        }
+
+        if($this->system === true) {
+            $str .= 'X';
+        }
+
+        return $str;
+    }
+
     public static function fromArray(array $data): Flag {
         return new Flag(
             $data['read'] ?? false,
