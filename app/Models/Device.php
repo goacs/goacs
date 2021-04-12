@@ -50,6 +50,11 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Device whereSerialNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Device whereSoftwareVersion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Device whereUpdatedAt($value)
+ * @property-read Collection|\App\Models\Log[] $faults
+ * @property-read int|null $faults_count
+ * @method static Builder|Device createdAfter($date)
+ * @method static Builder|Device updatedLast24Hours()
+ * @method static Builder|Device whereProductClass($value)
  */
 class Device extends Model
 {
@@ -61,6 +66,9 @@ class Device extends Model
         'connection_request_url', 'connection_request_user', 'connection_request_password',
         'updated_at', 'product_class'];
 
+    /**
+     * @return HasMany|DeviceParameter
+     */
     public function parameters(): HasMany {
         return $this->hasMany(DeviceParameter::class);
     }

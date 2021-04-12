@@ -10,6 +10,7 @@ use App\ACS\Entities\Flag;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\XML\XSDTypes;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|DeviceParameter whereValue($value)
  * @mixin \Eloquent
  * @property-read \App\Models\Device $device
+ * @method static Builder|DeviceParameter pathset(string $path)
  */
 class DeviceParameter extends Model implements ParameterInterface
 {
@@ -76,6 +78,10 @@ class DeviceParameter extends Model implements ParameterInterface
 
         //magic XD
         return $parameter?->value ?? '';
+    }
+
+    public function scopePathset(Builder $query, string $path) {
+        $query->where('name', 'like', $path.'%');
     }
 
     public function toParamaterValueStruct(): ParameterValueStruct {

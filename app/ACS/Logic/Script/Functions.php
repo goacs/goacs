@@ -6,6 +6,7 @@ namespace App\ACS\Logic\Script;
 
 use App\ACS\Context;
 use App\ACS\Entities\Device;
+use App\ACS\Entities\Task;
 use App\ACS\Types;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;
@@ -59,6 +60,18 @@ class Functions
         if($this->deviceModel->templates()->find($id) === null) {
             $this->deviceModel->templates()->attach($id, ['priority' => $priority]);
         }
+    }
+
+    public function addObject(string $path) {
+        $task = new Task(Types::AddObject);
+        $task->setPayload(['parameter' => $path]);
+        $this->context->tasks->addTask($task);
+    }
+
+    public function deleteObject(string $path) {
+        $task = new Task(Types::DeleteObject);
+        $task->setPayload(['parameter' => $path]);
+        $this->context->tasks->addTask($task);
     }
 
     public function uploadFirmware(string $filename) {

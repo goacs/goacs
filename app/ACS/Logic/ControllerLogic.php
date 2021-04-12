@@ -420,10 +420,19 @@ class ControllerLogic
 
     private function processDeleteObjectResponse()
     {
+        $prevTask = $this->context->tasks->prevTask();
+        if($prevTask->name !== Types::DeleteObject) {
+            \Log::error('DeleteObjectResponse out of order!', ['context' => $this->context]);
+            return;
+        }
+        $path = $prevTask->payload['parameter'];
+        $this->context->deviceModel->parameters()->pathset($path)->delete();
     }
 
     private function processDownloadResponse()
     {
+//        /** @var DownloadResponse $downloadResponse */
+//        $downloadResponse = $this->context->cpeResponse;
     }
 
     private function processTransferCompleteRequest()

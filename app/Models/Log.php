@@ -36,6 +36,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @mixin \Eloquent
  * @property array $detail
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereDetail($value)
+ * @property-read \App\Models\Device $device
+ * @method static Builder|Log createdAfter($date)
+ * @method static Builder|Log fault()
+ * @method static Builder|Log last24Hours()
+ * @method static Builder|Log type(string $type)
+ * @method static Builder|Log whereFrom($value)
+ * @method static Builder|Log whereType($value)
  */
 class Log extends Model
 {
