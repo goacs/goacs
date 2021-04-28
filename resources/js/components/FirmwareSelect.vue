@@ -4,7 +4,7 @@
       :options="files"
       placeholder="Select firmware"
       label="name"
-      :reduce="item => item.id"
+      :reduce="item => item.name"
   >
 
     <template #option="item">

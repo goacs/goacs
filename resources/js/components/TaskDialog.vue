@@ -137,7 +137,7 @@
         this.newtask.id = this.taskid
         this.newtask.infinite = this.infinite
         if(this.name === 'UploadFirmware') {
-          this.newtask.asFirmwareUpdateTask(this.fileType, this.fileName)
+          this.newtask.asFirmwareUpdateTask('1 Firmware Upgrade Image', this.fileName)
         } else if (this.name === 'RunScript') {
           this.newtask.asScriptTask(this.script)
         } else if (this.name === 'AddObject') {

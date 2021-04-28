@@ -46,7 +46,7 @@ export class Task {
     }
 
     asFirmwareUpdateTask(filetype, filename) {
-        this.name = 'UploadFirmware'
+        this.name = 'Download'
         this.payload = {
             filetype: filetype,
             filename: filename,
