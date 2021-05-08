@@ -51,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Device whereSerialNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Device whereSoftwareVersion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Device whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Device whereDebug($value)
  * @property-read Collection|\App\Models\Log[] $faults
  * @property-read int|null $faults_count
  * @method static Builder|Device createdAfter($date)
@@ -89,7 +90,6 @@ class Device extends Model
     public function scopeCreatedAfter(Builder $query, $date) {
         return $query->where('created_at', '>=', $date);
     }
-
 
     public function getTemplatesParameters() {
         $templatesWithParameters = $this

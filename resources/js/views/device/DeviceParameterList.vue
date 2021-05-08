@@ -243,5 +243,7 @@
 </script>
 
 <style lang="scss">
-
+.template-item {
+  background-color: rgba(0,0,21,.05);
+}
 </style>

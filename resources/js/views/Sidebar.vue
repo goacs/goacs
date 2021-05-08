@@ -42,6 +42,11 @@
           :to="{ path: '/settings/users' }"
         >
         </CSidebarNavItem>
+        <CSidebarNavItem
+          name="Debug"
+          :to="{ path: '/settings/debug' }"
+        >
+        </CSidebarNavItem>
       </CSidebarNavDropdown>
 
     </CSidebarNav>

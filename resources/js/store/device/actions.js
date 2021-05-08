@@ -29,7 +29,7 @@ export default {
       const response = await this._vm.$http.get(`/api/device/${parameters.id}/parameters?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
       const data = response.data.data.map(item => {
         if(item.source === 'template') {
-          item._classes = 'table-info';
+          item._classes = 'template-item';
         }
 
         return item;

@@ -40,7 +40,7 @@ Route::apiResource('template.parameters', \App\Http\Controllers\Template\Templat
 Route::prefix('settings')->group(function() {
     Route::apiResource('tasks', \App\Http\Controllers\Settings\Tasks\TaskController::class);
     Route::apiResource('user', \App\Http\Controllers\Settings\Users\UserController::class);
-
+    Route::apiResource('debug', \App\Http\Controllers\Settings\DebugController::class)->only(['index', 'store']);
 });
 
 Route::apiResource('file', \App\Http\Controllers\File\FileController::class);

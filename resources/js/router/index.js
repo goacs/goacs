@@ -64,6 +64,11 @@ const routes = [
             path: 'users',
             name: 'settings-users',
             component: () => import('@/views/settings/users/UsersList.vue'),
+          },
+          {
+            path: 'debug',
+            name: 'settings-debug',
+            component: () => import('@/views/settings/debug/DebugView.vue'),
           }
         ]
       }
