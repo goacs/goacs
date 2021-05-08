@@ -41,6 +41,19 @@
           <th>Last connection time</th>
           <td>{{ device.updated_at | moment }}</td>
         </tr>
+        <tr>
+          <th>Debug</th>
+          <td>
+            <CSwitch
+            :checked.sync="device.debug"
+            type="checkbox"
+            color="dark"
+            label-on="yes"
+            label-off="no"
+          >
+          </CSwitch>
+          </td>
+        </tr>
         </tbody>
       </table>
     </CCardBody>
@@ -85,9 +98,9 @@
     components: { CachedParametersDialog},
     computed: {
       ...mapGetters({
+        hasCachedParams: 'device/hasCachedParams',
         device: 'device/getDevice',
-        hasCachedParams: 'device/hasCachedParams'
-      }),
+      })
     },
     data() {
       return {
@@ -121,9 +134,24 @@
           this.loading = false;
         }
       },
+      async update() {
+        try {
+          this.loading = true;
+          await this.$store.dispatch('device/updateDevice', this.device);
+        } finally {
+          this.loading = false;
+        }
+      },
       cached() {
         this.$store.dispatch('device/fetchCachedParameters', this.device.id);
         this.cachedParamsDialog = true;
+      }
+    },
+    watch: {
+      'device.debug': {
+        handler(value) {
+          this.update();
+        }
       }
     }
   }

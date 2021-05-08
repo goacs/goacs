@@ -24,7 +24,7 @@ Route::prefix('dashboard')->group(function() {
     Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index']);
 });
 
-Route::apiResource('device', \App\Http\Controllers\Device\DeviceController::class)->only(['index', 'show', 'destroy']);
+Route::apiResource('device', \App\Http\Controllers\Device\DeviceController::class)->only(['index', 'show', 'update', 'destroy']);
 Route::post('device/{device}/addobject', [\App\Http\Controllers\Device\DeviceController::class, 'addObject']);
 Route::get('device/{device}/provision', [\App\Http\Controllers\Device\DeviceController::class, 'provision']);
 Route::get('device/{device}/lookup', [\App\Http\Controllers\Device\DeviceController::class, 'lookup']);

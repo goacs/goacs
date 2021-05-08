@@ -4,6 +4,7 @@
 namespace App\Http\Resource\Device;
 
 
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,6 +22,7 @@ class DeviceResource extends JsonResource
             'connection_request_url' => $this->connection_request_url,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
+            'debug' => (bool) $this->debug,
         ];
     }
 }

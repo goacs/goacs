@@ -80,6 +80,10 @@ class Log extends Model
             return;
         }
 
+        if($device->debug === false) {
+            return;
+        }
+
         $log = new static();
         $log->device_id = $device->id;
         $log->full_xml = $xml;

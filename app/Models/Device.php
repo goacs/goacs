@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property string|null $connection_request_password
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property boolean $debug
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DeviceParameter[] $parameters
  * @property-read int|null $parameters_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Task[] $tasks
@@ -64,7 +65,7 @@ class Device extends Model
 
     protected $fillable = ['serial_number', 'oui', 'software_version', 'hardware_version',
         'connection_request_url', 'connection_request_user', 'connection_request_password',
-        'updated_at', 'product_class'];
+        'updated_at', 'product_class', 'debug'];
 
     /**
      * @return HasMany|DeviceParameter

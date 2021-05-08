@@ -28,6 +28,6 @@ class SettingsController extends Controller
 
     private function flatSettings() {
         $settings = Setting::all();
-        return $settings->mapWithKeys(fn($item) => [$item->name => $item->value]);
+        return $settings->mapWithKeys(fn($item) => [$item->name => Setting::decodeValue($item->value)]);
     }
 }

@@ -15,10 +15,25 @@ export default {
       console.error("Cannot fetch device")
     }
   },
+  async updateDevice({commit}, device) {
+    try {
+      const response = await this._vm.$http.patch(`/api/device/${device.id}`, device);
+      commit('setDevice', response.data.data)
+    } catch (e) {
+      console.error("Cannot update device")
+    }
+  },
   async fetchParameters({ commit }, parameters) {
     const filterStr = filterToQueryString(parameters.filter)
     try {
       const response = await this._vm.$http.get(`/api/device/${parameters.id}/parameters?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
+      const data = response.data.data.map(item => {
+        if(item.source === 'template') {
+          item._classes = 'table-info';
+        }
+
+        return item;
+      })
       commit('setParameters', response.data.data)
       commit('hasCachedParams', response.data.has_cached_items)
       return response

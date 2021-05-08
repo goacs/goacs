@@ -10,7 +10,7 @@ class DeviceUpdateRequest extends FormRequest
 {
     public function rules(): array {
         return [
-
+            'debug' => 'boolean',
         ];
     }
 }

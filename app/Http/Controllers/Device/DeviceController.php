@@ -42,6 +42,11 @@ class DeviceController extends Controller
         return new DeviceResource($device);
     }
 
+    public function update(DeviceUpdateRequest $request, Device $device) {
+        $device->fill($request->validated())->save();
+        return new DeviceResource($device);
+    }
+
     public function destroy(Device $device) {
         $device->templates()->sync([]);
         $device->parameters()->delete();

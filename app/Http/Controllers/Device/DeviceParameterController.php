@@ -15,6 +15,7 @@ use App\Http\Resource\Device\DeviceParameterResource;
 use App\Models\Device;
 use App\Models\DeviceParameter;
 use App\Models\Filters\FlagFilter;
+use App\Models\TemplateParameter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -30,12 +31,32 @@ class DeviceParameterController extends Controller
 
     public function index(Request $request, Device $device) {
         $query = QueryBuilder::for($device->parameters()->orderBy('name'));
+        $query->select('*');
+        $query->addSelect(\DB::raw("'device' as source"));
         $query->allowedFilters([
             'name',
             'type',
             'value',
             AllowedFilter::custom('flags', new FlagFilter())
         ]);
+
+        $templateQuery = QueryBuilder::for(
+            TemplateParameter::whereHas('template', function($query) use ($device) {
+                $query->whereIn('id', $device->templates->pluck('id'));
+            })
+        );
+        $templateQuery->select('*');
+        $templateQuery->addSelect(\DB::raw("'template' as source"));
+        $templateQuery->allowedFilters([
+            'name',
+            'type',
+            'value',
+            AllowedFilter::custom('flags', new FlagFilter())
+        ]);
+
+        //Magic
+        $query->union($templateQuery->getQuery());
+
         /** @var LengthAwarePaginator $paginator */
         $paginator = $query->paginate($request->per_page ?: 25);
         /** @var ParameterValuesCollection $cachedItems */
@@ -46,6 +67,7 @@ class DeviceParameterController extends Controller
                 return $parameter;
             });
         }
+
         return (new JsonResource($paginator))->additional([
             'has_cached_items' => $cachedItems !== false
         ]);

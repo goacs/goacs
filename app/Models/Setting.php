@@ -38,7 +38,7 @@ class Setting extends Model
     protected $fillable = ['name', 'value'];
 
     public static function setValue(string $key, $value) {
-        static::updateOrCreate(['name' => $key],['value' => (string) $value]);
+        static::updateOrCreate(['name' => $key],['value' => (string) self::encodeValue($value)]);
         \Cache::forget(self::CACHE_PREFIX.$key);
     }
 
@@ -46,10 +46,28 @@ class Setting extends Model
         return \Cache::remember(self::CACHE_PREFIX.$key, 3600, function() use ($key) {
             $data = static::where('name', $key)->first();
             if($data !== null) {
-                return $data->value;
+                return static::decodeValue($data->value);
             }
 
             return '';
         });
+    }
+
+    public static function decodeValue(string $value): mixed {
+        try {
+            $value = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+
+        }
+
+        return $value;
+    }
+
+    public static function encodeValue($value) {
+        if(is_array($value)) {
+            return json_encode($value);
+        }
+
+        return $value;
     }
 }

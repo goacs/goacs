@@ -41,7 +41,7 @@
           </template>
 
           <template #actions="{item}">
-            <td>
+            <td v-if="item.source === 'device'">
               <CButton
                 v-if="item.flags.object === true"
                 size="sm"
@@ -57,6 +57,11 @@
                 @click="editItem(item)"
               >
                 <CIcon name="cil-pencil"/>
+              </CButton>
+            </td>
+            <td v-else>
+              <CButton type="button" color="primary" size="sm" class="mr-2" :to="{name: 'template-view', params: {id: item.device_id}}">
+                {{ templateName(item.device_id) }}
               </CButton>
             </td>
           </template>
@@ -135,7 +140,8 @@
     computed: {
       ...mapGetters({
         device: 'device/getDevice',
-        parameters: 'device/getParameters'
+        parameters: 'device/getParameters',
+        templates: 'device/getDeviceTemplates',
       }),
     },
     methods: {
@@ -225,6 +231,10 @@
       stripString(prop, len) {
         return prop.value.substr(0, len);
       },
+      templateName(template_id) {
+        const template =  _.find(this.templates, {id: template_id});
+        return template.name
+      }
     },
     beforeDestroy() {
       this.$store.commit('device/setParameters', {})
