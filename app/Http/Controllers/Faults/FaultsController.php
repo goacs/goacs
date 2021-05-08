@@ -30,10 +30,10 @@ class FaultsController extends Controller
             ])
             ->allowedFilters([
                 'id',
-                'device_id',
                 'code',
                 'message',
-                AllowedFilter::scope('created_after')
+                AllowedFilter::partial('device_id', 'device.serial_number'),
+                AllowedFilter::scope('created_after'),
             ]);
         return $query->paginate($request->per_page ?: 25);
     }
