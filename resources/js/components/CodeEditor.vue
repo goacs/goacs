@@ -39,13 +39,17 @@
     },
     mounted() {
       window.Prism.plugins.customClass.map({ number: "prism-number", tag: "prism-tag" });
-      this.code = this.value
+      this.$nextTick(function() {
+        this.code = this.value
+      })
     },
     watch: {
-
       code(val) {
         this.$emit('input', val);
       },
+      value(val) {
+        this.code = val;
+      }
     },
   }
 </script>
