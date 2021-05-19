@@ -18,7 +18,7 @@ class DashboardController extends Controller
         return response()->json([
            'devices_count' => Device::count(),
            'informs_count' => Device::updatedLast24Hours()->count(),
-           'faults_count' => Log::last24Hours()->count(),
+           'faults_count' => Log::fault()->last24Hours()->count(),
            'faults' => [],
         ]);
     }
