@@ -109,11 +109,16 @@ class XMLParser
     }
 
     private function extractRequestId() {
-        foreach($this->header->childNodes as $child) {
-            if($child instanceof \DOMElement && $child->localName === 'ID') {
-                $this->requestId = $child->firstChild->nodeValue;
-                return;
+        if($this->header !== null) {
+            foreach ($this->header->childNodes as $child) {
+                if ($child instanceof \DOMElement && $child->localName === 'ID') {
+                    $this->requestId = $child->firstChild->nodeValue;
+                    return;
+                }
             }
+        } else {
+            //todo: quick workaround for request which not contains header
+            $this->requestId = sha1(microtime());
         }
     }
 
