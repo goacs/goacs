@@ -105,7 +105,7 @@ class DeviceParameter extends Model implements ParameterInterface
             $values = collect();
             /** @var ParameterValueStruct $item */
             foreach ($chunk as $item) {
-                $data = collect([
+                $data = [
                     'device_id' => $device->id,
                     'name' => $item->name,
                     'value' => $item->value,
@@ -113,17 +113,12 @@ class DeviceParameter extends Model implements ParameterInterface
                     'flags' => $item->flag->toJson(),
                     'created_at' => now(),
                     'updated_at' => now(),
-                ]);
+                ];
 
-                $data = $data->map(fn($item) => "'{$item}'");
-                $values[] = '('.$data->join(',').')';
+                $values[] = $data;
+
             }
-            $values = $values->join(',');
-
-            $query = "INSERT INTO device_parameters(device_id, name, value, type, flags, created_at, updated_at) VALUES {$values}
-                    ON DUPLICATE KEY UPDATE name=values(name), value=values(value), type=values(type), flags=values(flags), updated_at=values(updated_at)";
-
-            \DB::statement($query);
+            static::upsert($values->toArray(), ['device_id', 'name'], ['name', 'value', 'type', 'flags', 'updated_at']);
         }
     }
 }

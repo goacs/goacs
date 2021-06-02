@@ -43,6 +43,8 @@ class ControllerLogic
 {
     const GET_PARAMETER_VALUES_CHUNK_SIZE = 4;
 
+    const SET_PARAMETER_VALUES_CHUNK_SIZE = 10;
+
     /**
      * @var Context
      */
@@ -504,7 +506,7 @@ class ControllerLogic
 
         dump("Diff params to set", $diffParameters);
 
-        foreach($diffParameters->chunk(10) as $chunk) {
+        foreach($diffParameters->chunk(self::SET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
             $task = new Task(Types::SetParameterValues);
             $task->setPayload(['parameters' => $chunk]);
             $this->context->tasks->addTask($task);
