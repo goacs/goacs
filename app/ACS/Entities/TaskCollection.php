@@ -30,6 +30,17 @@ class TaskCollection extends Collection
         $this->push($task);
     }
 
+    public function addTaskBeforeTask(Task $task, string $before) {
+        $index = $this->search(fn(Task $othTask) => $othTask->name === $before && $othTask->done_at === null);
+
+        if($index !== false) {
+            $this->splice($index, 0 ,[$task]);
+            return;
+        }
+
+        $this->add($task);
+    }
+
     public function nextTask(): ?Task {
         return $this->filter(fn(Task $task) => $task->done_at === null)->first();
     }

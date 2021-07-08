@@ -173,7 +173,9 @@ class ControllerLogic
         }
 
         if($task->isOnRequest($this->context->bodyType) === false) {
-            return;
+            $this->context->tasks->add(clone $task);
+            $task->done();
+            $this->runTasks();
         }
 
 
