@@ -19,6 +19,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.2",
         "laravie/parser": "^2.1",
+        "league/flysystem": "1.1.4",
         "spatie/laravel-query-builder": "^3.3",
         "swooletw/laravel-swoole": "dev-improvement/php8",
         "symfony/dom-crawler": "^5.2",
