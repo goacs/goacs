@@ -29,6 +29,8 @@ RUN docker-php-ext-install \
     pdo_mysql
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+ADD https://github.com/moparisthebest/static-curl/releases/download/v7.77.0/curl-amd64 /usr/local/bin/curl
+RUN chmod +x /usr/local/bin/curl
 
 RUN mkdir -p /var/log/supervisor && \
         rm -rf /var/lib/apt/lists/* $HOME/.composer/*-old.phar /usr/bin/qemu-*-static
