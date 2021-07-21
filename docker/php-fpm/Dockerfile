@@ -16,8 +16,9 @@ RUN apt-get update && \
             supervisor                 \
             unzip                      \
             zlib1g-dev                 \
-            nodejs                       \
+            nodejs                     \
             npm                        \
+            httpie                     \
             --no-install-recommends
 
 RUN pecl install swoole redis

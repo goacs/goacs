@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Device;
 
 
 use App\ACS\Context;
+use App\ACS\Kick;
 use App\ACS\Types;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Device\DeviceAddObjectRequest;
@@ -15,6 +16,7 @@ use App\Models\Setting;
 use App\Models\Task;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -72,28 +74,18 @@ class DeviceController extends Controller
     }
 
     public function kick(Device $device) {
-        $client = new Client();
-
         if($device->connection_request_password !== null && $device->connection_request_password !== '') {
             $auth = [$device->connection_request_user, $device->connection_request_password];
         } else {
             $auth = [Setting::getValue('connection_request_username'), Setting::getValue('connection_request_password')];
         }
 
-        try {
-            $response = $client->get($device->connection_request_url, ['auth' => $auth]);
+        $kickService = new Kick($device->connection_request_url, $auth[0], $auth[1]);
 
-            if (in_array($response->getStatusCode(), [200, 201])) {
-                return new JsonResource([]);
-            }
-        } catch (ClientException $exception) {
-            $auth[] = 'digest';
-            $response = $client->get($device->connection_request_url, ['auth' => $auth]);
-
-            if (in_array($response->getStatusCode(), [200, 201])) {
-                return new JsonResource([]);
-            }
+        if($kickService->kick()) {
+            return new JsonResponse([]);
         }
+
         return response()->json(['error' => 'Kick failed'], 503);
     }
 
