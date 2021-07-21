@@ -16,17 +16,23 @@ RUN apt-get update && \
             supervisor                 \
             unzip                      \
             zlib1g-dev                 \
+            nodejs                       \
+            npm                        \
             --no-install-recommends
 
 RUN pecl install swoole redis
 
-RUN docker-php-ext-enable swoole
-RUN docker-php-ext-enable redis
+RUN npm install chokidar
 
 RUN docker-php-ext-install \
     pdo \
     pdo_pgsql \
+    pcntl \
     pdo_mysql
+
+RUN docker-php-ext-enable swoole
+RUN docker-php-ext-enable redis
+RUN docker-php-ext-enable pcntl
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 ADD https://github.com/moparisthebest/static-curl/releases/download/v7.77.0/curl-amd64 /usr/local/bin/curl
