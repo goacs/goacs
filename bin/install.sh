@@ -8,4 +8,4 @@ docker-compose exec acs php artisan jwt:secret --force
 docker-compose exec acs php artisan migrate:install
 docker-compose exec acs php artisan migrate
 docker-compose exec acs php artisan db:seed
-docker-compose exec acs supervisorctl restart goacs
+docker-compose exec acs supervisorctl restart server
