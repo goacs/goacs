@@ -8,6 +8,7 @@ use App\ACS\Context;
 use App\ACS\Response\FaultResponse;
 use App\ACS\Types;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -46,6 +47,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Log extends Model
 {
+    use MassPrunable;
+
     protected $table = 'logs';
 
     protected $fillable = ['from', 'type', 'full_xml', 'code', 'message', 'detail'];
@@ -109,5 +112,10 @@ class Log extends Model
 
     public function scopeCreatedAfter(Builder $query, $date): Builder {
         return $query->where('created_at', '>=', $date);
+    }
+
+    public function prunable()
+    {
+        return static::where('created_at', '<=', now()->subDay());
     }
 }
