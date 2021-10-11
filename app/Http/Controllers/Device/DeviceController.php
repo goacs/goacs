@@ -35,6 +35,8 @@ class DeviceController extends Controller
                 'id',
                 'serial_number',
                 'serial_alt',
+                'software_version',
+                'product_class',
                 AllowedFilter::scope('created_after')
             ]);
         return $query->paginate($request->per_page ?: 25);
