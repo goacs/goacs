@@ -11,7 +11,9 @@
                 :autoload="false"
                 ref="table"
                 :fields="fields"
-        >
+                :columnFilter='{ external: true, lazy: true }'
+
+      >
 
 
         <template #size="{item}">
@@ -69,6 +71,7 @@
                 {
                   label: 'Size',
                   key: 'size',
+                  filter: false,
                 },
                 {
                   label: 'Upload date',

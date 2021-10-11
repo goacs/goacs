@@ -25,32 +25,17 @@
         <td>{{ item.created_at | moment }}</td>
       </template>
     </PaginatedTable>
-    <CModal
-      title="Fault details"
-      size="lg"
-      color="dark"
-      centered
-      :show.sync="details.dialog"
-    >
-      <json-tree :data="details.json"></json-tree>
-
-      <CTextarea
-        class="mt-3"
-        label="Data"
-        rows="20"
-        v-model="details.xml"
-      >
-      </CTextarea>
-    </CModal>
+    <LogDetails v-model="details.dialog" :details="details"></LogDetails>
   </CModal>
 </template>
 
 <script>
 import PaginatedTable from "../../../components/PaginatedTable";
 import {mapGetters} from "vuex";
+import LogDetails from "../../../components/LogDetails";
 export default {
   name: "LogsModal",
-  components: {PaginatedTable},
+  components: {LogDetails, PaginatedTable},
   props: {
     value: {
       type: Boolean,

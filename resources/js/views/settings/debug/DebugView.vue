@@ -32,7 +32,7 @@
                   <label>Enabled Devices</label>
                   <div class="form-control-plaintext">
                     <CListGroup>
-                      <CListGroupItem v-for="(device, idx) in debug.devices" class="d-flex justify-content-between align-items-center">
+                      <CListGroupItem v-for="(device, idx) in debug.devices" :key="device.id" class="d-flex justify-content-between align-items-center">
                         <router-link :to="{name: 'devices-view', params: {id: device.id}}">{{ device.serial_number }}</router-link>
                         <CButton
                           size="sm"

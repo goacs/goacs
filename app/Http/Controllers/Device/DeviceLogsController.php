@@ -34,6 +34,8 @@ class DeviceLogsController extends Controller
             ->allowedFilters([
                 'code',
                 'message',
+                'type',
+                'from',
                 AllowedFilter::scope('created_after')
             ]);
         return $query->paginate($request->per_page ?: 25);
