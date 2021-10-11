@@ -68,6 +68,10 @@ class Device extends Model
         'connection_request_url', 'connection_request_user', 'connection_request_password',
         'updated_at', 'product_class', 'debug'];
 
+    protected $casts = [
+        'debug' => 'boolean'
+    ];
+
     /**
      * @return HasMany|DeviceParameter
      */

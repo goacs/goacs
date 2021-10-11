@@ -79,23 +79,17 @@ class Log extends Model
     public static function logConversation(Device $device, string $from, string $type, string $xml, array $detail = []) {
         $enabled = boolval(Setting::getValue('conversation_log'));
 
-        if($enabled === false) {
-            return;
+        if($enabled && $device->debug === true) {
+            $log = new static();
+            $log->device_id = $device->id;
+            $log->full_xml = $xml;
+            $log->code = $type;
+            $log->message = $type;
+            $log->detail = $detail;
+            $log->type = $type;
+            $log->from = $from;
+            $log->save();
         }
-
-        if($device->debug === false) {
-            return;
-        }
-
-        $log = new static();
-        $log->device_id = $device->id;
-        $log->full_xml = $xml;
-        $log->code = $type;
-        $log->message = $type;
-        $log->detail = $detail;
-        $log->type = $type;
-        $log->from = $from;
-        $log->save();
     }
 
     public function scopeFault(Builder $query): Builder {
