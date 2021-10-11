@@ -69,6 +69,7 @@
           {
             key: 'parameters_count',
             label: 'Parameters count',
+            filter: false,
           },
           {
             key: 'updated_at',

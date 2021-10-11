@@ -10,6 +10,7 @@ use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Response;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class FileController extends Controller
 {
@@ -21,8 +22,12 @@ class FileController extends Controller
     }
 
     public function index(Request $request) {
-        $query = File::query();
-        $this->prepareFilter($request, $query);
+        $query = QueryBuilder::for(File::class)
+            ->allowedFilters([
+                'name',
+                'type',
+                'created_at',
+            ]);
         return $query->paginate(25);
     }
 

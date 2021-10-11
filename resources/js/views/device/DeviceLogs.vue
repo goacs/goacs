@@ -27,15 +27,7 @@
         </tr>
         </tbody>
       </table>
-      <CModal
-        title="Fault details"
-        size="lg"
-        color="dark"
-        centered
-        :show.sync="details.dialog"
-      >
-        <json-tree :data="details.json"></json-tree>
-      </CModal>
+      <LogDetails v-model="details.dialog" :details="details"></LogDetails>
     </CCardBody>
     <LogsModal v-if="device" v-model="modalDialog"></LogsModal>
   </CCard>
@@ -44,10 +36,11 @@
 <script>
   import {mapGetters} from "vuex";
   import LogsModal from "./logs/LogsModal";
+  import LogDetails from "../../components/LogDetails";
 
   export default {
     name: "DeviceLogs",
-    components: {LogsModal},
+    components: {LogDetails, LogsModal},
     data() {
       return {
         lastFaults: [],
@@ -66,6 +59,7 @@
     methods: {
       showDetails(fault) {
         this.details.json = fault.detail;
+        this.details.xml = fault.full_xml;
         this.details.dialog = true;
       },
       async loadLastFaults() {

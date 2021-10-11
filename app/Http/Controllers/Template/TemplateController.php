@@ -10,6 +10,7 @@ use App\Http\Resource\Template\TemplateResource;
 use App\Models\Template;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class TemplateController extends Controller
 {
@@ -19,8 +20,13 @@ class TemplateController extends Controller
     }
 
     public function index(Request $request) {
-        $query = Template::withCount('parameters');
-        $this->prepareFilter($request, $query);
+        $query = QueryBuilder::for(Template::class)
+            ->withCount('parameters')
+            ->allowedFilters([
+                'name',
+                'parameters_count',
+                'updated_at'
+            ]);
         return $query->paginate(25);
     }
 
