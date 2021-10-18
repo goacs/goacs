@@ -92,7 +92,11 @@ class Device extends Model
     }
 
     public function scopeCreatedAfter(Builder $query, $date) {
-        return $query->where('created_at', '>=', $date);
+        if(! $date instanceof Carbon) {
+            $date = new Carbon($date);
+        }
+
+        return $query->where('created_at', '>=', $date->addMinutes(2));
     }
 
     public function getTemplatesParameters() {
