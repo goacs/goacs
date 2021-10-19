@@ -72,7 +72,7 @@ class GetParameterValuesResponseProcessor extends Processor
                 //TODO: Task Runner
                 //$this->runTasks();
 
-                (new SetParametersValueRequestProcessor($this->context))();
+                (new SetParameterValuesRequestProcessor($this->context))();
             }
         }
     }

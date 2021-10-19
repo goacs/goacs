@@ -12,11 +12,17 @@ use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Task;
 use App\ACS\Events\ParameterLookupDone;
+use App\ACS\Logic\Processors\AddObjectResponseProcessor;
+use App\ACS\Logic\Processors\DeleteObjectResponseProcessor;
+use App\ACS\Logic\Processors\DownloadResponseProcessor;
 use App\ACS\Logic\Processors\EmptyResponseProcessor;
+use App\ACS\Logic\Processors\FaultResponseProcessor;
 use App\ACS\Logic\Processors\GetParameterNamesResponseProcessor;
 use App\ACS\Logic\Processors\GetParameterValuesResponseProcessor;
 use App\ACS\Logic\Processors\GetRPCMethodsRequestProcessor;
 use App\ACS\Logic\Processors\InformRequestProcessor;
+use App\ACS\Logic\Processors\SetParameterValuesResponseProcessor;
+use App\ACS\Logic\Processors\TransferCompleteProcessor;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
 use App\ACS\Request\AddObjectRequest;
@@ -88,27 +94,27 @@ class ControllerLogic
                 break;
 
             case Types::SetParameterValuesResponse:
-                $this->processSetParameterValuesResponse();
+                (new SetParameterValuesResponseProcessor($this->context))();
                 break;
 
             case Types::AddObjectResponse:
-                $this->processAddObjectResponse();
+                (new AddObjectResponseProcessor($this->context))();
                 break;
 
             case Types::DeleteObjectResponse:
-                $this->processDeleteObjectResponse();
+                (new DeleteObjectResponseProcessor($this->context))();
                 break;
 
             case Types::DownloadResponse:
-                $this->processDownloadResponse();
+                (new DownloadResponseProcessor($this->context))();
                 break;
 
             case Types::TransferComplete:
-                $this->processTransferCompleteRequest();
+                (new TransferCompleteProcessor($this->context))();
                 break;
 
             case Types::FaultResponse:
-                $this->processFault();
+                (new FaultResponseProcessor($this->context))();
                 break;
 
         }
@@ -248,54 +254,6 @@ class ControllerLogic
 
     }
 
-
-
-    private function processAddObjectResponse()
-    {
-        $prevTask = $this->context->tasks->prevTask();
-        if($prevTask->name !== Types::AddObject) {
-            \Log::error('AddObjectResponse out of order!', ['context' => $this->context]);
-            return;
-        }
-        /** @var AddObjectResponse $addObjectResponse */
-        $addObjectResponse = $this->context->cpeResponse;
-        $path = $prevTask->payload['parameter'];
-        $gpvTask = new Task(Types::GetParameterValues);
-
-        $gpvTask->setPayload(
-            [
-                'parameters' => new Collection([
-                    (new ParameterInfoStruct())->name => $path.".".$addObjectResponse->getInstanceNumber()."."
-                ]),
-            ]
-        );
-
-        //TODO Add to task list...
-
-    }
-
-    private function processDeleteObjectResponse()
-    {
-        $prevTask = $this->context->tasks->prevTask();
-        if($prevTask->name !== Types::DeleteObject) {
-            \Log::error('DeleteObjectResponse out of order!', ['context' => $this->context]);
-            return;
-        }
-        $path = $prevTask->payload['parameter'];
-        $this->context->deviceModel->parameters()->pathset($path)->delete();
-    }
-
-    private function processDownloadResponse()
-    {
-//        /** @var DownloadResponse $downloadResponse */
-//        $downloadResponse = $this->context->cpeResponse;
-    }
-
-    private function processTransferCompleteRequest()
-    {
-        $this->context->acsResponse = new TransferCompleteResponse($this->context);
-    }
-
     private function endSession()
     {
         $root = $this->context->device->root;
@@ -322,42 +280,6 @@ class ControllerLogic
         foreach ($tasks as $task) {
             $this->context->tasks->addTask($task->toACSTask());
             $task->delete();
-        }
-    }
-
-
-
-    private function loadGlobalTasks(string $on_request)
-    {
-        $tasks = \App\Models\Task::where([
-            'for_type' => \App\Models\Task::TYPE_GLOBAL,
-            'on_request' => $on_request
-        ])->get();
-
-        foreach ($tasks as $task) {
-            $this->context->tasks->addTask($task->toACSTask());
-            if($task->infinite === false) {
-                $task->delete();
-            }
-        }
-    }
-
-    private function processFault()
-    {
-        /** @var FaultResponse $response */
-        $response = $this->context->cpeResponse;
-        Log::fromFaultResponse($this->context->deviceModel, $response);
-    }
-
-    private function processSetParameterValuesResponse()
-    {
-        $prevTask = $this->context->tasks->prevTask();
-        if($prevTask !== null && $prevTask->name === Types::SetParameterValues) {
-            $parameters = $prevTask->payload['parameters'];
-            /** @var ParameterValueStruct $parameter */
-            foreach ($parameters as $parameter) {
-                $this->context->parameterValues->put($parameter->name, $parameter);
-            }
         }
     }
 

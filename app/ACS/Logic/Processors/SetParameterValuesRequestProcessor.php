@@ -13,7 +13,7 @@ use App\ACS\Types;
 use App\Models\DeviceParameter;
 use App\Models\Setting;
 
-class SetParametersValueRequestProcessor extends Processor
+class SetParameterValuesRequestProcessor extends Processor
 {
     const SET_PARAMETER_VALUES_CHUNK_SIZE = 10;
 
