@@ -42,5 +42,6 @@ RUN chmod +x /usr/local/bin/curl
 RUN mkdir -p /var/log/supervisor && \
         rm -rf /var/lib/apt/lists/* $HOME/.composer/*-old.phar /usr/bin/qemu-*-static
 
+RUN composer install --no-dev
 
 CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
