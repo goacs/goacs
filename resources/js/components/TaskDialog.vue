@@ -111,6 +111,10 @@
           {
             value: 'Reboot',
             label: 'Reboot',
+          },
+          {
+            value: 'ResetFactory',
+            label: 'ResetFactory',
           }
         ],
         requests: [
@@ -125,6 +129,10 @@
           {
             value: 'GetParameterValuesResponse',
             label: 'GetParameterValuesResponse',
+          },
+          {
+            value: 'TransferComplete',
+            label: 'TransferComplete'
           }
         ],
       };

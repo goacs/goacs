@@ -28,6 +28,11 @@ class Types
     const FaultResponse = 'Fault';
     const TransferComplete = 'TransferComplete';
     const TransferCompleteResponse = 'TransferCompleteResponse';
+    const Reboot = 'Reboot';
+    const RebootResponse = 'RebootResponse';
+    const FactoryReset = 'FactoryReset';
+    const FactoryResetResponse = 'FactoryResetResponse';
+
 
     const RunScript = 'RunScript';
 

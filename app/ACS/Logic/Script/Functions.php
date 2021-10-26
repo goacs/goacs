@@ -86,4 +86,14 @@ class Functions
         ];
         $task->save();
     }
+
+    public function reboot() {
+        $task = new Task(Types::Reboot);
+        $this->context->tasks->addTask($task);
+    }
+
+    public function factoryReset() {
+        $task = new Task(Types::FactoryReset);
+        $this->context->tasks->addTask($task);
+    }
 }

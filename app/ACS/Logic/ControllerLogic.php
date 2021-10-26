@@ -28,9 +28,11 @@ use App\ACS\Logic\Script\SandboxException;
 use App\ACS\Request\AddObjectRequest;
 use App\ACS\Request\DeleteObjectRequest;
 use App\ACS\Request\DownloadRequest;
+use App\ACS\Request\FactoryResetRequest;
 use App\ACS\Request\GetParameterNamesRequest;
 use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
+use App\ACS\Request\RebootRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Response\AddObjectResponse;
 use App\ACS\Response\DownloadResponse;
@@ -111,6 +113,10 @@ class ControllerLogic
 
             case Types::TransferComplete:
                 (new TransferCompleteProcessor($this->context))();
+                break;
+
+            case Types::FactoryResetResponse:
+            case Types::RebootResponse:
                 break;
 
             case Types::FaultResponse:
@@ -229,6 +235,16 @@ class ControllerLogic
             case Types::TransferCompleteResponse:
                 $response = new TransferCompleteResponse($this->context);
                 $this->context->acsResponse = $response;
+                break;
+
+            case Types::Reboot:
+                $request = new RebootRequest($this->context);
+                $this->context->acsRequest = $request;
+                break;
+
+            case Types::FactoryReset:
+                $request = new FactoryResetRequest($this->context);
+                $this->context->acsRequest = $request;
                 break;
 
             case Types::RunScript:
