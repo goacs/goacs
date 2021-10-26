@@ -39,6 +39,11 @@ class Context
     const LOOKUP_PARAMS_ENABLED_PREFIX = 'LOOKUP_ENABLED_';
     const PROVISION_PREFIX = 'PROVISION_';
 
+
+    const PROVISIONING_STATE_NEW = 0;
+    const PROVISIONING_STATE_PROCESSING = 1;
+    const PROVISIONING_STATE_ERROR = 9;
+
     /**
      * @var Request
      */
@@ -79,6 +84,8 @@ class Context
     public bool $newSession = true;
 
     public string $requestId = '';
+
+    public int $provisioningCurrentState = 0;
 
     public function __construct(Request $request, Response $response)
     {
@@ -170,12 +177,15 @@ class Context
     {
         return $response
             ->header('Content-Type', 'text/xml')
-            //->header('Connection', 'Keep-alive')
+            ->header('SOAPServer', 'GoACS')
+            ->header('Server', 'GoACS')
+            ->header('Content-Type', 'text/xml; encoding="utf-8"')
             ;
     }
 
     public function loadFromSession()
     {
+        $this->provisioningCurrentState = $this->session()->get('provisioningCurrentState', 0);
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
@@ -190,7 +200,7 @@ class Context
     }
 
     public function storeToSession() {
-        \Cache::put("SESSID_".$this->device->serialNumber, $this->session()->getId(),(5*60));
+        $this->session()->put('provisioningCurrentState', $this->provisioningCurrentState);
         $this->session()->put('device', $this->device);
         $this->session()->put('parameterNames', $this->parameterInfos);
         $this->session()->put('parameterValues', $this->parameterValues);
@@ -204,6 +214,8 @@ class Context
     }
 
     public function flushSession() {
+        dump('flushing session '."SESSID_".$this->device->serialNumber);
+        \Cache::forget("SESSID_".$this->device->serialNumber);
         $this->session()->flush();
     }
 

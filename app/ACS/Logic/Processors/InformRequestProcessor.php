@@ -6,10 +6,13 @@ declare(strict_types=1);
 namespace App\ACS\Logic\Processors;
 
 
+use App\ACS\Context;
 use App\ACS\Entities\Task;
 use App\ACS\Request\InformRequest;
+use App\ACS\Response\ErrorResponse;
 use App\ACS\Types;
 use App\Models\Device;
+use App\Models\Log;
 
 class InformRequestProcessor extends Processor
 {
@@ -25,6 +28,17 @@ class InformRequestProcessor extends Processor
         }
 
         $this->updateDeviceData();
+
+        if($this->sessionExists()) {
+            $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_ERROR;
+            $this->context->acsResponse = new ErrorResponse($this->context, 'Session DUP');
+            Log::logError($this->context->deviceModel,  'Session DUP', '100400', [
+                'faultString' => 'SESSION ID: '. \Cache::get("SESSID_".$this->context->device->serialNumber)
+            ]);
+            return;
+        }
+
+        \Cache::put("SESSID_".$this->context->device->serialNumber, $this->context->session()->getId(),(5*60));
 
         $task = new Task(Types::INFORMResponse);
         $this->context->tasks->addTask($task);
@@ -47,5 +61,9 @@ class InformRequestProcessor extends Processor
 
         $this->context->new = $this->context->deviceModel->wasRecentlyCreated;
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
+    }
+
+    private function sessionExists(): bool {
+        return \Cache::has("SESSID_".$this->context->device->serialNumber);
     }
 }

@@ -162,10 +162,10 @@ return [
     */
 
     'tables' => [
-//        'example:1000' => [
-//            'name' => 'string:1000',
-//            'votes' => 'int',
-//        ],
+        'parameters:100000' => [
+            'name' => 'string:256',
+            'value' => 'string:1000',
+        ],
     ],
 
     /*

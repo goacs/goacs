@@ -14,10 +14,12 @@ abstract class ACSRequest
      * @var Context
      */
     protected Context $context;
+    public string $type;
 
-    public function __construct(Context $context)
+    public function __construct(Context $context, string $type = 'xml')
     {
         $this->context = $context;
+        $this->type = $type;
     }
 
     public abstract function getBody(): string;

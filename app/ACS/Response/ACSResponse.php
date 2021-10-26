@@ -13,11 +13,13 @@ abstract class ACSResponse
     /**
      * @var Context
      */
-    private Context $context;
+    protected Context $context;
+    public string $type;
 
-    public function __construct(Context $context)
+    public function __construct(Context $context, string $type = 'xml')
     {
         $this->context = $context;
+        $this->type = $type;
     }
 
     abstract public function getBody(): string;

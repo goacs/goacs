@@ -125,18 +125,20 @@ class ControllerLogic
             (string) $this->context->request->getContent(),
         );
 
-        $this->runTasks();
+        if($this->context->provisioningCurrentState !== Context::PROVISIONING_STATE_ERROR) {
+            $this->runTasks();
+        }
 
         if($this->context->cpeRequest !== null) {
+            if($this->context->acsResponse->type === 'text') {
+                $body = $this->context->acsResponse->getBody();
+            } else {
+                $body = XMLParser::normalize($this->context->acsResponse->getBody());
+            }
+
             $this->context
                 ->response
-                ->setContent(
-                    XMLParser::normalize($this->context->acsResponse->getBody())
-                )
-                ->header('SOAPServer', 'GoACS')
-                ->header('Server', 'GoACS')
-                ->header('Content-Type', 'text/xml; encoding="utf-8"')
-            //    ->send()
+                ->setContent($body)
             ;
 
             Log::logConversation($this->context->deviceModel,
@@ -146,15 +148,15 @@ class ControllerLogic
             );
 
         } else if($this->context->acsRequest !== null) {
+            if($this->context->acsRequest->type === 'text') {
+                $body = $this->context->acsRequest->getBody();
+            } else {
+                $body = XMLParser::normalize($this->context->acsRequest->getBody());
+            }
+
             $this->context
                 ->response
-                ->setContent(
-                    XMLParser::normalize($this->context->acsRequest->getBody())
-                )
-                ->header('SOAPServer', 'GoACS')
-                ->header('Server', 'GoACS')
-                ->header('Content-Type', 'text/xml; encoding="utf-8"')
-            //    ->send()
+                ->setContent($body)
             ;
 
             Log::logConversation($this->context->deviceModel,
