@@ -42,6 +42,7 @@ class Context
 
     const PROVISIONING_STATE_NEW = 0;
     const PROVISIONING_STATE_PROCESSING = 1;
+    const PROVISIONING_STATE_READPARAMS = 2;
     const PROVISIONING_STATE_ERROR = 9;
 
     /**

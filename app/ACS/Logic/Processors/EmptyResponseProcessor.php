@@ -16,6 +16,10 @@ class EmptyResponseProcessor extends Processor
     {
         $this->loadGlobalTasks(Types::EMPTY);
 
+        if($this->context->tasks->nextTask() !== null) {
+            return;
+        }
+
         if($this->context->new === true || $this->context->provision === true || $this->context->lookupParameters) {
             $task = new Task(Types::GetParameterNames);
             $task->setPayload([
