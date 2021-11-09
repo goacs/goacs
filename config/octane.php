@@ -217,4 +217,14 @@ return [
 
     'max_execution_time' => 30,
 
+    //Swoole hacks :))
+    'swoole' => [
+        'options' => [
+            'package_max_length' => 50 * 1024 * 1024,
+            // The data to send can't be larger than buffer_output_size.
+            'buffer_output_size' => 10 * 1024 * 1024,
+        ],
+    ],
+
+
 ];
