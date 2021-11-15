@@ -40,7 +40,7 @@ class Context
     const PROVISION_PREFIX = 'PROVISION_';
 
 
-    const PROVISIONING_STATE_NEW = 0;
+    const PROVISIONING_STATE_INFORM = 0;
     const PROVISIONING_STATE_PROCESSING = 1;
     const PROVISIONING_STATE_READPARAMS = 2;
     const PROVISIONING_STATE_ERROR = 9;
@@ -125,9 +125,14 @@ class Context
                 $this->cpeRequest = new InformRequest($parser->body);
                 $this->device = $this->cpeRequest->device;
                 $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX.$this->device->serialNumber, false);
-                $this->provision = \Cache::get(self::PROVISION_PREFIX.$this->device->serialNumber, false);
-                if($this->cpeRequest->hasEvent(0) || $this->cpeRequest->hasEvent(1)) {
-                    $this->provision = true;
+                $this->provisioningCurrentState = self::PROVISIONING_STATE_INFORM;
+
+                if(
+                    $this->cpeRequest->hasEvent(0) ||
+                    $this->cpeRequest->hasEvent(1) ||
+                    \Cache::get(self::PROVISION_PREFIX.$this->device->serialNumber, false)
+                ) {
+                    $this->provisioningCurrentState = self::PROVISIONING_STATE_READPARAMS;
                 }
                 break;
 

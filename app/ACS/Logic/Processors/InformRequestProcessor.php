@@ -43,6 +43,11 @@ class InformRequestProcessor extends Processor
         $task = new Task(Types::INFORMResponse);
         $this->context->tasks->addTask($task);
         $this->loadGlobalTasks(Types::INFORM);
+
+        if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_INFORM && $this->context->new === true) {
+            $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_READPARAMS;
+        }
+
     }
 
     private function updateDeviceData(): void {
@@ -60,7 +65,6 @@ class InformRequestProcessor extends Processor
         );
 
         $this->context->new = $this->context->deviceModel->wasRecentlyCreated;
-        $this->context->provisioningCurrentState = $this->context->new === true ? Context::PROVISIONING_STATE_NEW : Context::PROVISIONING_STATE_READPARAMS;
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
     }
 
