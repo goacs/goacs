@@ -48,4 +48,12 @@ class TaskCollection extends Collection
     public function prevTask(): ?Task {
         return $this->filter(fn(Task $task) => $task->done_at !== null)->last();
     }
+
+    public function hasTasksToRun(): bool {
+        return $this->filter(fn(Task $task) => $task->done_at !== null)->count() > 0;
+    }
+
+    public function flush() {
+        $this->items  = [];
+    }
 }

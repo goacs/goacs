@@ -57,6 +57,11 @@ export class Task {
         this.name = 'Reboot'
         this.payload = {}
     }
+
+    asFactoryReset() {
+      this.name = 'FactoryReset'
+      this.payload = {}
+    }
 }
 
 export function taskFromObject(obj) {

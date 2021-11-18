@@ -219,6 +219,26 @@ class Context
         ]);
     }
 
+    public function endSession()
+    {
+        $root = $this->device->root;
+        if($param = $this->parameterValues->get($root.'DeviceInfo.ProductClass')?->value) {
+            $this->deviceModel->product_class = $param;
+        }
+
+        if($param = $this->parameterValues->get($root.'DeviceInfo.SoftwareVersion')?->value) {
+            $this->deviceModel->software_version = $param;
+        }
+
+        if($param = $this->parameterValues->get($root.'DeviceInfo.HardwareVersion')?->value) {
+            $this->deviceModel->hardware_version = $param;
+        }
+
+        $this->deviceModel->save();
+        $this->flushSession();
+    }
+
+
     public function flushSession() {
         dump('flushing session '."SESSID_".$this->device->serialNumber);
         \Cache::forget("SESSID_".$this->device->serialNumber);

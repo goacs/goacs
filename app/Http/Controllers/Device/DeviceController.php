@@ -77,6 +77,7 @@ class DeviceController extends Controller
     }
 
     public function kick(Device $device) {
+        \Cache::forget("SESSID_".$device->serial_number);
         if($device->connection_request_password !== null && $device->connection_request_password !== '') {
             $auth = [$device->connection_request_user, $device->connection_request_password];
         } else {

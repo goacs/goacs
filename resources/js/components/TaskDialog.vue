@@ -113,8 +113,8 @@
             label: 'Reboot',
           },
           {
-            value: 'ResetFactory',
-            label: 'ResetFactory',
+            value: 'FactoryReset',
+            label: 'FactoryReset',
           }
         ],
         requests: [
@@ -154,6 +154,8 @@
           this.newtask.asDeleteObjectTask(this.path)
         } else if(this.name === 'Reboot') {
           this.newtask.asReboot()
+        } else if(this.name === 'FactoryReset') {
+          this.newtask.asFactoryReset();
         }
       },
       unserializeTask() {

@@ -11,6 +11,7 @@ use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Task;
 use App\ACS\Events\ParameterLookupDone;
 use App\ACS\Logic\DeviceParametersLogic;
+use App\ACS\Logic\TaskRunner;
 use App\ACS\Types;
 use App\Models\DeviceParameter;
 use App\Models\Setting;
@@ -60,7 +61,7 @@ class GetParameterValuesResponseProcessor extends Processor
                 $this->dispatcher->dispatch(new ParameterLookupDone($this->context->deviceModel, $this->context->parameterValues));
             }
 
-            if($this->context->provision === true || $this->context->new === true) {
+//            if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_PROCESSING) {
                 $root = $this->context->device->root;
                 $settingsUsername = Setting::getValue('connection_request_username');
                 $settingsPassword = Setting::getValue('connection_request_password');
@@ -69,11 +70,11 @@ class GetParameterValuesResponseProcessor extends Processor
 
                 $this->loadGlobalTasks(Types::GetParameterValuesResponse);
 
-                //TODO: Task Runner
-                //$this->runTasks();
+                $taskRunner = new TaskRunner($this->context);
+                $taskRunner->run();
 
                 (new SetParameterValuesRequestProcessor($this->context))();
-            }
+//            }
         }
     }
 

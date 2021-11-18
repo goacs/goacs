@@ -173,140 +173,18 @@ class ControllerLogic
         }
 
         $this->context->storeToSession();
+
+        if($this->context->tasks->hasTasksToRun() === false) {
+            $this->context->endSession();
+        }
+
         return $this->context->response;
     }
 
     private function runTasks()
     {
-        $this->loadDeviceTasks();
-        /** @var Task $task */
-        $task = $this->context->tasks->nextTask();
-        if($task === null) {
-            $this->endSession();
-            return;
-        }
-
-        if($task->isOnRequest($this->context->bodyType) === false) {
-            $this->context->tasks->add(clone $task);
-            $task->done();
-            $this->runTasks();
-        }
-
-
-        switch ($task->name) {
-            case Types::INFORMResponse:
-                $acsResponse = (new InformResponse($this->context));
-                $this->context->acsResponse = $acsResponse;
-                break;
-
-            case Types::GetParameterNames:
-                $acsRequest = (new GetParameterNamesRequest($this->context, $task->payload['parameter']));
-                $this->context->acsRequest = $acsRequest;
-                break;
-
-
-            case Types::GetParameterValues:
-                $request = new GetParameterValuesRequest($this->context);
-                $request->setParameters($task->payload['parameters']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::SetParameterValues:
-                $request = new SetParameterValuesRequest($this->context, $task->payload['parameters']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::AddObject:
-                $request = new AddObjectRequest($this->context, $task->payload['parameter']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::DeleteObject:
-                $request = new DeleteObjectRequest($this->context, $task->payload['parameter']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::Download:
-                $fileData = $this->getFileData($task->payload['filename']);
-                $request = new DownloadRequest($this->context, $task->payload['filetype'], $fileData['url'], $fileData['size']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::TransferCompleteResponse:
-                $response = new TransferCompleteResponse($this->context);
-                $this->context->acsResponse = $response;
-                break;
-
-            case Types::Reboot:
-                $request = new RebootRequest($this->context);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::FactoryReset:
-                $request = new FactoryResetRequest($this->context);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::RunScript:
-                $sandbox = new Sandbox($this->context, $task->payload['script']);
-                try {
-                    $sandbox->run();
-                    Log::logConversation($this->context->deviceModel,
-                        'acs',
-                        'Run Script',
-                        (string) $task->payload['script'],
-                    );
-                } catch (SandboxException $exception) {
-                    $fault = $this->context->deviceModel->faults()->make();
-                    $fault->full_xml = $exception->getTraceAsString();
-                    $fault->message = $exception->getMessage();
-                    $fault->code = '100020';
-                    $fault->save();
-                }
-                $task->done();
-                $this->runTasks();
-                break;
-        }
-
-        $task->done();
-
-    }
-
-    private function endSession()
-    {
-        $root = $this->context->device->root;
-        if($param = $this->context->parameterValues->get($root.'DeviceInfo.ProductClass')?->value) {
-            $this->context->deviceModel->product_class = $param;
-        }
-
-        if($param = $this->context->parameterValues->get($root.'DeviceInfo.SoftwareVersion')?->value) {
-            $this->context->deviceModel->software_version = $param;
-        }
-
-        if($param = $this->context->parameterValues->get($root.'DeviceInfo.HardwareVersion')?->value) {
-            $this->context->deviceModel->hardware_version = $param;
-        }
-
-        $this->context->deviceModel->save();
-        $this->context->flushSession();
-    }
-
-
-    private function loadDeviceTasks()
-    {
-        $tasks = $this->context->deviceModel->tasks()->get();
-        foreach ($tasks as $task) {
-            $this->context->tasks->addTask($task->toACSTask());
-            $task->delete();
-        }
-    }
-
-    private function getFileData(string $filename): array {
-        $file = File::whereName($filename)->first();
-        return [
-            'url' => \Storage::disk($file->disk)->url($file->filepath),
-            'size' => $file->size,
-        ];
+        $taskRunner = new TaskRunner($this->context);
+        $taskRunner->run();
     }
 
 }
