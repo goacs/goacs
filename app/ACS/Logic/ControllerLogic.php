@@ -36,6 +36,7 @@ use App\ACS\Request\RebootRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Response\AddObjectResponse;
 use App\ACS\Response\DownloadResponse;
+use App\ACS\Response\ErrorResponse;
 use App\ACS\Response\FaultResponse;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Response\GetRPCMethodsACSResponse;
@@ -174,7 +175,8 @@ class ControllerLogic
 
         $this->context->storeToSession();
 
-        if($this->context->tasks->hasTasksToRun() === false) {
+        if($this->context->tasks->hasTasksToRun() === false
+            && ($this->context->acsResponse instanceof ErrorResponse) === false) {
             $this->context->endSession();
         }
 

@@ -27,6 +27,7 @@ use App\ACS\Response\GetParameterValuesResponse;
 use App\ACS\Response\SetParameterValuesResponse;
 use App\ACS\XML\XMLParser;
 use App\Models\Device as DeviceModel;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -115,67 +116,73 @@ class Context
 
     private function processBody()
     {
-        $parser = new XMLParser((string)$this->request->getContent());
-        $this->bodyType = $parser->bodyType;
-        $this->cwmpVersion = $parser->cwmpVersion;
-        $this->requestId = $parser->requestId;
+        try {
+            $parser = new XMLParser((string)$this->request->getContent());
+            $this->bodyType = $parser->bodyType;
+            $this->cwmpVersion = $parser->cwmpVersion;
+            $this->requestId = $parser->requestId;
 
-        switch ($this->bodyType) {
-            case Types::INFORM:
-                $this->cpeRequest = new InformRequest($parser->body);
-                $this->device = $this->cpeRequest->device;
-                $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX.$this->device->serialNumber, false);
-                $this->provisioningCurrentState = self::PROVISIONING_STATE_INFORM;
+            switch ($this->bodyType) {
+                case Types::INFORM:
+                    $this->cpeRequest = new InformRequest($parser->body);
+                    $this->device = $this->cpeRequest->device;
+                    $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX . $this->device->serialNumber, false);
+                    $this->provisioningCurrentState = self::PROVISIONING_STATE_INFORM;
 
-                if(
-                    $this->cpeRequest->hasEvent(0) ||
-                    $this->cpeRequest->hasEvent(1) ||
-                    \Cache::get(self::PROVISION_PREFIX.$this->device->serialNumber, false)
-                ) {
-                    $this->provisioningCurrentState = self::PROVISIONING_STATE_READPARAMS;
-                }
-                break;
+                    if (
+                        $this->cpeRequest->hasEvent(0) ||
+                        $this->cpeRequest->hasEvent(1) ||
+                        \Cache::get(self::PROVISION_PREFIX . $this->device->serialNumber, false)
+                    ) {
+                        $this->provisioningCurrentState = self::PROVISIONING_STATE_READPARAMS;
+                    }
+                    break;
 
-            case Types::GetRPCMethodsRequest:
-                $this->cpeRequest = new GetRPCMethodsCPERequest($parser->body);
-                break;
+                case Types::GetRPCMethodsRequest:
+                    $this->cpeRequest = new GetRPCMethodsCPERequest($parser->body);
+                    break;
 
-            case Types::GetParameterNamesResponse:
-                $this->cpeResponse = new GetParameterNamesResponse($parser->body);
-                $this->parameterInfos = $this->parameterInfos->merge($this->cpeResponse->parameters);
-                $this->parameterValues = $this->parameterValues->merge($this->parameterInfos->toParameterValuesCollecton());
-                break;
+                case Types::GetParameterNamesResponse:
+                    $this->cpeResponse = new GetParameterNamesResponse($parser->body);
+                    $this->parameterInfos = $this->parameterInfos->merge($this->cpeResponse->parameters);
+                    $this->parameterValues = $this->parameterValues->merge($this->parameterInfos->toParameterValuesCollecton());
+                    break;
 
-            case Types::GetParameterValuesResponse:
-                $this->cpeResponse = new GetParameterValuesResponse($parser->body);
-                $this->parameterValues = $this->parameterValues->merge($this->cpeResponse->parameters);
-                $this->parameterValues->assignDefaultFlags($this->parameterInfos);
-                break;
+                case Types::GetParameterValuesResponse:
+                    $this->cpeResponse = new GetParameterValuesResponse($parser->body);
+                    $this->parameterValues = $this->parameterValues->merge($this->cpeResponse->parameters);
+                    $this->parameterValues->assignDefaultFlags($this->parameterInfos);
+                    break;
 
-            case Types::SetParameterValuesResponse:
-                $this->cpeResponse = new SetParameterValuesResponse($parser->body);
-                break;
+                case Types::SetParameterValuesResponse:
+                    $this->cpeResponse = new SetParameterValuesResponse($parser->body);
+                    break;
 
-            case Types::AddObjectResponse:
-                $this->cpeResponse = new AddObjectResponse($parser->body);
-                break;
+                case Types::AddObjectResponse:
+                    $this->cpeResponse = new AddObjectResponse($parser->body);
+                    break;
 
-            case Types::DeleteObjectResponse:
-                $this->cpeResponse = new DeleteObjectResponse($parser->body);
-                break;
+                case Types::DeleteObjectResponse:
+                    $this->cpeResponse = new DeleteObjectResponse($parser->body);
+                    break;
 
-            case Types::DownloadResponse:
-                $this->cpeResponse = new DownloadResponse($parser->body);
-                break;
+                case Types::DownloadResponse:
+                    $this->cpeResponse = new DownloadResponse($parser->body);
+                    break;
 
-            case Types::TransferComplete:
-                $this->cpeRequest = new TransferCompleteRequest($parser->body);
-                break;
+                case Types::TransferComplete:
+                    $this->cpeRequest = new TransferCompleteRequest($parser->body);
+                    break;
 
-            case Types::FaultResponse:
-                $this->cpeResponse = new FaultResponse($parser);
-                break;
+                case Types::FaultResponse:
+                    $this->cpeResponse = new FaultResponse($parser);
+                    break;
 
+            }
+        } catch (\Throwable $throwable) {
+            if($this->deviceModel !== null) {
+                Log::logError($this->deviceModel, $throwable->getMessage()."\n\n".(string) $this->request->getContent());
+            }
         }
     }
 

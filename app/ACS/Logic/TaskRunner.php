@@ -31,6 +31,7 @@ class TaskRunner
 
     public function __construct(Context $context) {
         $this->context = $context;
+        $this->loadDeviceTasks();
         $this->selectNextTask();
     }
 
@@ -39,17 +40,17 @@ class TaskRunner
     }
 
     public function run() {
-//        $taskName = $this->currentTask?->name ?? 'No task to run';
-//        Log::logConversation($this->context->deviceModel, 'acs', 'TaskRunner', $taskName);
+        //dump('all tasks', $this->context->tasks);
+        //$taskName = $this->currentTask?->name ?? 'No task to run';
+        //Log::logConversation($this->context->deviceModel, 'acs', 'TaskRunner', $taskName);
         if($this->currentTask === null) {
             return;
         }
 
-        $this->loadDeviceTasks();
         /** @var Task $task */
 
         if($this->currentTask->isOnRequest($this->context->bodyType) === false) {
-            $this->context->tasks->add(clone $task);
+            $this->context->tasks->add(clone $this->currentTask);
             $this->currentTask->done();
             $this->selectNextTask();
             $this->run();
@@ -112,6 +113,9 @@ class TaskRunner
 
             case Types::RunScript:
                 $this->runScriptTask();
+                $this->loadDeviceTasks();
+                $this->selectNextTask();
+                $this->run();
                 break;
         }
 
@@ -147,8 +151,7 @@ class TaskRunner
         }
         // Run other tasks
         $this->currentTask->done();
-        $this->selectNextTask();
-        $this->run();
+
     }
 
     //TODO: Move to another class
