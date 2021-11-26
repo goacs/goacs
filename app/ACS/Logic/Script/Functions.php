@@ -77,7 +77,7 @@ class Functions
     public function uploadFirmware(string $filename) {
         $task = $this->deviceModel->tasks()->make();
         $task->name = Types::Download;
-        $task->on_request = Types::EMPTY;
+        $task->on_request = '';
         $task->not_before = now()->subDay();
         $task->infinite = false;
         $task->payload = [

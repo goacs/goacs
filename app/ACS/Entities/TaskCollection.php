@@ -50,7 +50,7 @@ class TaskCollection extends Collection
     }
 
     public function hasTasksToRun(): bool {
-        return $this->filter(fn(Task $task) => $task->done_at !== null)->count() > 0;
+        return $this->filter(fn(Task $task) => $task->done_at === null)->count() > 0;
     }
 
     public function flush() {

@@ -65,7 +65,7 @@ class Context
 
     public ?Device $device = null;
 
-    public ?DeviceModel $deviceModel;
+    public ?DeviceModel $deviceModel = null;
 
     public ParameterInfoCollection $parameterInfos;
 
@@ -126,6 +126,7 @@ class Context
                 case Types::INFORM:
                     $this->cpeRequest = new InformRequest($parser->body);
                     $this->device = $this->cpeRequest->device;
+                    $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
                     $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX . $this->device->serialNumber, false);
                     $this->provisioningCurrentState = self::PROVISIONING_STATE_INFORM;
 
@@ -242,6 +243,7 @@ class Context
         }
 
         $this->deviceModel->save();
+        Log::logInfo($this->deviceModel, 'Ending session');
         $this->flushSession();
     }
 

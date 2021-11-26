@@ -49,8 +49,9 @@ class GetParameterValuesResponseProcessor extends Processor
             );
         }
 
-
+        dump("ISGPV ".$this->context->tasks->isNextTask(Types::GetParameterValues));
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
+            dump("No GPV Tasks");
 //            dump("PROVSION MODE", $this->context->provision);
             if($this->context->lookupParameters === true) {
                 \Cache::put(
@@ -69,9 +70,6 @@ class GetParameterValuesResponseProcessor extends Processor
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestPassword', $settingsPassword, 'RWS', 'xsd:string');
 
                 $this->loadGlobalTasks(Types::GetParameterValuesResponse);
-
-                $taskRunner = new TaskRunner($this->context);
-                $taskRunner->run();
 
                 (new SetParameterValuesRequestProcessor($this->context))();
 //            }

@@ -40,87 +40,93 @@ class TaskRunner
     }
 
     public function run() {
-        //dump('all tasks', $this->context->tasks);
-        //$taskName = $this->currentTask?->name ?? 'No task to run';
-        //Log::logConversation($this->context->deviceModel, 'acs', 'TaskRunner', $taskName);
-        if($this->currentTask === null) {
-            return;
-        }
+        try {
+            //dump('all tasks', $this->context->tasks);
+            //$taskName = $this->currentTask?->name ?? 'No task to run';
+            //Log::logConversation($this->context->deviceModel, 'acs', 'TaskRunner', $taskName);
+            if ($this->currentTask === null) {
+                return;
+            }
 
-        /** @var Task $task */
+            /** @var Task $task */
 
-        if($this->currentTask->isOnRequest($this->context->bodyType) === false) {
-            $this->context->tasks->add(clone $this->currentTask);
-            $this->currentTask->done();
-            $this->selectNextTask();
-            $this->run();
-        }
-
-
-        switch ($this->currentTask->name) {
-            case Types::INFORMResponse:
-                $acsResponse = (new InformResponse($this->context));
-                $this->context->acsResponse = $acsResponse;
-                break;
-
-            case Types::GetParameterNames:
-                $acsRequest = (new GetParameterNamesRequest($this->context, $this->currentTask->payload['parameter']));
-                $this->context->acsRequest = $acsRequest;
-                break;
-
-
-            case Types::GetParameterValues:
-                $request = new GetParameterValuesRequest($this->context);
-                $request->setParameters($this->currentTask->payload['parameters']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::SetParameterValues:
-                $request = new SetParameterValuesRequest($this->context, $this->currentTask->payload['parameters']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::AddObject:
-                $request = new AddObjectRequest($this->context, $this->currentTask->payload['parameter']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::DeleteObject:
-                $request = new DeleteObjectRequest($this->context, $this->currentTask->payload['parameter']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::Download:
-                $fileData = $this->getFileData($this->currentTask->payload['filename']);
-                $request = new DownloadRequest($this->context, $this->currentTask->payload['filetype'], $fileData['url'], $fileData['size']);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::TransferCompleteResponse:
-                $response = new TransferCompleteResponse($this->context);
-                $this->context->acsResponse = $response;
-                break;
-
-            case Types::Reboot:
-                $request = new RebootRequest($this->context);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::FactoryReset:
-                $request = new FactoryResetRequest($this->context);
-                $this->context->acsRequest = $request;
-                break;
-
-            case Types::RunScript:
-                $this->runScriptTask();
-                $this->loadDeviceTasks();
+            if ($this->currentTask->isOnRequest($this->context->bodyType) === false) {
+                $this->context->tasks->add(clone $this->currentTask);
+                $this->currentTask->done();
                 $this->selectNextTask();
                 $this->run();
-                break;
-        }
+            }
 
-        if($this->currentTask !== null) {
-            $this->currentTask->done();
+
+            switch ($this->currentTask->name) {
+                case Types::INFORMResponse:
+                    $acsResponse = (new InformResponse($this->context));
+                    $this->context->acsResponse = $acsResponse;
+                    break;
+
+                case Types::GetParameterNames:
+                    $acsRequest = (new GetParameterNamesRequest($this->context, $this->currentTask->payload['parameter']));
+                    $this->context->acsRequest = $acsRequest;
+                    break;
+
+
+                case Types::GetParameterValues:
+                    $request = new GetParameterValuesRequest($this->context);
+                    $request->setParameters($this->currentTask->payload['parameters']);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::SetParameterValues:
+                    $request = new SetParameterValuesRequest($this->context, $this->currentTask->payload['parameters']);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::AddObject:
+                    $request = new AddObjectRequest($this->context, $this->currentTask->payload['parameter']);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::DeleteObject:
+                    $request = new DeleteObjectRequest($this->context, $this->currentTask->payload['parameter']);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::Download:
+                    $fileData = $this->getFileData($this->currentTask->payload['filename']);
+                    $request = new DownloadRequest($this->context, $this->currentTask->payload['filetype'], $fileData['url'], $fileData['size']);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::TransferCompleteResponse:
+                    $response = new TransferCompleteResponse($this->context);
+                    $this->context->acsResponse = $response;
+                    break;
+
+                case Types::Reboot:
+                    $request = new RebootRequest($this->context);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::FactoryReset:
+                    $request = new FactoryResetRequest($this->context);
+                    $this->context->acsRequest = $request;
+                    break;
+
+                case Types::RunScript:
+                    $this->runScriptTask();
+                    $this->loadDeviceTasks();
+                    $this->selectNextTask();
+                    $this->run();
+                    break;
+            }
+
+            if ($this->currentTask !== null) {
+                $this->currentTask->done();
+            }
+        } catch (\Throwable $throwable) {
+            dump("Error in script: ");
+            dump($throwable->getMessage());
+            dump($throwable->getTraceAsString());
         }
     }
 
@@ -144,7 +150,7 @@ class TaskRunner
             );
         } catch (SandboxException $exception) {
             $fault = $this->context->deviceModel->faults()->make();
-            $fault->full_xml = $exception->getTraceAsString();
+            $fault->full_xml = $exception->getMessage()."\n\n".$exception->getTraceAsString();
             $fault->message = $exception->getMessage();
             $fault->code = '100020';
             $fault->save();

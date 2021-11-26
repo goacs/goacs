@@ -75,6 +75,14 @@ class ControllerLogic
 
     public function process(): Response {
 
+        if($this->context->bodyType !== Types::INFORM && $this->context->newSession) {
+            dump('Invalid session, error response');
+            $this->context->response->setContent(
+                (new ErrorResponse($this->context, 'invalid session'))
+            );
+            return $this->context->response;
+        }
+
         switch ($this->context->bodyType) {
             case Types::INFORM:
                 (new InformRequestProcessor($this->context))();
@@ -126,6 +134,7 @@ class ControllerLogic
 
         }
 
+
         Log::logConversation($this->context->deviceModel,
             'device',
             $this->context->bodyType,
@@ -175,8 +184,11 @@ class ControllerLogic
 
         $this->context->storeToSession();
 
-        if($this->context->tasks->hasTasksToRun() === false
-            && ($this->context->acsResponse instanceof ErrorResponse) === false) {
+        if( $this->context->response->getContent() === ""
+            &&! $this->context->cpeRequest instanceof InformRequest
+            && ! $this->context->acsResponse instanceof TransferCompleteResponse
+            && ! $this->context->acsResponse instanceof ErrorResponse
+            && $this->context->tasks->hasTasksToRun() === false) {
             $this->context->endSession();
         }
 

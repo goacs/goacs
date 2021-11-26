@@ -76,6 +76,18 @@ class Log extends Model
         return $log;
     }
 
+    public static function logInfo(Device $device, string $message, array $detail = []) {
+        $log = new static();
+        $log->device_id = $device->id;
+        $log->full_xml = $message;
+        $log->code = '200000';
+        $log->message = $message;
+        $log->detail = $detail;
+        $log->type = 'INFO';
+        $log->from = 'acs';
+        $log->save();
+    }
+
     public static function logError(Device $device, string $message, string $code = '100000', array $detail = []) {
         $log = new static();
         $log->device_id = $device->id;

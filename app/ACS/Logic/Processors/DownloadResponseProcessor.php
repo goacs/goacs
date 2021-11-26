@@ -10,6 +10,7 @@ use App\ACS\Entities\Task;
 use App\ACS\Request\RebootRequest;
 use App\ACS\Response\DownloadResponse;
 use App\ACS\Types;
+use App\Models\Log;
 
 class DownloadResponseProcessor extends Processor
 {
@@ -21,7 +22,8 @@ class DownloadResponseProcessor extends Processor
         $this->context->tasks->flush();
         if($response->status === 1) {
             dump('Reboot needed to upgrade software');
-            $this->context->tasks->addTask(new Task(Types::Reboot));
+            Log::logInfo($this->context->deviceModel, "Reboot needed to upgrade software");
+            //$this->context->tasks->addTask(new Task(Types::Reboot));
         }
 
     }
