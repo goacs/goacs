@@ -76,7 +76,6 @@ class ControllerLogic
     public function process(): Response {
 
         if($this->context->bodyType !== Types::INFORM && $this->context->newSession) {
-            dump('Invalid session, error response');
             $this->context->response->setContent(
                 (new ErrorResponse($this->context, 'invalid session'))
             );

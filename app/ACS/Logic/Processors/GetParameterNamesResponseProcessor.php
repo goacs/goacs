@@ -20,7 +20,6 @@ class GetParameterNamesResponseProcessor extends Processor
         $getParameterNamesResponse = $this->context->cpeResponse;
 
         if($this->context->tasks->isNextTask(Types::GetParameterNames) === false) {
-            dump("GPN CHUNKING");
             $filteredParameters = $getParameterNamesResponse->parameters->filterByChunkCount(2,2)->filterEndsWithDot();
             foreach ($filteredParameters->chunk(self::GET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
                 $task = new Task(Types::GetParameterValues);

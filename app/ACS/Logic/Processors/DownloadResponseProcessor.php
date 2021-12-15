@@ -21,7 +21,6 @@ class DownloadResponseProcessor extends Processor
         $response = $this->context->cpeResponse;
         $this->context->tasks->flush();
         if($response->status === 1) {
-            dump('Reboot needed to upgrade software');
             Log::logInfo($this->context->deviceModel, "Reboot needed to upgrade software");
             //$this->context->tasks->addTask(new Task(Types::Reboot));
         }

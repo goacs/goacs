@@ -19,7 +19,6 @@ class SetParameterValuesRequestProcessor extends Processor
 
     public function __invoke()
     {
-        dump('SPV');
         $this->setPII();
         $this->compareAndProcessObjectParameters();
         $this->compareAndProcessSetParameters();
@@ -38,8 +37,6 @@ class SetParameterValuesRequestProcessor extends Processor
 //            ->sortBy('name')
         ;
 
-        //dump("Diff params to set", $diffParameters);
-
         foreach($diffParameters->chunk(self::SET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
             $task = new Task(Types::SetParameterValues);
             $task->setPayload(['parameters' => $chunk]);
@@ -50,15 +47,12 @@ class SetParameterValuesRequestProcessor extends Processor
     private function compareAndProcessObjectParameters() {
         $parameterService = new DeviceParametersLogic($this->context->deviceModel);
         $dbParameters = $parameterService->combinedDeviceParametersWithTemplates();
-        //dump("DBParams", $dbParameters->count());
         $sessionParameters = $this->context->parameterValues;
-        //dump("session params", $sessionParameters->count());
 
         $parametersToAdd = $parameterService
             ->getParametersToCreateInstance($sessionParameters, $dbParameters)
             ->sortBy('name');
 
-        //dump("Object params to add", $parametersToAdd);
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
             $task = new Task(Types::AddObject);

@@ -41,7 +41,6 @@ class TaskRunner
 
     public function run() {
         try {
-            //dump('all tasks', $this->context->tasks);
             //$taskName = $this->currentTask?->name ?? 'No task to run';
             //Log::logConversation($this->context->deviceModel, 'acs', 'TaskRunner', $taskName);
             if ($this->currentTask === null) {
@@ -124,9 +123,7 @@ class TaskRunner
                 $this->currentTask->done();
             }
         } catch (\Throwable $throwable) {
-            dump("Error in script: ");
-            dump($throwable->getMessage());
-            dump($throwable->getTraceAsString());
+            Log::logError($this->context->deviceModel, $throwable->getMessage());
         }
     }
 

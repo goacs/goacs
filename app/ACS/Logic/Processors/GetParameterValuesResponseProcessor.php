@@ -49,10 +49,7 @@ class GetParameterValuesResponseProcessor extends Processor
             );
         }
 
-        dump("ISGPV ".$this->context->tasks->isNextTask(Types::GetParameterValues));
         if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
-            dump("No GPV Tasks");
-//            dump("PROVSION MODE", $this->context->provision);
             if($this->context->lookupParameters === true) {
                 \Cache::put(
                     Context::LOOKUP_PARAMS_PREFIX.$this->context->device->serialNumber,

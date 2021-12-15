@@ -45,12 +45,9 @@ class Kick
 
     private function execProcess(array $args): bool {
         $process = new Process([self::HTTPIE_EXECUTABLE, ...$args]);
-        dump($process->getCommandLine());
         $process->enableOutput();
         $process->setTimeout(5);
         $result = $process->run();
-        dump($process->getOutput());
-        dump($process->getErrorOutput());
         return $result === 0;
     }
 

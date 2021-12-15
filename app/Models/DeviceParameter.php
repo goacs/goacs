@@ -96,9 +96,6 @@ class DeviceParameter extends Model implements ParameterInterface
     public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {
         $currentDBParameters = ParameterValuesCollection::fromEloquent($device->parameters()->get());
         $diffParameters = $parameterValuesCollection->diff($currentDBParameters);
-        $diffParameters2 = $currentDBParameters->diff($parameterValuesCollection);
-//        dump("Diff resp->db: ".$diffParameters->count());
-//        dump("Diff db->resp: ".$diffParameters2->count());
 
         foreach($diffParameters->chunk(300) as $chunk) {
 

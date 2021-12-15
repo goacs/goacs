@@ -17,12 +17,7 @@ class EmptyResponseProcessor extends Processor
     {
         $this->loadGlobalTasks(Types::EMPTY);
 
-        dump($this->context->tasks->nextTask());
-        dump("PCS", $this->context->provisioningCurrentState);
-        dump(\Cache::get(Context::PROVISION_PREFIX.$this->context->device->serialNumber));
-
         if($this->context->tasks->nextTask() !== null && $this->context->tasks->nextTask()->isOnRequest(Types::EMPTY) === false) {
-            dump('return');
             return;
         }
 

@@ -37,7 +37,6 @@ class XMLParser
     }
 
     public function parse() {
-//        dump("XML", $this->xml);
         if(empty($this->xml)) {
             $this->bodyType = Types::EMPTY;
             return;
@@ -61,7 +60,6 @@ class XMLParser
             $this->header = $xml->evaluate("/${soapEnvNs}:Envelope/${soapEnvNs}:Header")->getNode(0);
             $this->body = $xml->evaluate("/${soapEnvNs}:Envelope/${soapEnvNs}:Body")->children()->getNode(0);
         } catch (\Exception $exception) {
-            dump($exception->getMessage());
             throw new ACSException("INVALID XML");
         }
 

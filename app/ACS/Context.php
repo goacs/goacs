@@ -259,7 +259,6 @@ class Context
 
 
     public function flushSession() {
-        dump('flushing session '."SESSID_".$this->device->serialNumber);
         \Cache::forget("SESSID_".$this->device->serialNumber);
         $this->session()->flush();
     }
