@@ -38,7 +38,6 @@ class TaskRunner
 
     public function selectNextTask() {
         $this->currentTask = $this->context->tasks->nextTask();
-        dump($this->currentTask);
     }
 
     public function run() {
