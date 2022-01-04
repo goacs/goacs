@@ -8,6 +8,7 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\ACS\Entities\Task;
+use App\ACS\Logic\Processors\SetParameterValuesRequestProcessor;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
 use App\ACS\Request\AddObjectRequest;
@@ -109,6 +110,10 @@ class TaskRunner
                 case Types::FactoryReset:
                     $request = new FactoryResetRequest($this->context);
                     $this->context->acsRequest = $request;
+                    break;
+
+                case Types::SetParameterValuesProcessor:
+                    (new SetParameterValuesRequestProcessor($this->context))();
                     break;
 
                 case Types::RunScript:

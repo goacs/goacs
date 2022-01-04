@@ -68,7 +68,8 @@ class GetParameterValuesResponseProcessor extends Processor
 
                 $this->loadGlobalTasks(Types::GetParameterValuesResponse);
 
-                (new SetParameterValuesRequestProcessor($this->context))();
+                $this->context->tasks->addTask(new Task(Types::SetParameterValuesProcessor));
+//                (new SetParameterValuesRequestProcessor($this->context))();
 //            }
         }
     }

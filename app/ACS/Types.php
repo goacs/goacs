@@ -36,4 +36,6 @@ class Types
 
     const RunScript = 'RunScript';
 
+    const SetParameterValuesProcessor = 'SetParameterValuesProcessor';
+
 }
