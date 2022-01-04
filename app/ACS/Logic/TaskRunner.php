@@ -38,6 +38,7 @@ class TaskRunner
 
     public function selectNextTask() {
         $this->currentTask = $this->context->tasks->nextTask();
+        dump($this->currentTask);
     }
 
     public function run() {
@@ -114,6 +115,9 @@ class TaskRunner
 
                 case Types::SetParameterValuesProcessor:
                     (new SetParameterValuesRequestProcessor($this->context))();
+                    $this->currentTask->done();
+                    $this->selectNextTask();
+                    $this->run();
                     break;
 
                 case Types::RunScript:
