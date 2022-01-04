@@ -53,6 +53,7 @@ class DeviceController extends Controller
     }
 
     public function destroy(Device $device) {
+        \Cache::forget("SESSID_".$device->serial_number);
         $device->templates()->sync([]);
         $device->parameters()->delete();
         $device->delete();
