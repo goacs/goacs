@@ -33,8 +33,8 @@ class Sandbox
         extract($this->variables);
         try {
             $ret = eval($this->getScript());
-        } catch (\Throwable $exception) {
-            throw new SandboxException("Sandbox exception", 100010, $exception);
+        } catch (\ParseError $exception) {
+            throw new SandboxException(sprintf("There is error in script on line %d", $exception->getLine()), $exception->getCode(), $exception);
         }
         return $ret;
     }

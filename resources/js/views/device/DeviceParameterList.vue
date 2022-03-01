@@ -2,7 +2,7 @@
   <CCard>
     <CCardHeader>
       <strong>Parameters</strong>
-      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addDialog = true">
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addItem">
         <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Add
       </CButton>
     </CCardHeader>
@@ -72,8 +72,22 @@
           </template>
         </PaginatedTable>
     </CCardBody>
-    <ParameterDialog v-model="addDialog" :item="addingItem" @onSave="storeParameter"></ParameterDialog>
-    <ParameterDialog v-model="editDialog" :item="editedItem" :isNew="false" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>
+    <ParameterDialog
+      v-model="addDialog"
+      :item="addingItem"
+      @onSave="storeParameter"
+      :saving.sync="addSaving"
+      :errors="errors"
+    ></ParameterDialog>
+    <ParameterDialog
+      v-model="editDialog"
+      :item="editedItem"
+      :isNew="false"
+      @onSave="updateParameter"
+      @onDelete="deleteParameter"
+      :saving.sync="editSaving"
+      :errors="errors"
+    ></ParameterDialog>
   </CCard>
 
 </template>
@@ -91,6 +105,8 @@
     data() {
       return {
         lookup: false,
+        addSaving: false,
+        editSaving: false,
         fields: [
           {
             label: 'Name',
@@ -142,6 +158,7 @@
         device: 'device/getDevice',
         parameters: 'device/getParameters',
         templates: 'device/getDeviceTemplates',
+        errors: 'dialog/getDeviceParametersErrors',
       }),
     },
     methods: {
@@ -180,9 +197,14 @@
           key: '',
         })
       },
+      addItem() {
+        this.$store.commit('dialog/setDeviceParametersErrors', {})
+        this.addDialog = true;
+      },
       editItem(item) {
         this.editedIndex = this.$refs.table.items
         this.editedItem = item
+        this.$store.commit('dialog/setDeviceParametersErrors', {})
         this.editDialog = true
       },
       async storeParameter(item) {
@@ -194,8 +216,11 @@
           this.addDialog = false
           await this.$refs.table.fetchItems()
         } catch (e) {
-
+          this.$store.commit('dialog/setDeviceParametersErrors', this.extractErrorsFromResponse(e.response));
+        } finally {
+          this.addSaving = false;
         }
+
         this.addingItem = {
           name: "",
           value: "",
@@ -211,8 +236,9 @@
           this.editDialog = false
           await this.$refs.table.fetchItems()
         } catch (e) {
-          console.log(e)
-
+          this.$store.commit('dialog/setDeviceParametersErrors', this.extractErrorsFromResponse(e.response));
+        } finally {
+          this.editSaving = false;
         }
       },
       async deleteParameter(item) {
@@ -224,15 +250,16 @@
           this.editDialog = false
           await this.$refs.table.fetchItems()
         } catch (e) {
-          console.log(e)
-
+          this.$store.commit('dialog/setDeviceParametersErrors', this.extractErrorsFromResponse(e.response));
+        } finally {
+          this.editSaving = false;
         }
       },
       stripString(prop, len) {
         return prop.value.substr(0, len);
       },
       templateName(template_id) {
-        const template =  _.find(this.templates, {id: template_id});
+        const template = _.find(this.templates, {id: template_id});
         return template.name
       }
     },

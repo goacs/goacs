@@ -9,6 +9,7 @@ import tasks from './tasks';
 import file from './file';
 import faults from './faults';
 import user from './user';
+import dialog from './dialog';
 
 Vue.use(Vuex)
 
@@ -34,8 +35,9 @@ const store = new Vuex.Store({
   },
   modules: {
     config,
-    device,
     dashboard,
+    device,
+    dialog,
     template,
     tasks,
     file,
