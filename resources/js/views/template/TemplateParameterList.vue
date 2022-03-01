@@ -64,7 +64,7 @@
       is-new
       @onSave="storeParameter"
       :saving="addSaving"
-      :errors="errors"
+      :errors="dialogErrors"
     ></ParameterDialog>
     <ParameterDialog
       v-model="editDialog"
@@ -72,7 +72,7 @@
       @onSave="updateParameter"
       @onDelete="deleteParameter"
       :saving="editSaving"
-      :errors="errors"
+      :errors="dialogErrors"
     ></ParameterDialog>
   </CCard>
 </template>
@@ -175,7 +175,7 @@
       ...mapGetters({
         template: 'template/getTemplate',
         parameters: 'template/getParameters',
-        errors: 'dialog/getTemplateParametersErrors',
+        dialogErrors: 'dialog/getTemplateParametersErrors',
       }),
     },
     methods: {

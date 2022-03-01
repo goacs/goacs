@@ -77,7 +77,7 @@
       :item="addingItem"
       @onSave="storeParameter"
       :saving.sync="addSaving"
-      :errors="errors"
+      :errors="dialogErrors"
     ></ParameterDialog>
     <ParameterDialog
       v-model="editDialog"
@@ -86,7 +86,7 @@
       @onSave="updateParameter"
       @onDelete="deleteParameter"
       :saving.sync="editSaving"
-      :errors="errors"
+      :errors="dialogErrors"
     ></ParameterDialog>
   </CCard>
 
@@ -158,7 +158,7 @@
         device: 'device/getDevice',
         parameters: 'device/getParameters',
         templates: 'device/getDeviceTemplates',
-        errors: 'dialog/getDeviceParametersErrors',
+        dialogErrors: 'dialog/getDeviceParametersErrors',
       }),
     },
     methods: {
