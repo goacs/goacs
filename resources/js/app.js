@@ -18,6 +18,7 @@ import JsonTree from 'vue-json-tree'
 window.Vue = require('vue').default;
 
 Vue.config.productionTip = false;
+Vue.config.silent = process.env.NODE_ENV === 'production';
 
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 axios.defaults.headers['Authorization'] = 'Bearer {auth_token}';

@@ -58,8 +58,22 @@
         </template>
       </PaginatedTable>
     </CCardBody>
-    <ParameterDialog v-model="addDialog" :item="addingItem" is-new @onSave="storeParameter"></ParameterDialog>
-    <ParameterDialog v-model="editDialog" :item="editedItem" @onSave="updateParameter" @onDelete="deleteParameter"></ParameterDialog>
+    <ParameterDialog
+      v-model="addDialog"
+      :item="addingItem"
+      is-new
+      @onSave="storeParameter"
+      :saving="addSaving"
+      :errors="errors"
+    ></ParameterDialog>
+    <ParameterDialog
+      v-model="editDialog"
+      :item="editedItem"
+      @onSave="updateParameter"
+      @onDelete="deleteParameter"
+      :saving="editSaving"
+      :errors="errors"
+    ></ParameterDialog>
   </CCard>
 </template>
 
@@ -74,6 +88,8 @@
     components: {FlagInput, ParameterDialog, PaginatedTable },
     data() {
       return {
+        addSaving: false,
+        editSaving: false,
         headers: [
           {
             text: 'Name',
@@ -158,7 +174,8 @@
     computed: {
       ...mapGetters({
         template: 'template/getTemplate',
-        parameters: 'template/getParameters'
+        parameters: 'template/getParameters',
+        errors: 'dialog/getTemplateParametersErrors',
       }),
     },
     methods: {
@@ -174,10 +191,12 @@
       addItem() {
         this.addDialog = true;
         this.addingItem.templateId = this.$route.params.id;
+        this.$store.commit('dialog/setTemplateParametersErrors', {})
       },
       editItem(item) {
         this.editedItem = item;
         this.editedItem.templateId = this.$route.params.id;
+        this.$store.commit('dialog/setTemplateParametersErrors', {})
         this.editDialog = true;
       },
       async storeParameter(savedItem) {
@@ -186,6 +205,9 @@
           this.addDialog = false;
           await this.$refs.table.fetchItems();
         } catch (e) {
+          this.$store.commit('dialog/setTemplateParametersErrors', this.extractErrorsFromResponse(e.response));
+        } finally {
+          this.addSaving = false;
         }
       },
       async updateParameter(savedItem) {
@@ -196,7 +218,9 @@
           this.editDialog = false;
           await this.$refs.table.fetchItems();
         } catch (e) {
-
+          this.$store.commit('dialog/setTemplateParametersErrors', this.extractErrorsFromResponse(e.response));
+        } finally {
+          this.editSaving = false;
         }
       },
       async deleteParameter(savedItem) {
@@ -208,7 +232,9 @@
           this.editDialog = false
           await this.$refs.table.fetchItems()
         } catch (e) {
-
+          this.$store.commit('dialog/setTemplateParametersErrors', this.extractErrorsFromResponse(e.response));
+        } finally {
+          this.editSaving = false;
         }
       },
       stripString(prop, len) {

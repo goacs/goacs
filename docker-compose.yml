@@ -10,7 +10,7 @@ services:
     ports:
       - 8085:8085
       - 9912:9912
-    restart: always
+    restart: on-failure
     links:
       - redis
       - mariadb

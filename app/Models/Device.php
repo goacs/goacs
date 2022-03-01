@@ -99,12 +99,18 @@ class Device extends Model
         return $query->where('created_at', '>=', $date->addMinutes(2));
     }
 
-    public function getTemplatesParameters() {
+    public function getTemplatesParameters(bool $important = false) {
         $templatesWithParameters = $this
             ->templates()
             ->orderByPivot('priority')
             ->with('parameters')
             ->get();
+
+        if($important === true) {
+            $templatesWithParameters = $templatesWithParameters->where('pivot.priority', '>=', 200);
+        } else {
+            $templatesWithParameters = $templatesWithParameters->where('pivot.priority', '<', 200);
+        }
 
         return $templatesWithParameters->pluck('parameters')->flatten(1);
     }

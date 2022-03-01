@@ -8,6 +8,12 @@
     @update:show="onModalClose"
   >
 
+    <CAlert v-if="Object.keys(errors).length > 0" color="danger">
+      <h3>Validation errors</h3>
+      <ul>
+        <li v-for="error in errors">{{ error[0] }}</li>
+      </ul>
+    </CAlert>
     <CInput
       label="Name"
       v-model="item.name"
@@ -42,7 +48,6 @@
     components: {FlagInput},
     data() {
       return {
-        saving: false,
       }
     },
     props: {
@@ -57,6 +62,14 @@
       isNew: {
         type: Boolean,
         default: () => false,
+      },
+      saving: {
+        type: Boolean,
+        default: () => false,
+      },
+      errors: {
+        type: Object,
+        default: () => [],
       }
     },
     computed: {
@@ -88,11 +101,6 @@
         this.$emit('input', false);
       }
     },
-    watch: {
-      value() {
-        this.saving = false;
-      },
-    }
   }
 </script>
 
