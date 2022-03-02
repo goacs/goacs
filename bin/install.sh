@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 docker-compose up node
-docker-compose up -d goacs
+docker-compose up -d acs
 docker-compose exec acs composer install --no-dev
 docker-compose exec acs php artisan key:generate
 docker-compose exec acs php artisan jwt:secret --force

@@ -135,7 +135,8 @@ class Context
                     if (
                         $this->cpeRequest->hasEvent(0) ||
                         $this->cpeRequest->hasEvent(1) ||
-                        \Cache::get(self::PROVISION_PREFIX . $this->device->serialNumber, false)
+                        \Cache::get(self::PROVISION_PREFIX . $this->device->serialNumber, false) ||
+                        $this->lookupParameters
                     ) {
                         $this->provisioningCurrentState = self::PROVISIONING_STATE_READPARAMS;
                     }

@@ -57,6 +57,7 @@ class GetParameterValuesResponseProcessor extends Processor
                     now()->addMinutes(15)
                 );
                 $this->dispatcher->dispatch(new ParameterLookupDone($this->context->deviceModel, $this->context->parameterValues));
+                return;
             }
 
 //            if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_PROCESSING) {
