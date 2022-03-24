@@ -23,10 +23,7 @@ class DeviceParametersLogic
     public function combinedDeviceParametersWithTemplates() {
         $deviceParameters = ParameterValuesCollection::fromEloquent($this->device->parameters()->get());
         $templatesParameters = ParameterValuesCollection::fromEloquent($this->device->getTemplatesParameters());
-        $importantTemplatesParameters = ParameterValuesCollection::fromEloquent($this->device->getTemplatesParameters(true));
-        $params = $templatesParameters->merge($deviceParameters);
-        return $params->merge($importantTemplatesParameters);
-
+        return $this->mergeParams($deviceParameters, $templatesParameters);
     }
 
     public function getParametersToCreateInstance(ParameterValuesCollection $sessionParameters, ParameterValuesCollection $dbParameters) {
@@ -49,5 +46,20 @@ class DeviceParametersLogic
         }
 
         return $toAddParams;
+    }
+
+    public function mergeParams(ParameterValuesCollection $deviceParams, ParameterValuesCollection $otherParams): ParameterValuesCollection {
+        $deviceParams = clone $deviceParams;
+
+        /** @var ParameterValueStruct $otherParam */
+        foreach ($otherParams as $otherParam) {
+            /** @var ParameterValueStruct $deviceParam */
+            $deviceParam = $deviceParams->get($otherParam->name);
+            if($deviceParam === null || $deviceParam->flag->send === false) {
+                $deviceParams->put($otherParam->name, $otherParam);
+            }
+        }
+
+        return $deviceParams;
     }
 }
