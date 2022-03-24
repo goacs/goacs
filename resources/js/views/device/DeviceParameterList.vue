@@ -62,6 +62,7 @@
             <td v-else>
               <CButton type="button" color="primary" size="sm" class="mr-2" :to="{name: 'template-view', params: {id: item.device_id}}">
                 {{ templateName(item.device_id) }}
+                <CBadge color="light" class="ml-2 position-static">{{ templatePriority(item.device_id) }}</CBadge>
               </CButton>
             </td>
           </template>
@@ -260,7 +261,11 @@
       },
       templateName(template_id) {
         const template = _.find(this.templates, {id: template_id});
-        return template.name
+        return template.name;
+      },
+      templatePriority(template_id) {
+        const template = _.find(this.templates, {id: template_id});
+        return template.pivot.priority;
       }
     },
     beforeDestroy() {
