@@ -12,6 +12,7 @@
         "ext-dom": "*",
         "ext-simplexml": "*",
         "barryvdh/laravel-ide-helper": "^2.9",
+        "beyondcode/laravel-websockets": "^1.13",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",

@@ -88,8 +88,9 @@
         },
         methods: {
           async download(file) {
-            const response = await this.$store.dispatch('file/download', file.id);
-            saveAs(response.data, file.name);
+            window.open(file.url);
+            // const response = await this.$store.dispatch('file/download', file.id);
+            // saveAs(response.data, file.name);
           },
           async deleteFile(file) {
             if(confirm(`Delete file: ${file.name}?`) === false) {
