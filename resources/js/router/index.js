@@ -29,7 +29,16 @@ const routes = [
         name: 'devices-view',
         component: () => import('@/views/device/DeviceView.vue')
       },
-
+      {
+        path: 'provision',
+        name: 'provision-list',
+        component: () => import('@/views/provision/ProvisionList.vue')
+      },
+      {
+        path: 'provision/create',
+        name: 'provision-create',
+        component: () => import('@/views/provision/ProvisionCreate.vue')
+      },
       {
         path: 'templates',
         name: 'template-list',
