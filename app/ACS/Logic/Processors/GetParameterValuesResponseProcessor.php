@@ -42,7 +42,7 @@ class GetParameterValuesResponseProcessor extends Processor
             }
         }
 
-        if($this->context->tasks->prevTask()?->name === Types::AddObject) {
+        if($this->context->tasks->prevTask()?->name === Types::AddObject || $this->fromAddObjectTask()) {
             DeviceParameter::massUpdateOrInsert(
                 $this->context->deviceModel,
                 $this->context->cpeResponse->parameters
@@ -75,5 +75,13 @@ class GetParameterValuesResponseProcessor extends Processor
         }
     }
 
+    private function fromAddObjectTask() {
+        if($this->context->tasks->prevTask()?->name === Types::GetParameterValues)
+        {
+            return isset($this->context->tasks->prevTask()?->payload['store']) && $this->context->tasks->prevTask()?->payload['store'] === true;
+        }
+
+        return false;
+    }
 
 }

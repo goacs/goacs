@@ -33,7 +33,10 @@ class AddObjectResponseProcessor extends Processor
                 'parameters' => new Collection([
                     (new ParameterInfoStruct())->name => $path.".".$addObjectResponse->getInstanceNumber()."."
                 ]),
+                'store' => true,
             ]
         );
+
+        $this->context->tasks->addTask($gpvTask);
     }
 }
