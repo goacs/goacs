@@ -79,6 +79,8 @@ class Context
 
     public string $cwmpVersion;
 
+    public string $cwmpUri;
+
     public bool $provision = false;
 
     public bool $lookupParameters = false;
@@ -101,10 +103,11 @@ class Context
 
     public function envelopeId(): string
     {
-        if($this->requestId !== '') {
-            return $this->requestId;
+        if($this->requestId === '') {
+            $this->requestId = (string) (time() . mt_rand(100000, 999999));
         }
-        return (string) (time() . mt_rand(100000, 999999));
+
+        return $this->requestId;
     }
 
     public function session()
@@ -122,6 +125,7 @@ class Context
             $parser = new XMLParser((string)$this->request->getContent());
             $this->bodyType = $parser->bodyType;
             $this->cwmpVersion = $parser->cwmpVersion;
+            $this->cwmpUri = $parser->cwmpUri;
             $this->requestId = $parser->requestId;
 
             switch ($this->bodyType) {
