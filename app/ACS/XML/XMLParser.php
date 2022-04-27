@@ -24,7 +24,7 @@ class XMLParser
 
     public string $cwmpVersion = '1.0';
 
-    public string $cwmpUri = '';
+    public string $cwmpUri = 'urn:dslforum-org:cwmp-1-0';
 
     public string $requestId = '';
 
