@@ -77,7 +77,7 @@ class ControllerLogic
 
         if($this->context->bodyType !== Types::INFORM && $this->context->newSession) {
             $this->context->response->setContent(
-                (new ErrorResponse($this->context, 'invalid session'))
+                (new ErrorResponse($this->context, 'invalid session'))->getBody()
             );
             return $this->context->response;
         }

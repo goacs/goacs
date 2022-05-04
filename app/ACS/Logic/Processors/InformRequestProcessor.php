@@ -33,7 +33,7 @@ class InformRequestProcessor extends Processor
             $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_ERROR;
             $this->context->acsResponse = new ErrorResponse($this->context, 'Session DUP');
             Log::logError($this->context->deviceModel,  'Session DUP', '100400', [
-                'faultString' => 'SESSION ID: '. \Cache::get("SESSID_".$this->context->device->serialNumber)
+                'faultString' => "KEY: SESSID_".$this->context->device->serialNumber.'  SESSION ID: '. \Cache::get("SESSID_".$this->context->device->serialNumber)
             ]);
             return;
         }
@@ -51,6 +51,10 @@ class InformRequestProcessor extends Processor
     }
 
     private function updateDeviceData(): void {
+        if(Device::whereSerialNumber($this->context->device->serialNumber)->exists() === false) {
+            $this->context->new = true;
+        }
+
         $this->context->deviceModel = Device::updateOrCreate(
             [
                 'serial_number' => $this->context->device->serialNumber,
@@ -61,10 +65,10 @@ class InformRequestProcessor extends Processor
                 'oui' => $this->context->device->oui,
                 'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
                 'updated_at' => now(),
+                'debug' => env('DEBUG_NEW_DEVICES', false),
             ]
         );
 
-        $this->context->new = $this->context->deviceModel->wasRecentlyCreated;
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
     }
 

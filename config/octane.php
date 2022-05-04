@@ -202,7 +202,7 @@ return [
     |
     */
 
-    'garbage' => 50,
+    'garbage' => 100,
 
     /*
     |--------------------------------------------------------------------------
@@ -220,9 +220,9 @@ return [
     //Swoole hacks :))
     'swoole' => [
         'options' => [
-            'package_max_length' => 50 * 1024 * 1024,
+            'package_max_length' => 100 * 1024 * 1024,
             // The data to send can't be larger than buffer_output_size.
-            'buffer_output_size' => 10 * 1024 * 1024,
+            'buffer_output_size' => 100 * 1024 * 1024,
         ],
     ],
 

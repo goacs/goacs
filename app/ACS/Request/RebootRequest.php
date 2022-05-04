@@ -17,7 +17,10 @@ class RebootRequest extends ACSRequest
 
     public function getBody(): string
     {
-        $body = '<cwmp:Reboot></cwmp:Reboot>';
+        $envelopeId = $this->context->envelopeId();
+        $body = '<cwmp:Reboot>';
+        $body .= '<CommandKey>'.$envelopeId.'</CommandKey>';
+        $body .= '</cwmp:Reboot>';
 
         return $this->withBaseBody($body);
     }

@@ -42,7 +42,7 @@ class GetParameterValuesResponseProcessor extends Processor
             }
         }
 
-        if($this->context->tasks->prevTask()?->name === Types::AddObject) {
+        if(\Arr::get($this->context->tasks->prevTask()?->payload ?? [], 'store', false) === true) {
             DeviceParameter::massUpdateOrInsert(
                 $this->context->deviceModel,
                 $this->context->cpeResponse->parameters
