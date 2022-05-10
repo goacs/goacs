@@ -30,14 +30,14 @@ const routes = [
         component: () => import('@/views/device/DeviceView.vue')
       },
       {
-        path: 'provision',
-        name: 'provision-list',
-        component: () => import('@/views/provision/ProvisionList.vue')
+        path: 'configuration',
+        name: 'configuration-list',
+        component: () => import('@/views/configuration/ConfigurationList.vue')
       },
       {
-        path: 'provision/create',
-        name: 'provision-create',
-        component: () => import('@/views/provision/ProvisionCreate.vue')
+        path: 'configuration/create',
+        name: 'configuration-create',
+        component: () => import('@/views/configuration/ConfigurationCreate.vue')
       },
       {
         path: 'templates',
@@ -62,7 +62,7 @@ const routes = [
           {
             path: '',
             name: 'settings-main',
-            component: () => import('@/views/settings/ConfigurationView.vue'),
+            component: () => import('@/views/settings/BaseSettings.vue'),
           },
           {
             path: 'tasks',

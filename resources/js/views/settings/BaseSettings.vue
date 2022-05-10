@@ -1,7 +1,8 @@
 <template>
   <CCard>
-    <CCardHeader>Configuration</CCardHeader>
+    <CCardHeader>Settings</CCardHeader>
     <CCardBody>
+      <h5>Base</h5>
       <ValidationObserver ref="form" v-slot="{ passes }">
         <CForm novalidate @submit.prevent="passes(login)">
           <ValidationProvider vid="pii" name="Periodic Inform Interval spread"
@@ -34,6 +35,9 @@
               :is-valid="isvalid(scope)"
             ></CInput>
           </ValidationProvider>
+          <h5>Mappings</h5>
+
+          <ParametersMapping v-model="config.mapping"></ParametersMapping>
         </CForm>
       </ValidationObserver>
     </CCardBody>
@@ -50,8 +54,10 @@
 </template>
 
 <script>
+  import ParametersMapping from "../../components/ParametersMapping";
   export default {
-    name: "ConfigurationView",
+    name: "BaseSettings",
+    components: {ParametersMapping},
     data() {
       return {
         saving: false,

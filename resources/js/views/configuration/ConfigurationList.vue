@@ -1,8 +1,8 @@
 <template>
   <CCard>
     <CCardHeader>
-      <strong>Provisions list</strong>
-      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="$router.push({name: 'provision-crete'})">
+      <strong>Configration list</strong>
+      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="$router.push({name: 'configuration-create'})">
         <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon>New
       </CButton>
     </CCardHeader>
@@ -10,7 +10,7 @@
       <PaginatedTable
         :fields="fields"
         :columnFilter='{ external: true, lazy: true }'
-        action="provision/list"
+        action="configuration/list"
         :autoload="false"
         :dense="true"
         ref="table"
@@ -33,7 +33,7 @@
 <script>
   import PaginatedTable from "../../components/PaginatedTable";
   export default {
-    name: "ProvisionList",
+    name: "ConfigurationList",
     components: {PaginatedTable},
     data() {
       return {

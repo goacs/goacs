@@ -18,8 +18,8 @@
         :to="{ path: '/devices' }"
       />
       <CSidebarNavItem
-        name="Provisions"
-        :to="{ path: '/provisions' }"
+        name="Configuration"
+        :to="{ path: '/configuration' }"
       />
       <CSidebarNavItem
         name="Templates"

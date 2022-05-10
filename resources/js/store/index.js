@@ -10,7 +10,7 @@ import file from './file';
 import faults from './faults';
 import user from './user';
 import dialog from './dialog';
-import provision from './provision';
+import configuration from './configuration';
 
 Vue.use(Vuex)
 
@@ -39,7 +39,7 @@ const store = new Vuex.Store({
     dashboard,
     device,
     dialog,
-    provision,
+    configuration,
     template,
     tasks,
     file,
