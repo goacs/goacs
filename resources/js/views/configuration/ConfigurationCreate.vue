@@ -6,6 +6,7 @@
     <CCardBody>
       <CInput label="Name" v-model="form.name"></CInput>
       <CInput label="Events" v-model="form.events"></CInput>
+      <CInput label="Rule" v-model="form.rule"></CInput>
       <label>Script</label>
       <CodeEditor v-model="form.script"></CodeEditor>
     </CCardBody>

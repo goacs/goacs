@@ -25,4 +25,8 @@ class ProvisionController extends Controller
     public function show(Provision $provision) {
         return new ProvisionResource($provision);
     }
+
+    public function store() {
+
+    }
 }

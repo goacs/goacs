@@ -24,6 +24,7 @@
         "league/flysystem": "1.1.4",
         "spatie/laravel-query-builder": "^3.3",
         "symfony/dom-crawler": "^5.2",
+        "symfony/expression-language": "^6.0",
         "symfony/process": "^5.3",
         "tymon/jwt-auth": "dev-develop"
     },
