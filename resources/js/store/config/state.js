@@ -1,4 +1,6 @@
 export default {
-  config: {},
+  config: {
+    mappings: [],
+  },
   debug: {},
 }

@@ -15,6 +15,7 @@ class SettingsJsonResource extends JsonResource
             'connection_request_username' => (string) $this->resource['connection_request_username'],
             'connection_request_password' => (string) $this->resource['connection_request_password'],
             'conversation_log' => boolval($this->resource['conversation_log']),
+            'mappings' => (array) $this->resource['mappings']
         ];
     }
 }

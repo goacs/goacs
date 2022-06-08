@@ -30,19 +30,17 @@ class Sandbox
     }
 
     public function run() {
-        extract($this->variables);
         try {
+            extract($this->variables);
             $ret = eval($this->getScript());
-        } catch (\ParseError $exception) {
-            throw new SandboxException(sprintf("There is error in script on line %d", $exception->getLine()), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            throw new SandboxException(sprintf("There is error in script on line %d. Message: %s", $exception->getLine(), $exception->getMessage()), $exception->getCode(), $exception);
         }
         return $ret;
     }
 
     public function getScript(): string {
-        $script = $this->script;
-        $script = str_replace('<?php', '', $script);
-        $script = str_replace("\n",'', $script);
+        $script = '?>'.$this->script;
         return $script;
     }
 }

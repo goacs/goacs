@@ -1,8 +1,15 @@
 <template>
   <div>
+    <CAlert color="info">Use $root variable, to replace it with correct device root</CAlert>
     <div v-for="(mapping, idx) in mappings">
-      <CInput v-model="mappings[idx].parameter" label="Parameter"></CInput>
-      <CInput v-model="mappings[idx].name" label="Name"></CInput>
+      <CRow>
+        <CCol md="4">
+          <CInput v-model="mappings[idx].parameter" label="Parameter"></CInput>
+        </CCol>
+        <CCol md="4">
+          <CInput v-model="mappings[idx].name" label="Name"></CInput>
+        </CCol>
+      </CRow>
     </div>
   </div>
 </template>
@@ -10,27 +17,17 @@
 <script>
 export default {
   name: "ParametersMapping",
-  data() {
-    return {
-      mappings: [],
-    };
-  },
-  props: {
-    value: {
-      type: Array,
-      required: true,
-    },
-  },
-  mounted() {
-    this.mappings = this.value;
-  },
-  watch: {
+  computed: {
     mappings: {
-      deep: true,
-      handler(val) {
-        this.$emit('input', val);
+      get() {
+        return this.$store.getters['config/getConfig']['mappings'];
+      },
+      set(mappings) {
+        const config = this.$store.getters['config/getConfig']
+        config.mappings = mappings;
+        this.$store.commit('config/setConfig', config);
       }
-    }
+    },
   }
 }
 </script>

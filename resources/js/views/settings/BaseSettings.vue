@@ -37,7 +37,7 @@
           </ValidationProvider>
           <h5>Mappings</h5>
 
-          <ParametersMapping v-model="config.mapping"></ParametersMapping>
+          <ParametersMapping></ParametersMapping>
         </CForm>
       </ValidationObserver>
     </CCardBody>

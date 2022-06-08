@@ -22,7 +22,13 @@ class ProvisionStoreRequest extends FormRequest
             'script' => 'required',
             'templates' => 'array',
             'templates.*' => 'exists:templates,id',
-            'rule' => 'string',
+            'rules' => 'array',
+            'rules.*.parameter' => 'required',
+            'rules.*.op' => [
+                'required',
+                Rule::in(['>', '>=', '<', '<=', '==', '!=', 'in', 'not in']),
+            ],
+            'rules.*.value' => 'required',
         ];
     }
 }
