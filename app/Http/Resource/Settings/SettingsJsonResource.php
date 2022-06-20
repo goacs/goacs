@@ -11,6 +11,7 @@ class SettingsJsonResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'read_behaviour' => $this->resource['read_behaviour'],
             'pii' => (string) $this->resource['pii'],
             'connection_request_username' => (string) $this->resource['connection_request_username'],
             'connection_request_password' => (string) $this->resource['connection_request_password'],

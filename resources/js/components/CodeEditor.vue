@@ -1,26 +1,22 @@
 <template>
-  <prism-editor
-          class="my-editor height-300"
-          v-model="code"
-          :highlight="highlighter"
-          :line-numbers="lineNumbers"
-  ></prism-editor>
+  <AceEditor
+    v-model="code"
+    @init="editorInit"
+    lang="php"
+    theme="monokai"
+    width="100%"
+    height="200px"
+    :options="options"
+  />
 </template>
 
 <script>
-  import { PrismEditor } from "vue-prism-editor";
-  import "vue-prism-editor/dist/prismeditor.min.css";
-  import { highlight, languages } from "prismjs/components/prism-core";
-  import "prismjs/components/prism-markup";
-  import "prismjs/components/prism-markup-templating";
-  import "prismjs/components/prism-php";
-  import "prismjs/themes/prism.css";
-  import "prismjs/plugins/custom-class/prism-custom-class";
+import AceEditor from 'vuejs-ace-editor';
 
   export default {
     name: "CodeEditor",
     components: {
-      PrismEditor
+      AceEditor
     },
     props: {
       value: {
@@ -30,17 +26,31 @@
     },
     data: () => ({
       code: '',
-      lineNumbers: true
+      lineNumbers: true,
+      options: {
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: false,
+        fontSize: 14,
+        highlightActiveLine: true,
+        enableSnippets: true,
+        showLineNumbers: true,
+        tabSize: 2,
+        showPrintMargin: false,
+        showGutter: true,
+      }
     }),
     methods: {
-      highlighter(code) {
-        return highlight(code, languages.php);
+      editorInit() {
+        require('brace/ext/language_tools')
+        require('brace/ext/beautify')
+        require('brace/mode/php')
+        require('brace/mode/less')
+        require('brace/theme/monokai')
       }
     },
     mounted() {
-      window.Prism.plugins.customClass.map({ number: "prism-number", tag: "prism-tag" });
       this.$nextTick(function() {
-        this.code = this.value
+        this.code = this.value;
       })
     },
     watch: {

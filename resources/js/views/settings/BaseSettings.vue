@@ -2,9 +2,11 @@
   <CCard>
     <CCardHeader>Settings</CCardHeader>
     <CCardBody>
-      <h5>Base</h5>
       <ValidationObserver ref="form" v-slot="{ passes }">
-        <CForm novalidate @submit.prevent="passes(login)">
+        <CForm novalidate @submit.prevent="passes(save)">
+          <h5>Behaviour</h5>
+          <CInputRadioGroup label="Read behaviour" :options="readBehaviourOptions" :checked.sync="config.read_behaviour" class="mb-3"></CInputRadioGroup>
+          <h5>Default parameter values</h5>
           <ValidationProvider vid="pii" name="Periodic Inform Interval spread"
                               v-slot="scope">
           <CInput
@@ -36,7 +38,6 @@
             ></CInput>
           </ValidationProvider>
           <h5>Mappings</h5>
-
           <ParametersMapping></ParametersMapping>
         </CForm>
       </ValidationObserver>
@@ -74,6 +75,22 @@
           this.$store.commit('config/setConfig', config);
         }
       },
+      readBehaviourOptions() {
+        return [
+          {
+            value: 'boot',
+            label: 'Read and store all parameters (except with send flag) on boot event'
+          },
+          {
+            value: 'new',
+            label: 'Read and store all parameters only when device is new in ACS',
+          },
+          {
+            value: 'none',
+            label: 'Do not store any parameters read from device'
+          }
+        ]
+      }
     },
     methods: {
       async save() {

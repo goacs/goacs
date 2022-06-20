@@ -15,6 +15,9 @@ class SettingStoreRequest extends FormRequest
             'pii' => 'required|string|regex:/^(\d+)-(\d+)$/',
             'connection_request_username' => 'required|string',
             'connection_request_password' => 'required|string',
+            'mappings' => 'array',
+            'conversation_log' => 'required|boolean',
+            'read_behaviour' => 'required|in:new,boot,none'
         ];
     }
 }
