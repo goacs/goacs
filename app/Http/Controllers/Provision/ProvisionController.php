@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Provision;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Provision\ProvisionStoreRequest;
 use App\Http\Resource\Provision\ProvisionResource;
 use App\Models\Device;
 use App\Models\Provision;
@@ -26,7 +27,16 @@ class ProvisionController extends Controller
         return new ProvisionResource($provision);
     }
 
-    public function store() {
+    public function store(ProvisionStoreRequest $request) {
+        $provision = Provision::create($request->except(['rules','denied']));
+        foreach ($request->rules as $rule) {
+            $provision->rules()->create($rule);
+        }
 
+        foreach ($request->denied as $denied) {
+            $provision->deniedParameters()->create($denied);
+        }
+
+        return new ProvisionResource($provision);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProvisionDenyParametersTable extends Migration
+class CreateProvisionDeniedParametersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateProvisionDenyParametersTable extends Migration
      */
     public function up()
     {
-        Schema::create('provision_deny_parameters', function (Blueprint $table) {
+        Schema::create('provision_denied_parameters', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Provision::class);
             $table->string('parameter');
@@ -28,6 +28,6 @@ class CreateProvisionDenyParametersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('provision_deny_parameters');
+        Schema::dropIfExists('provision_denied_parameters');
     }
 }

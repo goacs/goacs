@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProvisionConditionsTable extends Migration
+class CreateProvisionRulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateProvisionConditionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('provision_conditions', function (Blueprint $table) {
+        Schema::create('provision_rules', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Provision::class);
             $table->string('parameter');
@@ -30,6 +30,6 @@ class CreateProvisionConditionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('provision_conditions');
+        Schema::dropIfExists('provision_rules');
     }
 }

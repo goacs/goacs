@@ -17,7 +17,7 @@ class ProvisionStoreRequest extends FormRequest
 
     public function rules(): array {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|unique:provisions',
             'events' => 'required',
             'script' => 'required',
             'templates' => 'array',
@@ -29,6 +29,8 @@ class ProvisionStoreRequest extends FormRequest
                 Rule::in(['>', '>=', '<', '<=', '==', '!=', 'in', 'not in']),
             ],
             'rules.*.value' => 'required',
+            'denied' => 'array',
+            'denied.*.parameter' => 'required',
         ];
     }
 }

@@ -16,7 +16,7 @@ class CreateProvisionsTable extends Migration
         Schema::create('provisions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('request');
+            $table->string('events');
             $table->longText('script');
             $table->softDeletes();
             $table->timestamps();
