@@ -28,15 +28,43 @@ class ProvisionController extends Controller
     }
 
     public function store(ProvisionStoreRequest $request) {
-        $provision = Provision::create($request->except(['rules','denied']));
-        foreach ($request->rules as $rule) {
-            $provision->rules()->create($rule);
+        return \DB::transaction(function() use ($request) {
+            $provision = Provision::create($request->except(['rules','denied']));
+            $this->saveRelated($provision, $request);
+            return new ProvisionResource($provision);
+        });
+    }
+
+    public function update(Provision $provision, ProvisionStoreRequest $request) {
+        return \DB::transaction(function() use ($request, $provision) {
+
+            $provision->forceFill($request->except(['rules', 'denied']));
+            $provision->save();
+
+            $this->deleteRelated($provision);
+            $this->saveRelated($provision, $request);
+
+            return new ProvisionResource($provision->refresh());
+        });
+    }
+
+    public function destroy(Provision $provision) {
+        $this->deleteRelated($provision);
+        $provision->delete();
+    }
+
+    private function deleteRelated(Provision $provision) {
+        $provision->rules()->forceDelete();
+        $provision->denied()->forceDelete();
+    }
+
+    private function saveRelated(Provision $provision, Request $request) {
+        foreach ($request->input('rules', []) as $rule) {
+            $provision->rules()->create(collect($rule)->except(['uniq'])->toArray());
         }
 
-        foreach ($request->denied as $denied) {
-            $provision->deniedParameters()->create($denied);
+        foreach ($request->input('denied', []) as $denied) {
+            $provision->denied()->create(collect($denied)->except(['uniq'])->toArray());
         }
-
-        return new ProvisionResource($provision);
     }
 }

@@ -5,6 +5,7 @@
     :options="flags"
     label="name"
     multiple
+    v-bind="{...$attrs, ...$props}"
   ></v-select>
 </template>
 

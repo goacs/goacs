@@ -13,11 +13,17 @@ class Provision extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name', 'events', 'script'
+    ];
+
+    protected $with = ['rules', 'denied'];
+
     public function rules(): HasMany {
         return $this->hasMany(ProvisionRule::class);
     }
 
-    public function deniedParameters(): HasMany {
+    public function denied(): HasMany {
         return $this->hasMany(ProvisionDeniedParameter::class);
     }
 }

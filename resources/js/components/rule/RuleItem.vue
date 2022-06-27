@@ -9,9 +9,9 @@
     </ValidationProvider>
     </CCol>
   <CCol sm="1">
-    <ValidationProvider :vid="`rules.${idx}.op`" name="Operator"
+    <ValidationProvider :vid="`rules.${idx}.operator`" name="Operator"
                         v-slot="scope">
-      <CSelect label="Operator" :value.sync="form.op" :options="options"
+      <CSelect label="Operator" :value.sync="form.operator" :options="options"
                :invalid-feedback="scope.errors[0]"
                :is-valid="isvalid(scope)"></CSelect>
     </ValidationProvider>
@@ -48,7 +48,7 @@ export default {
       operators: ['>', '>=', '<', '<=', '==', '!=', 'in', 'not in'],
       form: {
         parameter: '',
-        op: '',
+        operator: '>',
         value: '',
       }
     }

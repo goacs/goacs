@@ -40,6 +40,11 @@ const routes = [
         component: () => import('@/views/configuration/ConfigurationCreate.vue')
       },
       {
+        path: 'configuration/:id',
+        name: 'configuration-edit',
+        component: () => import('@/views/configuration/ConfigurationEdit.vue')
+      },
+      {
         path: 'templates',
         name: 'template-list',
         component: () => import('@/views/template/TemplateList.vue')

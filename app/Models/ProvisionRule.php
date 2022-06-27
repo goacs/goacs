@@ -9,5 +9,9 @@ class ProvisionRule extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'parameter', 'operator', 'value'
+    ];
+
     protected $table = 'provision_rules';
 }

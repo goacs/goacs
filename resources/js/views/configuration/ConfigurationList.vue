@@ -1,7 +1,7 @@
 <template>
   <CCard>
     <CCardHeader>
-      <strong>Configration list</strong>
+      <strong>Configuration list</strong>
       <CButton color="dark" class="float-right" variant="outline" size="sm" @click="$router.push({name: 'configuration-create'})">
         <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon>New
       </CButton>
@@ -20,7 +20,7 @@
         </template>
         <template #actions="{ item }">
           <td>
-            <CButton color="dark" class="float-right" variant="outline" size="sm" :to="{ name: 'template-view', params: { id: item.id}}">
+            <CButton color="dark" class="float-right" variant="outline" size="sm" :to="{ name: 'configuration-edit', params: { id: item.id}}">
               <CIcon name="cil-magnifying-glass" class="btn-icon mt-0" size="sm"></CIcon> View
             </CButton>
           </td>
@@ -72,16 +72,6 @@
 
         this.dialog = false;
       },
-      async save() {
-        try {
-          await this.$store.dispatch('template/addTemplate', this.template)
-        } catch (e) {
-
-        } finally {
-          this.dialog = false;
-          this.$refs.table.fetchItems()
-        }
-      }
     }
   }
 </script>

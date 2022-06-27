@@ -16,5 +16,7 @@ class SettingsSeeder extends Seeder
         Setting::firstOrCreate(['name' => 'connection_request_username'], ['value' => 'ACS']);
         Setting::firstOrCreate(['name' => 'connection_request_password'], ['value' => 'ACS']);
         Setting::firstOrCreate(['name' => 'conversation_log'], ['value' => 'false']);
+        Setting::firstOrCreate(['name' => 'read_behaviour'], ['value' => 'new']);
+        Setting::firstOrCreate(['name' => 'mappings'], ['value' => '[]]']);
     }
 }

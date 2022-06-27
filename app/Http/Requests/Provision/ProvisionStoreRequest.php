@@ -17,14 +17,18 @@ class ProvisionStoreRequest extends FormRequest
 
     public function rules(): array {
         return [
-            'name' => 'required|string|unique:provisions',
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('provisions')->ignore($this->provision?->id)
+            ],
             'events' => 'required',
             'script' => 'required',
             'templates' => 'array',
             'templates.*' => 'exists:templates,id',
             'rules' => 'array',
             'rules.*.parameter' => 'required',
-            'rules.*.op' => [
+            'rules.*.operator' => [
                 'required',
                 Rule::in(['>', '>=', '<', '<=', '==', '!=', 'in', 'not in']),
             ],

@@ -73,6 +73,7 @@ class InformRequestProcessor extends Processor
     }
 
     private function sessionExists(): bool {
+        return false;
         return \Cache::has("SESSID_".$this->context->device->serialNumber);
     }
 }

@@ -9,5 +9,9 @@ class ProvisionDeniedParameter extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'parameter',
+    ];
+
     protected $table = 'provision_denied_parameters';
 }

@@ -1,4 +1,10 @@
 export default {
-  template: {},
-  parameters: [],
+  provision: {
+    name: '',
+    events: '',
+    rules: [],
+    script: '<?php\n\n',
+    templates: [],
+    denied: [],
+  },
 }
