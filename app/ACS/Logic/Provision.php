@@ -4,6 +4,8 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\Models\Provision as ProvisionModel;
+use App\Models\ProvisionRule;
+use Illuminate\Support\Collection;
 
 class Provision
 {
@@ -20,12 +22,47 @@ class Provision
                 continue;
             }
 
-            //Filter Rules
+            //Filter Request
+            if(in_array($this->context->bodyType, $storedProvision->requestsArray()) === false) {
+                continue;
+            }
 
+            //Filter Rules
+            if($this->evaluateRules($storedProvision->rules) === false) {
+                continue;
+            }
 
             $passedProvisions[] = $storedProvision;
         }
 
         return $passedProvisions;
     }
+
+    private function evaluateRules(Collection $rules): bool {
+        if($rules->isEmpty()) {
+            return true;
+        }
+
+        return $rules->filter(function (ProvisionRule $rule) {
+            $parameterValue = $this->context->parameterValues->get($rule->parameter);
+            if($parameterValue !== null) {
+                return $this->condition($parameterValue, $rule->value, $rule->operator);
+            }
+
+            return false;
+        })->isNotEmpty();
+    }
+
+    private function condition(mixed $var1, mixed $var2, string $operator) {
+        switch ($operator) {
+            case "=":  return $var1 == $var2;
+            case "!=": return $var1 != $var2;
+            case ">=": return $var1 >= $var2;
+            case "<=": return $var1 <= $var2;
+            case ">":  return $var1 >  $var2;
+            case "<":  return $var1 <  $var2;
+            default:       return true;
+        }
+    }
+
 }

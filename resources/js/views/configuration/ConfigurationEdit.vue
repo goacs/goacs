@@ -5,6 +5,9 @@
       <CButton class="float-right" variant="outline" color="danger" size="sm" @click="remove">
         <CIcon name="cil-trash" class="btn-icon mt-0" size="sm"></CIcon>Remove
       </CButton>
+      <CButton class="float-right mr-4" variant="outline" color="primary" size="sm" @click="clone">
+        <CIcon name="cil-clone" class="btn-icon mt-0" size="sm"></CIcon>Clone
+      </CButton>
     </CCardHeader>
     <CCardBody>
       <ValidationObserver ref="validator" v-slot="{ passes }">
