@@ -53,16 +53,27 @@ class Provision
         })->isNotEmpty();
     }
 
-    private function condition(mixed $var1, mixed $var2, string $operator) {
+    private function condition(string $paramValue, string $ruleValue, string $operator) {
+        if($operator === 'in') {
+            return $this->inCondition($paramValue, $ruleValue);
+        } elseif($operator === 'not in') {
+            return !$this->inCondition($paramValue, $ruleValue);
+        }
+
         switch ($operator) {
-            case "=":  return $var1 == $var2;
-            case "!=": return $var1 != $var2;
-            case ">=": return $var1 >= $var2;
-            case "<=": return $var1 <= $var2;
-            case ">":  return $var1 >  $var2;
-            case "<":  return $var1 <  $var2;
+            case "==":  return $paramValue == $ruleValue;
+            case "!=": return $paramValue != $ruleValue;
+            case ">=": return $paramValue >= $ruleValue;
+            case "<=": return $paramValue <= $ruleValue;
+            case ">":  return $paramValue >  $ruleValue;
+            case "<":  return $paramValue <  $ruleValue;
             default:       return true;
         }
+    }
+
+    private function inCondition(string $paramValue, string $ruleValue) {
+        $ruleValue = explode(',', $ruleValue);
+        return in_array($paramValue, $ruleValue);
     }
 
 }
