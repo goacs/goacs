@@ -29,7 +29,8 @@ class GetParameterValuesResponseProcessor extends Processor
 
     public function __invoke()
     {
-        if($this->context->new) {
+        $rb = Setting::getValue('read_behaviour');
+        if($this->context->new &&  $rb === 'new') {
             //Save Parameters in db
             DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
 
@@ -40,6 +41,12 @@ class GetParameterValuesResponseProcessor extends Processor
                     $this->context->parameterInfos->filterEndsWithDot()->toParameterValuesCollecton()
                 );
             }
+        } else if($rb === 'boot') {
+            DeviceParameter::massUpdateOrInsert(
+                $this->context->deviceModel,
+                $this->context->cpeResponse->parameters,
+                true
+            );
         }
 
         if(\Arr::get($this->context->tasks->prevTask()?->payload ?? [], 'store', false) === true) {

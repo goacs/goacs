@@ -62,7 +62,7 @@ class ParameterValuesCollection extends Collection
         }
     }
 
-    public function diff($items)
+    public function diff($items, bool $skipSend = false)
     {
         $diff = new ParameterValuesCollection();
         /** @var ParameterValueStruct $item */
@@ -72,6 +72,11 @@ class ParameterValuesCollection extends Collection
             foreach ($items as $othItem) {
                 if($item->name === $othItem->name) {
                     $exist = true;
+
+                    if($skipSend && ($item->flag->send || $othItem->flag->send)) {
+                        continue;
+                    }
+
                     if($item->value !== $othItem->value || $item->type !== $othItem->type || $item->flag->toString() !== $othItem->flag->toString()) {
                         $diff->put($item->name, $item);
                     }

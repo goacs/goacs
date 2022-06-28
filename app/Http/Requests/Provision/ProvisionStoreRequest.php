@@ -22,8 +22,9 @@ class ProvisionStoreRequest extends FormRequest
                 'string',
                 Rule::unique('provisions')->ignore($this->provision?->id)
             ],
-            'events' => 'required',
+            'events' => 'string',
             'script' => 'required',
+            'requests' => 'string',
             'templates' => 'array',
             'templates.*' => 'exists:templates,id',
             'rules' => 'array',

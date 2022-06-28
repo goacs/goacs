@@ -93,6 +93,8 @@ class Context
 
     public int $provisioningCurrentState = 0;
 
+    public array $events = [];
+
     public function __construct(Request $request, Response $response)
     {
         $this->request = $request;
@@ -135,6 +137,7 @@ class Context
                     $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
                     $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX . $this->device->serialNumber, false);
                     $this->provisioningCurrentState = self::PROVISIONING_STATE_INFORM;
+                    $this->events = $this->cpeRequest->events;
 
                     if (
                         $this->cpeRequest->hasEvent(0) ||
@@ -239,6 +242,7 @@ class Context
             'provision' => $this->provision,
             'newSession' => false,
             'lookupParameters' => $this->lookupParameters,
+            'events' => $this->events
         ]);
     }
 

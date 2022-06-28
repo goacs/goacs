@@ -14,7 +14,7 @@ class Provision extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'events', 'script'
+        'name', 'events', 'requests', 'script'
     ];
 
     protected $with = ['rules', 'denied'];
@@ -25,5 +25,13 @@ class Provision extends Model
 
     public function denied(): HasMany {
         return $this->hasMany(ProvisionDeniedParameter::class);
+    }
+
+    public function eventsArray(): array {
+        return explode(',', $this->events);
+    }
+
+    public function requestsArray(): array {
+        return explode(',', $this->requests);
     }
 }

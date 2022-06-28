@@ -16,7 +16,18 @@
       class="mb-4"
       v-model="form.events"
                  :invalid-feedback="scope.errors[0]"
-                 :is-valid="isvalid(scope)"></EventSelect>
+                 :is-valid="isvalid(scope)">
+
+    </EventSelect>
+
+    <label>Requests</label>
+    <RequestSelect
+      class="mb-4"
+      v-model="form.requests"
+      :invalid-feedback="scope.errors[0]"
+      :is-valid="isvalid(scope)">
+
+    </RequestSelect>
 
 
   </ValidationProvider>
@@ -71,10 +82,11 @@
 import RuleItem from "../../components/rule/RuleItem";
 import CodeEditor from "../../components/CodeEditor";
 import EventSelect from "../../components/EventSelect";
+import RequestSelect from "../../components/RequestSelect";
 
 export default {
   name: "ConfigurationForm",
-  components: {EventSelect, RuleItem, CodeEditor},
+  components: {RequestSelect, EventSelect, RuleItem, CodeEditor},
   computed: {
     form: {
       set(val) {

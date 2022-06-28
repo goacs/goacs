@@ -15,7 +15,7 @@
     props: {
       value: {
         type: String,
-        required: true,
+        default: () => '',
       },
     },
     data() {
@@ -54,9 +54,6 @@
     },
     methods: {
       initializeEvents() {
-        if(!this.value) {
-          return
-        }
         this.selectedEvents = [];
         const splittedValue = this.value.split(',')
         console.log(splittedValue);
