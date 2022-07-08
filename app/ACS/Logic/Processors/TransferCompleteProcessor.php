@@ -13,6 +13,7 @@ class TransferCompleteProcessor extends Processor
 
     public function __invoke()
     {
+        $this->context->provision->queueTasks();
         $this->context->acsResponse = new TransferCompleteResponse($this->context);
     }
 }

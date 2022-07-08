@@ -3,22 +3,56 @@
 namespace App\ACS\Logic;
 
 use App\ACS\Context;
+use App\ACS\Entities\Event;
+use App\ACS\Entities\Task;
+use App\ACS\Types;
+use App\Models\DeviceParameter;
+use App\Models\Log;
 use App\Models\Provision as ProvisionModel;
 use App\Models\ProvisionRule;
 use Illuminate\Support\Collection;
 
 class Provision
 {
+    public array $passedProvisions = [];
+
     public function __construct(private Context $context) {}
 
-    public function getProvisions(): array {
+    public function queueTasks() {
+        /** @var ProvisionModel $provision */
+        foreach($this->getProvisions() as $provision) {
+            $task = new Task(Types::RunScript);
+            $task->setPayload(['script'=>$provision->script]);
+            $this->context->tasks->addTask($task);
+        }
+    }
+
+    public function getDeniedParameters(): Collection {
+        $parameters = new Collection();
+        foreach ($this->getProvisions() as $provision) {
+            foreach($provision->denied as $deniedParameter) {
+                $parameter = str_replace('$root', $this->context->device->root, $deniedParameter->paramter);
+                $parameters[] = $parameter;
+            }
+        }
+
+        return $parameters->unique()->values();
+    }
+
+    public function getProvisions($force = false): array {
+        if($force === false && count($this->passedProvisions) > 0) {
+            return $this->passedProvisions;
+        }
+
         /** @var ProvisionModel[] $storedProvisions */
         $storedProvisions = ProvisionModel::with(['rules','denied'])->get();
 
-        $passedProvisions = [];
+        $this->passedProvisions = [];
         foreach ($storedProvisions as $storedProvision) {
+//            dump('Checking provision: '. $storedProvision->name);
             //Filter Events
-            if ($storedProvision->event !== '' && count(array_intersect($storedProvision->eventsArray(), $this->context->events)) === 0) {
+            $requestEvents = $this->context->events->map(fn(Event $item) => $item->getCode())->values()->toArray();
+            if ($storedProvision->events !== '' && count(array_intersect($storedProvision->eventsArray(), $requestEvents)) === 0) {
                 continue;
             }
 
@@ -31,11 +65,12 @@ class Provision
             if($this->evaluateRules($storedProvision->rules) === false) {
                 continue;
             }
-
-            $passedProvisions[] = $storedProvision;
+            Log::logInfo($this->context->deviceModel, 'Passed provision: '.$storedProvision->name);
+//            dump('passed');
+            $this->passedProvisions[] = $storedProvision;
         }
 
-        return $passedProvisions;
+        return $this->passedProvisions;
     }
 
     private function evaluateRules(Collection $rules): bool {
@@ -43,14 +78,21 @@ class Provision
             return true;
         }
 
-        return $rules->filter(function (ProvisionRule $rule) {
-            $parameterValue = $this->context->parameterValues->get($rule->parameter);
-            if($parameterValue !== null) {
-                return $this->condition($parameterValue, $rule->value, $rule->operator);
+        $passed = $rules->filter(function (ProvisionRule $rule) {
+            $parameter = str_replace('$root', $this->context->device->root, $rule->parameter);
+            $deviceParameter = $this->context->parameterValues->get($parameter);
+            if($deviceParameter === null) {
+                $deviceParameter =  DeviceParameter::getParameter($this->context->deviceModel->id, $parameter);
+            }
+
+            if($deviceParameter !== null) {
+                return $this->condition($deviceParameter->value, $rule->value, $rule->operator);
             }
 
             return false;
-        })->isNotEmpty();
+        });
+
+        return $passed->count() === $rules->count();
     }
 
     private function condition(string $paramValue, string $ruleValue, string $operator) {

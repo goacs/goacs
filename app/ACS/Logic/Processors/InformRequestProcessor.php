@@ -42,7 +42,7 @@ class InformRequestProcessor extends Processor
 
         $task = new Task(Types::INFORMResponse);
         $this->context->tasks->addTask($task);
-        $this->loadGlobalTasks(Types::INFORM);
+        $this->context->provision->queueTasks();
 
         if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_INFORM && $this->context->new === true) {
             $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_READPARAMS;
@@ -55,19 +55,25 @@ class InformRequestProcessor extends Processor
             $this->context->new = true;
         }
 
-        $this->context->deviceModel = Device::updateOrCreate(
+        $this->context->deviceModel = Device::firstOrNew(
             [
                 'serial_number' => $this->context->device->serialNumber,
-            ],
-            [
-                'software_version' => $this->context->parameterValues->get($this->context->device->root .'DeviceInfo.SoftwareVersion')?->value,
-                'product_class' => $this->context->device->productClass,
-                'oui' => $this->context->device->oui,
-                'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
-                'updated_at' => now(),
-                'debug' => env('DEBUG_NEW_DEVICES', false),
             ]
         );
+
+        $this->context->deviceModel->fill([
+            'software_version' => $this->context->parameterValues->get($this->context->device->root .'DeviceInfo.SoftwareVersion')?->value,
+            'product_class' => $this->context->device->productClass,
+            'oui' => $this->context->device->oui,
+            'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
+            'updated_at' => now(),
+        ]);
+
+        if($this->context->deviceModel->wasRecentlyCreated) {
+            $this->context->deviceModel->debug = env('DEBUG_NEW_DEVICES', false);
+        }
+
+        $this->context->deviceModel->save();
 
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
     }

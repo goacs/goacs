@@ -1,10 +1,12 @@
 <template>
   <CModal
+    class="param-modal"
     title="Lookup parameters"
     size="xl"
     color="dark"
     centered
     :closeOnBackdrop="false"
+    :addContentClasses="['param-modal']"
     :show="value"
     @update:show="onModalClose"
   >
@@ -60,6 +62,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+.param-modal {
+  width: 1500px !important;
+}
 </style>

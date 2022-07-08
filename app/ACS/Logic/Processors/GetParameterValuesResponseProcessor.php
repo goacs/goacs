@@ -74,7 +74,9 @@ class GetParameterValuesResponseProcessor extends Processor
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestUsername', $settingsUsername, 'RWS', 'xsd:string');
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestPassword', $settingsPassword, 'RWS', 'xsd:string');
 
-                $this->loadGlobalTasks(Types::GetParameterValuesResponse);
+//                $this->loadGlobalTasks(Types::GetParameterValuesResponse);
+
+                $this->context->provision->queueTasks();
 
                 $this->context->tasks->addTask(new Task(Types::SetParameterValuesProcessor));
 //                (new SetParameterValuesRequestProcessor($this->context))();

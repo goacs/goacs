@@ -54,8 +54,8 @@ export default {
           key: 'from',
         },
         {
-          label: 'Type',
-          key: 'type',
+          label: 'Message',
+          key: 'message',
         },
         {
           label: 'At',

@@ -11,6 +11,7 @@ use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\Task;
 use App\ACS\Entities\TaskCollection;
+use App\ACS\Logic\Provision;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
 use App\ACS\Request\GetRPCMethodsCPERequest;
@@ -81,7 +82,7 @@ class Context
 
     public string $cwmpUri;
 
-    public bool $provision = false;
+    public Provision $provision;
 
     public bool $lookupParameters = false;
 
@@ -93,7 +94,7 @@ class Context
 
     public int $provisioningCurrentState = 0;
 
-    public array $events = [];
+    public Collection $events;
 
     public function __construct(Request $request, Response $response)
     {
@@ -198,6 +199,9 @@ class Context
                     break;
 
             }
+
+            $this->provision = new Provision($this);
+
         } catch (\Throwable $throwable) {
             if($this->deviceModel !== null) {
                 Log::logError($this->deviceModel, $throwable->getMessage()."\n\n".(string) $this->request->getContent());
@@ -239,7 +243,6 @@ class Context
         $this->session()->put('tasks', $this->tasks);
         $this->session()->put('this', [
             'new' => $this->new,
-            'provision' => $this->provision,
             'newSession' => false,
             'lookupParameters' => $this->lookupParameters,
             'events' => $this->events
