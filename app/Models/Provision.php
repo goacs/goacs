@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Provision extends Model
 {
     use HasFactory;
+    use DeepClone;
 
     protected $fillable = [
         'name', 'events', 'requests', 'script'

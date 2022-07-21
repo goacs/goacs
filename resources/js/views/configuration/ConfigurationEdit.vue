@@ -67,6 +67,19 @@ export default {
       } catch (e) {
 
       }
+    },
+    async clone() {
+      if(confirm('Did you want to clone this configuration?') === false) {
+        return;
+      }
+
+      try {
+        const response = await this.$store.dispatch('configuration/clone', this.form.id);
+        await this.$router.push({ name: 'configuration-edit', params: {id: response.data.data.id}})
+
+      } catch (e) {
+
+      }
     }
   },
   async beforeMount() {

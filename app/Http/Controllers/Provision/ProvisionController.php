@@ -48,6 +48,15 @@ class ProvisionController extends Controller
         });
     }
 
+    public function clone(Provision $provision) {
+        return \DB::transaction(function () use ($provision){
+            $clone = $provision->clone();
+            $clone->name .= ' cloned '.now()->toDateTimeString();
+            $clone->save();
+            return new ProvisionResource($clone->refresh());
+        });
+    }
+
     public function destroy(Provision $provision) {
         $this->deleteRelated($provision);
         $provision->delete();

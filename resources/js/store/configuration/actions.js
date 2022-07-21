@@ -15,6 +15,9 @@ export default {
     commit('setProvision', response.data.data);
     return response;
   },
+  async clone({commit}, id) {
+    return await this._vm.$http.get(`/api/provision/${id}/clone`);
+  },
   async destroy({ commit }, id) {
     const response = await this._vm.$http.delete(`/api/provision/${id}`);
     commit('resetProvision');
