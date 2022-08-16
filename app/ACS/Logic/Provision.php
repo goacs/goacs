@@ -45,7 +45,7 @@ class Provision
         }
 
         /** @var ProvisionModel[] $storedProvisions */
-        $storedProvisions = ProvisionModel::with(['rules','denied'])->get();
+        $storedProvisions = ProvisionModel::with(['rules','denied'])->orderByRaw('name + 0')->get();
 
         $this->passedProvisions = [];
         foreach ($storedProvisions as $storedProvision) {
@@ -57,12 +57,12 @@ class Provision
             }
 
             //Filter Request
-            if(in_array($this->context->bodyType, $storedProvision->requestsArray()) === false) {
+            if($storedProvision->requests !== '' && in_array($this->context->bodyType, $storedProvision->requestsArray()) === false) {
                 continue;
             }
 
             //Filter Rules
-            if($this->evaluateRules($storedProvision->rules) === false) {
+            if($storedProvision->rules->isNotEmpty() && $this->evaluateRules($storedProvision->rules) === false) {
                 continue;
             }
             Log::logInfo($this->context->deviceModel, 'Passed provision: '.$storedProvision->name);
