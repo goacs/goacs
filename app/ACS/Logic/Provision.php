@@ -31,7 +31,7 @@ class Provision
         $parameters = new Collection();
         foreach ($this->getProvisions() as $provision) {
             foreach($provision->denied as $deniedParameter) {
-                $parameter = str_replace('$root', $this->context->device->root, $deniedParameter->paramter);
+                $parameter = str_replace('$root.', $this->context->device->root, $deniedParameter->paramter);
                 $parameters[] = $parameter;
             }
         }
@@ -79,23 +79,19 @@ class Provision
         }
 
         $passed = $rules->filter(function (ProvisionRule $rule) {
-            $parameter = str_replace('$root', $this->context->device->root, $rule->parameter);
+            $parameter = str_replace('$root.', $this->context->device->root, $rule->parameter);
             $deviceParameter = $this->context->parameterValues->get($parameter);
             if($deviceParameter === null) {
                 $deviceParameter =  DeviceParameter::getParameter($this->context->deviceModel->id, $parameter);
             }
 
-            if($deviceParameter !== null) {
-                return $this->condition($deviceParameter->value, $rule->value, $rule->operator);
-            }
-
-            return false;
+            return $this->condition($deviceParameter?->value, $rule->value, $rule->operator);
         });
 
         return $passed->count() === $rules->count();
     }
 
-    private function condition(string $paramValue, string $ruleValue, string $operator) {
+    private function condition(?string $paramValue, string $ruleValue, string $operator) {
         if($operator === 'in') {
             return $this->inCondition($paramValue, $ruleValue);
         } elseif($operator === 'not in') {
