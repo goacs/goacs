@@ -16,6 +16,6 @@ class FaultResponseProcessor extends Processor
     {
         /** @var FaultResponse $response */
         $response = $this->context->cpeResponse;
-        Log::fromFaultResponse($this->context->deviceModel, $response);
+        Log::fromFaultResponse($this->context, $response);
     }
 }

@@ -114,4 +114,8 @@ export default {
     const filterStr = filterToQueryString(parameters.filter)
     return await this._vm.$http.get(`/api/device/${parameters.device_id}/logs?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
   },
+
+  async downloadLogs(context, {device_id, session_id}) {
+    return await this._vm.$http.get(`/api/device/${device_id}/logs/download?session_id=${session_id}`);
+  }
 }

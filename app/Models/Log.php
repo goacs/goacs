@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $message
  * @property string $type
  * @property string $from
+ * @property string $session_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Log newModelQuery()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereDeviceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Log whereSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereFullXml($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereMessage($value)
@@ -51,7 +53,7 @@ class Log extends Model
 
     protected $table = 'logs';
 
-    protected $fillable = ['from', 'type', 'full_xml', 'code', 'message', 'detail'];
+    protected $fillable = ['from', 'type', 'full_xml', 'code', 'message', 'detail', 'session_id'];
 
     protected $dateFormat = 'Y-m-d H:i:s.u';
 
@@ -63,55 +65,59 @@ class Log extends Model
         return $this->belongsTo(Device::class);
     }
 
-    public static function fromFaultResponse(Device $device, FaultResponse $faultResponse): self {
+    public static function fromFaultResponse(Context $context, FaultResponse $faultResponse): self {
         $log = new static();
-        $log->device_id = $device->id;
+        $log->device_id = $context->deviceModel->id;
         $log->full_xml = $faultResponse->fullXML;
         $log->code = $faultResponse->faultCode;
         $log->message = $faultResponse->faultString;
         $log->detail = json_decode(json_encode($faultResponse->detail), true);
         $log->type = Types::FaultResponse;
         $log->from = 'device';
+        $log->session_id = $context->sessionId;
         $log->save();
         return $log;
     }
 
-    public static function logInfo(Device $device, string $message, array $detail = []) {
+    public static function logInfo(Context $context, string $message, array $detail = []) {
         $log = new static();
-        $log->device_id = $device->id;
+        $log->device_id = $context->deviceModel->id;
         $log->full_xml = $message;
         $log->code = '200000';
         $log->message = $message;
         $log->detail = $detail;
         $log->type = 'INFO';
         $log->from = 'acs';
+        $log->session_id = $context->sessionId;
         $log->save();
     }
 
-    public static function logError(Device $device, string $message, string $code = '100000', array $detail = []) {
+    public static function logError(Context $context, string $message, string $code = '100000', array $detail = []) {
         $log = new static();
-        $log->device_id = $device->id;
+        $log->device_id = $context->deviceModel->id;
         $log->full_xml = $message;
         $log->code = $code;
         $log->message = $message;
         $log->detail = $detail;
         $log->type = 'ERROR';
         $log->from = 'acs';
+        $log->session_id = $context->sessionId;
         $log->save();
     }
 
-    public static function logConversation(Device $device, string $from, string $type, string $xml, array $detail = []) {
+    public static function logConversation(Context $context, string $from, string $type, string $xml, array $detail = []) {
         $enabled = boolval(Setting::getValue('conversation_log'));
 
-        if($enabled && $device->debug === true) {
+        if($enabled && $context->deviceModel->debug === true) {
             $log = new static();
-            $log->device_id = $device->id;
+            $log->device_id = $context->deviceModel->id;
             $log->full_xml = $xml;
             $log->code = $type;
             $log->message = $type;
             $log->detail = $detail;
             $log->type = $type;
             $log->from = $from;
+            $log->session_id = $context->sessionId;
             $log->save();
         }
     }

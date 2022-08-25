@@ -32,7 +32,7 @@ class InformRequestProcessor extends Processor
         if($this->sessionExists()) {
             $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_ERROR;
             $this->context->acsResponse = new ErrorResponse($this->context, 'Session DUP');
-            Log::logError($this->context->deviceModel,  'Session DUP', '100400', [
+            Log::logError($this->context,  'Session DUP', '100400', [
                 'faultString' => "KEY: SESSID_".$this->context->device->serialNumber.'  SESSION ID: '. \Cache::get("SESSID_".$this->context->device->serialNumber)
             ]);
             return;

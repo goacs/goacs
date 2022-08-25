@@ -42,6 +42,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'logs' => [
+            'driver' => 'local',
+            'root' => public_path('logs'),
+            'url' => env('APP_URL').'/logs',
+            'visibility' => 'public',
+        ],
+
         'file_store' => [
             'driver' => 'local',
             'root' => storage_path('files'),

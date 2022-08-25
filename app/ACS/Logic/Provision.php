@@ -65,7 +65,7 @@ class Provision
             if($storedProvision->rules->isNotEmpty() && $this->evaluateRules($storedProvision->rules) === false) {
                 continue;
             }
-            Log::logInfo($this->context->deviceModel, 'Passed provision: '.$storedProvision->name);
+            Log::logInfo($this->context, 'Passed provision: '.$storedProvision->name);
 //            dump('passed');
             $this->passedProvisions[] = $storedProvision;
         }
@@ -82,7 +82,7 @@ class Provision
             $parameter = str_replace('$root.', $this->context->device->root, $rule->parameter);
             $deviceParameter = $this->context->parameterValues->get($parameter);
             if($deviceParameter === null) {
-                $deviceParameter =  DeviceParameter::getParameter($this->context->deviceModel->id, $parameter);
+                $deviceParameter = DeviceParameter::getParameter($this->context->deviceModel->id, $parameter);
             }
 
             return $this->condition($deviceParameter?->value, $rule->value, $rule->operator);

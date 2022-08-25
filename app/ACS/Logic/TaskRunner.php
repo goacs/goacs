@@ -131,7 +131,7 @@ class TaskRunner
                 $this->currentTask->done();
             }
         } catch (\Throwable $throwable) {
-            Log::logError($this->context->deviceModel, $throwable->getMessage());
+            Log::logError($this->context, $throwable->getMessage());
         }
     }
 
@@ -148,7 +148,7 @@ class TaskRunner
         $sandbox = new Sandbox($this->context, $this->currentTask->payload['script']);
         try {
             $sandbox->run();
-            Log::logConversation($this->context->deviceModel,
+            Log::logConversation($this->context,
                 'acs',
                 'Run Script',
                 (string) $this->currentTask->payload['script'],
@@ -169,7 +169,7 @@ class TaskRunner
     private function getFileData(string $filename): array {
         $file = File::whereName($filename)->first();
         if($file === false || \Storage::disk($file->disk)->exists($file->filepath) === false) {
-            Log::logError($this->context->deviceModel, "Cannot find file in store: ".$filename);
+            Log::logError($this->context, "Cannot find file in store: ".$filename);
             //TODO: Throw ACS Exception, then catch in ExceptionHandler and respond with some error to device.
         }
         return [

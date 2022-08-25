@@ -16,9 +16,14 @@
     >
       <template #actions="{item}">
         <td>
-        <CButton color="dark" class="float-right" variant="outline" size="sm" @click="showDetails(item)">
-          Details
-        </CButton>
+          <div class="float-right">
+            <CButton color="dark" variant="outline" size="sm" @click="downloadLogs(item)">
+              Download
+            </CButton>
+            <CButton color="dark" variant="outline" size="sm" @click="showDetails(item)">
+              Details
+            </CButton>
+          </div>
         </td>
       </template>
       <template #created_at="{item}">
@@ -85,6 +90,19 @@ export default {
       this.details.json = log.detail;
       this.details.xml = log.full_xml;
       this.details.dialog = true;
+    },
+    async downloadLogs(item) {
+      try {
+        const response = await this.$store.dispatch('device/downloadLogs', {
+          device_id: this.$route.params.id,
+          session_id: item.session_id,
+        });
+        window.open(response.data.data.url);
+      } catch (e) {
+        //alert
+        console.log(e);
+      }
+
     },
     async onModalClose(_, event, accept) {
       this.hide();

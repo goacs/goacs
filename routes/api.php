@@ -33,6 +33,7 @@ Route::patch('/device/{device}/parameters/patch', [\App\Http\Controllers\Device\
 Route::apiResource('device.parameters', \App\Http\Controllers\Device\DeviceParameterController::class);
 Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTemplateController::class)->only(['index', 'store', 'destroy']);
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
+Route::get('/device/{device}/logs/download', [\App\Http\Controllers\Device\DeviceLogsController::class, 'downloadLogs']);
 Route::apiResource('device.logs', \App\Http\Controllers\Device\DeviceLogsController::class)->only(['index']);
 Route::get('provision/{provision}/clone', [\App\Http\Controllers\Provision\ProvisionController::class, 'clone']);
 Route::apiResource('provision', \App\Http\Controllers\Provision\ProvisionController::class);

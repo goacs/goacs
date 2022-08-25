@@ -92,6 +92,8 @@ class Context
 
     public string $requestId = '';
 
+    public string $sessionId = ''; //For logs only
+
     public int $provisioningCurrentState = 0;
 
     public Collection $events;
@@ -100,7 +102,7 @@ class Context
     {
         $this->request = $request;
         $this->response = $this->configureResponse($response);
-        $this->loadFromSession();
+        $this->createOrLoadSession();
         $this->processBody();
     }
 
@@ -204,7 +206,7 @@ class Context
 
         } catch (\Throwable $throwable) {
             if($this->deviceModel !== null) {
-                Log::logError($this->deviceModel, $throwable->getMessage()."\n\n".(string) $this->request->getContent());
+                Log::logError($this, $throwable->getMessage()."\n\n".(string) $this->request->getContent());
             }
         }
     }
@@ -219,8 +221,9 @@ class Context
             ;
     }
 
-    public function loadFromSession()
+    public function createOrLoadSession()
     {
+        $this->sessionId = $this->session()->getId();
         $this->provisioningCurrentState = $this->session()->get('provisioningCurrentState', 0);
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
@@ -265,7 +268,7 @@ class Context
         }
 
         $this->deviceModel->save();
-        Log::logInfo($this->deviceModel, 'Ending session');
+        Log::logInfo($this, 'Ending session');
         $this->flushSession();
     }
 

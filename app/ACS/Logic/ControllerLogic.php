@@ -113,7 +113,7 @@ class ControllerLogic
         }
 
 
-        Log::logConversation($this->context->deviceModel,
+        Log::logConversation($this->context,
             'device',
             $this->context->bodyType,
             (string) $this->context->request->getContent(),
@@ -135,7 +135,7 @@ class ControllerLogic
                 ->setContent($body)
             ;
 
-            Log::logConversation($this->context->deviceModel,
+            Log::logConversation($this->context,
                 'acs',
                 $this->context->acsResponse->getBaseName(),
                 (string) $this->context->acsResponse->getBody(),
@@ -153,7 +153,7 @@ class ControllerLogic
                 ->setContent($body)
             ;
 
-            Log::logConversation($this->context->deviceModel,
+            Log::logConversation($this->context,
                 'acs',
                 $this->context->acsRequest->getBaseName(),
                 (string) $this->context->acsRequest->getBody(),

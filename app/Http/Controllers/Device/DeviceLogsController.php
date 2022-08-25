@@ -9,6 +9,7 @@ use App\ACS\Types;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Device\DeviceAddObjectRequest;
 use App\Http\Requests\Device\DeviceUpdateRequest;
+use App\Http\Requests\Device\DownloadDeviceLogRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
 use App\Models\Log;
@@ -39,5 +40,45 @@ class DeviceLogsController extends Controller
                 AllowedFilter::scope('created_after')
             ]);
         return $query->paginate($request->per_page ?: 25);
+    }
+
+    public function downloadLogs(Device $device, DownloadDeviceLogRequest $request) {
+        $logs = Log::whereDeviceId($device->id)->whereSessionId($request->session_id)
+            ->orderBy('created_at')
+            ->get();
+
+        $buffer = $logs->map(fn(Log $log) => $this->formatLogEntry($log))->join('');
+
+
+        $filename = "goacs_session_log_{$request->session_id}.txt";
+
+        if(\Storage::disk('logs')->put($filename, $buffer) === true) {
+            return new JsonResource([
+               'url' =>  \Storage::disk('logs')->url($filename)
+            ]);
+        }
+
+        return response()->json([], 500);
+    }
+
+    private function formatLogEntry(Log $log): string {
+        /**
+         *[2022-07-12 13:32:23] ACS -> DEVICE | DEVICE -> ACS
+         *
+         * content....
+         */
+
+        $from = $log->from;
+        $to = 'acs';
+
+        if($from === 'acs') {
+            $to = 'device';
+        }
+
+        $strLog = "[{$log->created_at->toDateTimeString('microsecond')}] {$from} -> {$to}".PHP_EOL;
+        $strLog .= $log->message.PHP_EOL;
+        $strLog .= $log->full_xml.PHP_EOL.PHP_EOL;
+
+        return $strLog;
     }
 }
