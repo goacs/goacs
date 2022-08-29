@@ -45,7 +45,7 @@ class Provision
         }
 
         /** @var ProvisionModel[] $storedProvisions */
-        $storedProvisions = ProvisionModel::with(['rules','denied'])->orderByRaw('name + 0')->get();
+        $storedProvisions = ProvisionModel::with(['rules','denied'])->orderByRaw('length(name), name')->get();
 
         $this->passedProvisions = [];
         foreach ($storedProvisions as $storedProvision) {
