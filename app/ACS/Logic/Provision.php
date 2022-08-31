@@ -22,16 +22,16 @@ class Provision
         /** @var ProvisionModel $provision */
         foreach($this->getProvisions() as $provision) {
             $task = new Task(Types::RunScript);
-            $task->setPayload(['script'=>$provision->script]);
+            $task->setPayload(['script' => $provision->script]);
             $this->context->tasks->addTask($task);
         }
     }
 
     public function getDeniedParameters(): Collection {
         $parameters = new Collection();
-        foreach ($this->getProvisions() as $provision) {
+        foreach ($this->getProvisions(skipEvents: true, skipRequests: true) as $provision) {
             foreach($provision->denied as $deniedParameter) {
-                $parameter = str_replace('$root.', $this->context->device->root, $deniedParameter->paramter);
+                $parameter = str_replace('$root.', $this->context->device->root, $deniedParameter->parameter);
                 $parameters[] = $parameter;
             }
         }
@@ -39,7 +39,7 @@ class Provision
         return $parameters->unique()->values();
     }
 
-    public function getProvisions($force = false): array {
+    public function getProvisions($force = false, $skipEvents = false, $skipRequests = false): array {
         if($force === false && count($this->passedProvisions) > 0) {
             return $this->passedProvisions;
         }
@@ -52,12 +52,12 @@ class Provision
 //            dump('Checking provision: '. $storedProvision->name);
             //Filter Events
             $requestEvents = $this->context->events->map(fn(Event $item) => $item->getCode())->values()->toArray();
-            if ($storedProvision->events !== '' && count(array_intersect($storedProvision->eventsArray(), $requestEvents)) === 0) {
+            if (!$skipEvents && $storedProvision->events !== '' && count(array_intersect($storedProvision->eventsArray(), $requestEvents)) === 0) {
                 continue;
             }
 
             //Filter Request
-            if($storedProvision->requests !== '' && in_array($this->context->bodyType, $storedProvision->requestsArray()) === false) {
+            if(!$skipRequests && $storedProvision->requests !== '' && in_array($this->context->bodyType, $storedProvision->requestsArray()) === false) {
                 continue;
             }
 
@@ -65,6 +65,7 @@ class Provision
             if($storedProvision->rules->isNotEmpty() && $this->evaluateRules($storedProvision->rules) === false) {
                 continue;
             }
+
             Log::logInfo($this->context, 'Passed provision: '.$storedProvision->name);
 //            dump('passed');
             $this->passedProvisions[] = $storedProvision;
@@ -81,7 +82,7 @@ class Provision
         $passed = $rules->filter(function (ProvisionRule $rule) {
             $parameter = str_replace('$root.', $this->context->device->root, $rule->parameter);
             $deviceParameter = $this->context->parameterValues->get($parameter);
-            if($deviceParameter === null) {
+            if($deviceParameter === null && $this->context->deviceModel !== null) {
                 $deviceParameter = DeviceParameter::getParameter($this->context->deviceModel->id, $parameter);
             }
 

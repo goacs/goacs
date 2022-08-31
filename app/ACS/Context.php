@@ -74,6 +74,8 @@ class Context
 
     public ParameterValuesCollection $parameterValues;
 
+    public Collection $deniedParameters;
+
     public TaskCollection $tasks;
 
     public string $bodyType;
@@ -228,6 +230,7 @@ class Context
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
+        $this->deniedParameters = $this->session()->get('deniedParameters', new Collection());
         $this->tasks = $this->session()->get('tasks', new TaskCollection());
         if($this->device->serialNumber !== "") {
             $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
@@ -239,6 +242,7 @@ class Context
     }
 
     public function storeToSession() {
+        $this->session()->put('deniedParameters', $this->deniedParameters);
         $this->session()->put('provisioningCurrentState', $this->provisioningCurrentState);
         $this->session()->put('device', $this->device);
         $this->session()->put('parameterNames', $this->parameterInfos);

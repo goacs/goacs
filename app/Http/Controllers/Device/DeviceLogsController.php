@@ -76,8 +76,8 @@ class DeviceLogsController extends Controller
         }
 
         $strLog = "[{$log->created_at->toDateTimeString('microsecond')}] {$from} -> {$to}".PHP_EOL;
-        $strLog .= $log->message.PHP_EOL;
-        $strLog .= $log->full_xml.PHP_EOL.PHP_EOL;
+        $strLog .= 'Message: '.$log->message.PHP_EOL;
+        $strLog .= 'Body: '.PHP_EOL.$log->full_xml.PHP_EOL.PHP_EOL;
 
         return $strLog;
     }
