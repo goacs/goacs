@@ -158,6 +158,7 @@ class TaskRunner
             $fault->full_xml = $exception->getMessage()."\n\n".$exception->getTraceAsString();
             $fault->message = $exception->getMessage();
             $fault->code = '100020';
+            $fault->session_id = $this->context->sessionId;
             $fault->save();
         }
         // Run other tasks
