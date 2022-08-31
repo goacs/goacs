@@ -28,15 +28,11 @@ abstract class ACSRequest
     {
         return '<?xml version="1.0" encoding="UTF-8"?>
 <soap-env:Envelope xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="'.$this->context->cwmpUri.'">
-<soap-env:Header><cwmp:ID soap-env:mustUnderstand="1">' . $this->reqid() . '</cwmp:ID></soap-env:Header><soap-env:Body>' . $body . '</soap-env:Body></soap-env:Envelope>';
+<soap-env:Header><cwmp:ID soap-env:mustUnderstand="1">' . $this->context->envelopeId() . '</cwmp:ID></soap-env:Header><soap-env:Body>' . $body . '</soap-env:Body></soap-env:Envelope>';
     }
 
     public function getBaseName(): string {
         $class_parts = explode('\\', get_class($this));
         return end($class_parts) ?? '';
-    }
-
-    private function reqid() {
-        return (string) (time() . mt_rand(100000, 999999));
     }
 }
