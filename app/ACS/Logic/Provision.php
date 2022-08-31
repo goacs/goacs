@@ -109,9 +109,9 @@ class Provision
         }
     }
 
-    private function inCondition(string $paramValue, string $ruleValue) {
+    private function inCondition(?string $paramValue, string $ruleValue) {
         $ruleValue = explode(',', $ruleValue);
-        return in_array($paramValue, $ruleValue);
+        return in_array($paramValue ?? '', $ruleValue);
     }
 
 }
