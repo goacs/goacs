@@ -19,10 +19,16 @@
       v-model="item.name"
     ></CInput>
 
-    <CInput
-      label="Type"
-      v-model="item.type"
-    ></CInput>
+    <CFormGroup class="form-group">
+      <template #label>
+        <label>Type</label>
+      </template>
+      <template #input>
+        <TypeSelect
+          v-model="item.type"
+        ></TypeSelect>
+      </template>
+    </CFormGroup>
 
     <CInput
       label="Value"
@@ -43,9 +49,10 @@
 
 <script>
   import FlagInput from "./FlagInput";
+  import TypeSelect from "./TypeSelect";
   export default {
     name: "ParameterDialog",
-    components: {FlagInput},
+    components: {TypeSelect, FlagInput},
     data() {
       return {
       }
