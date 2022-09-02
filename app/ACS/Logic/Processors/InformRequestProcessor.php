@@ -27,9 +27,9 @@ class InformRequestProcessor extends Processor
             $this->context->device->root = explode(".", $this->context->parameterValues->first()->name)[0].".";
         }
 
-        $this->context->deniedParameters = $this->context->provision->getDeniedParameters();
-
         $this->updateDeviceData();
+
+        $this->context->deniedParameters = $this->context->provision->getDeniedParameters();
 
         if($this->sessionExists()) {
             $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_ERROR;
