@@ -162,7 +162,7 @@ return [
     */
 
     'tables' => [
-        'parameters:100000' => [
+        'parameters:1000' => [
             'name' => 'string:256',
             'value' => 'string:1000',
         ],
