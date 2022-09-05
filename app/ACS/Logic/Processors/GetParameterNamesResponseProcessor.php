@@ -24,6 +24,11 @@ class GetParameterNamesResponseProcessor extends Processor
         if($this->context->tasks->isNextTask(Types::GetParameterNames) === false) {
             $filteredParameters = $this->filterDenyParameters($getParameterNamesResponse->parameters);
             $filteredParameters = $filteredParameters->filterByChunkCount(2,2)->filterEndsWithDot();
+
+            if($filteredParameters->isEmpty()) {
+                $filteredParameters = $this->filterDenyParameters($getParameterNamesResponse->parameters);
+            }
+
             foreach ($filteredParameters->chunk(self::GET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
                 $task = new Task(Types::GetParameterValues);
                 $task->setPayload([
