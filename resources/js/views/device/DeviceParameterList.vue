@@ -2,9 +2,29 @@
   <CCard>
     <CCardHeader>
       <strong>Parameters</strong>
-      <CButton color="dark" class="float-right" variant="outline" size="sm" @click="addItem">
+      <div  class="float-right">
+      <LoadingButton
+        size="sm"
+        color="dark"
+        class="shadow-sm"
+        @click.native="lookupParameters"
+        :loading="lookupLoading"
+      >
+        Lookup parameters
+      </LoadingButton>
+      <CButton
+        v-if="hasCachedParams"
+        size="sm"
+        color="dark"
+        class="shadow-sm"
+        @click="cached"
+      >
+        View lookuped parameters
+      </CButton>
+      <CButton color="dark" variant="outline" size="sm" @click="addItem">
         <CIcon name="cil-plus" class="btn-icon mt-0" size="sm"></CIcon> Add
       </CButton>
+      </div>
     </CCardHeader>
     <CCardBody>
         <PaginatedTable
@@ -51,6 +71,7 @@
                 <CIcon name="cil-plus"/>
               </CButton>
               <CButton
+                v-if="item.flags.write === true"
                 size="sm"
                 color="dark"
                 variant="ghost"
@@ -100,9 +121,10 @@
   import ParameterDialog from "../../components/ParameterDialog";
   import Multiselect from "../../components/Multiselect";
   import FlagInput from "../../components/FlagInput";
+  import LoadingButton from "../../components/LoadingButton";
   export default {
     name: "DeviceParameterList",
-    components: {FlagInput, Multiselect, ParameterDialog, PaginatedTable },
+    components: {LoadingButton, FlagInput, Multiselect, ParameterDialog, PaginatedTable },
     data() {
       return {
         lookup: false,
@@ -152,6 +174,7 @@
         editedIndex: -1,
         saving: false,
         flagFilter: {},
+        lookupLoading: false,
       }
     },
     computed: {
@@ -160,6 +183,8 @@
         parameters: 'device/getParameters',
         templates: 'device/getDeviceTemplates',
         dialogErrors: 'dialog/getDeviceParametersErrors',
+        hasCachedParams: 'device/hasCachedParams',
+
       }),
     },
     methods: {
@@ -183,6 +208,22 @@
           // eslint-disable-next-line no-prototype-builtins
           return item.hasOwnProperty('cached')
         }).length > 0
+
+        const index = this.getLookupColumnIndex();
+
+        if(this.lookup === true && index === -1) {
+          this.fields.splice(3,0, {
+            label: 'Readed',
+            key: 'cached',
+            filter: false,
+
+          });
+        } else if(this.lookup === false && index !== -1) {
+            this.fields.splice(index, 1);
+        }
+      },
+      getLookupColumnIndex() {
+        return this.fields.findIndex(field => field.key === 'cached');
       },
       parseFlag(flag) {
         const parser = new FlagParser(flag)
@@ -255,6 +296,22 @@
         } finally {
           this.editSaving = false;
         }
+      },
+      async lookupParameters() {
+        try {
+          this.lookupLoading = true;
+          await this.$store.dispatch('device/lookup', this.device.id)
+        } catch (e) {
+
+        } finally {
+          this.lookupLoading = false;
+        }
+      },
+      cached() {
+        const route = this.$router.resolve({name: 'devices-cached-params', params: {id: this.device.id }});
+        window.open(route.href, '_blank');
+        // this.$store.dispatch('device/fetchCachedParameters', this.device.id);
+        // this.cachedParamsDialog = true;
       },
       stripString(prop, len) {
         return prop.value.substr(0, len);

@@ -6,6 +6,17 @@
         <CForm novalidate @submit.prevent="passes(save)">
           <h5>Behaviour</h5>
           <CInputRadioGroup label="Read behaviour" :options="readBehaviourOptions" :checked.sync="config.read_behaviour" class="mb-3"></CInputRadioGroup>
+          <h5>Variables</h5>
+          <ValidationProvider vid="lookup_cache_ttl" name="Lookup parameters cache TTL"
+                              v-slot="scope">
+            <CInput
+              type="text"
+              label="Lookup parameters cache TTL (minutes)"
+              v-model.number="config.lookup_cache_ttl"
+              :invalid-feedback="scope.errors[0]"
+              :is-valid="isvalid(scope)"
+            ></CInput>
+          </ValidationProvider>
           <h5>Default parameter values</h5>
           <ValidationProvider vid="pii" name="Periodic Inform Interval spread"
                               v-slot="scope">

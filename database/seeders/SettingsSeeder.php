@@ -13,6 +13,7 @@ class SettingsSeeder extends Seeder
 {
     public function run() {
         Setting::firstOrCreate(['name' => 'pii'], ['value' => '36000-56000']);
+        Setting::firstOrCreate(['name' => 'lookup_cache_ttl'], ['value' => '15']);
         Setting::firstOrCreate(['name' => 'connection_request_username'], ['value' => 'ACS']);
         Setting::firstOrCreate(['name' => 'connection_request_password'], ['value' => 'ACS']);
         Setting::firstOrCreate(['name' => 'conversation_log'], ['value' => 'false']);

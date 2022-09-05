@@ -30,6 +30,11 @@ const routes = [
         component: () => import('@/views/device/DeviceView.vue')
       },
       {
+        path: 'devices/:id/cached',
+        name: 'devices-cached-params',
+        component: () => import('@/views/device/DeviceCachedParametersView.vue')
+      },
+      {
         path: 'configuration',
         name: 'configuration-list',
         component: () => import('@/views/configuration/ConfigurationList.vue')

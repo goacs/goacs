@@ -64,7 +64,7 @@ class GetParameterValuesResponseProcessor extends Processor
                 \Cache::put(
                     Context::LOOKUP_PARAMS_PREFIX.$this->context->device->serialNumber,
                     $this->context->parameterValues,
-                    now()->addMinutes(15)
+                    now()->addMinutes((int)Setting::getValue('lookup_cache_ttl'))
                 );
                 $this->dispatcher->dispatch(new ParameterLookupDone($this->context->deviceModel, $this->context->parameterValues));
                 return;
