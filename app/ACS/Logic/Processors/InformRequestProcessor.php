@@ -71,7 +71,7 @@ class InformRequestProcessor extends Processor
             'updated_at' => now(),
         ]);
 
-        if($this->context->deviceModel->wasRecentlyCreated) {
+        if($this->context->deviceModel->exists === false) {
             $this->context->deviceModel->debug = env('DEBUG_NEW_DEVICES', false);
         }
 
