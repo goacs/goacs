@@ -38,11 +38,29 @@
           <template #value="{ item, index }">
             <td>
               <template v-if="item.value.length > 50">
-                {{ stripString(item, 50) }}
+                {{ stripString(item.value, 50) }}
                 <CButton
                 @click="$refs.table.toggleDetails(item, index)"
                 size="sm"
                 color="primary"
+                >
+                  {{Boolean(item._toggled) ? 'Collapse' : 'Expand'}}
+                </CButton>
+              </template>
+              <template v-else>
+                {{ item.value }}
+              </template>
+            </td>
+          </template>
+
+          <template #cached="{ item, index }">
+            <td>
+              <template v-if="item.cached.length > 50">
+                {{ stripString(item.cached, 50) }}
+                <CButton
+                  @click="$refs.table.toggleDetails(item, index)"
+                  size="sm"
+                  color="primary"
                 >
                   {{Boolean(item._toggled) ? 'Collapse' : 'Expand'}}
                 </CButton>
@@ -89,7 +107,8 @@
           </template>
           <template #details="{item}">
             <CCollapse :show="Boolean(item._toggled)" style="max-width: 100em">
-              {{item.value}}
+              <h5>Value: </h5>{{ item.value }}
+              <div v-if="item.cached"><h5 class="mt-3">Readed:</h5> {{ item.cached }}</div>
             </CCollapse>
           </template>
         </PaginatedTable>
@@ -314,7 +333,7 @@
         // this.cachedParamsDialog = true;
       },
       stripString(prop, len) {
-        return prop.value.substr(0, len);
+        return prop.substr(0, len);
       },
       templateName(template_id) {
         const template = _.find(this.templates, {id: template_id});
