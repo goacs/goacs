@@ -16,4 +16,5 @@ use Illuminate\Support\Facades\Route;
 Route::post('/acs', [\App\Http\Controllers\ACSController::class, 'process']);
 Route::get('/acs', [\App\Http\Controllers\ACSController::class, 'process']);
 
+
 Route::get('{any}', fn() => view('app'))->where('any', '.*');

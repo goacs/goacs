@@ -1,9 +1,23 @@
 <template>
   <CCard>
-    <CCardHeader>Configuration</CCardHeader>
+    <CCardHeader>Settings</CCardHeader>
     <CCardBody>
       <ValidationObserver ref="form" v-slot="{ passes }">
-        <CForm novalidate @submit.prevent="passes(login)">
+        <CForm novalidate @submit.prevent="passes(save)">
+          <h5>Behaviour</h5>
+          <CInputRadioGroup label="Read behaviour" :options="readBehaviourOptions" :checked.sync="config.read_behaviour" class="mb-3"></CInputRadioGroup>
+          <h5>Variables</h5>
+          <ValidationProvider vid="lookup_cache_ttl" name="Lookup parameters cache TTL"
+                              v-slot="scope">
+            <CInput
+              type="text"
+              label="Lookup parameters cache TTL (minutes)"
+              v-model.number="config.lookup_cache_ttl"
+              :invalid-feedback="scope.errors[0]"
+              :is-valid="isvalid(scope)"
+            ></CInput>
+          </ValidationProvider>
+          <h5>Default parameter values</h5>
           <ValidationProvider vid="pii" name="Periodic Inform Interval spread"
                               v-slot="scope">
           <CInput
@@ -34,6 +48,8 @@
               :is-valid="isvalid(scope)"
             ></CInput>
           </ValidationProvider>
+          <h5>Mappings</h5>
+          <ParametersMapping></ParametersMapping>
         </CForm>
       </ValidationObserver>
     </CCardBody>
@@ -50,8 +66,10 @@
 </template>
 
 <script>
+  import ParametersMapping from "../../components/ParametersMapping";
   export default {
-    name: "ConfigurationView",
+    name: "BaseSettings",
+    components: {ParametersMapping},
     data() {
       return {
         saving: false,
@@ -68,6 +86,22 @@
           this.$store.commit('config/setConfig', config);
         }
       },
+      readBehaviourOptions() {
+        return [
+          {
+            value: 'boot',
+            label: 'Read and store all parameters (except with send flag) on boot event'
+          },
+          {
+            value: 'new',
+            label: 'Read and store all parameters only when device is new in ACS',
+          },
+          {
+            value: 'none',
+            label: 'Do not store any parameters read from device'
+          }
+        ]
+      }
     },
     methods: {
       async save() {

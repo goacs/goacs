@@ -58,6 +58,7 @@ class ParameterValueCollectionTest extends TestCase
         $parameter = new ParameterValueStruct();
         $parameter->name = "A.B";
         $parameter->value = "1";
+        $parameter->flag->send = true;
         $dbParams->add($parameter);
         $parameter = new ParameterValueStruct();
         $parameter->name = "A.B.C";
@@ -66,6 +67,7 @@ class ParameterValueCollectionTest extends TestCase
         $parameter = new ParameterValueStruct();
         $parameter->name = "A.B.C.D";
         $parameter->value = "3";
+        $dbParams->add($parameter);
         $parameter = new ParameterValueStruct();
         $parameter->name = "A.B.C.D.E";
         $parameter->value = "5";
@@ -90,8 +92,10 @@ class ParameterValueCollectionTest extends TestCase
 
         $diff = $dbParams->diff($cpeParams);
         $diff2 = $cpeParams->diff($dbParams);
+        $diffWithSkip = $cpeParams->diff($dbParams, true);
 
-        $this->assertCount(3, $diff);
+
+        $this->assertCount(4, $diff);
         $this->assertEquals("1", $diff['A.B']->value);
         $this->assertEquals("2", $diff['A.B.C']->value);
         $this->assertEquals("5", $diff['A.B.C.D.E']->value);
@@ -100,6 +104,10 @@ class ParameterValueCollectionTest extends TestCase
         $this->assertEquals("2", $diff2['A.B']->value);
         $this->assertEquals("1", $diff2['A.B.C']->value);
         $this->assertEquals("3", $diff2['A.B.C.D.F']->value);
+
+        $this->assertCount(2, $diffWithSkip);
+        $this->assertEquals("1", $diffWithSkip['A.B.C']->value);
+        $this->assertEquals("3", $diffWithSkip['A.B.C.D.F']->value);
     }
 
     public function test_default_sorting() {

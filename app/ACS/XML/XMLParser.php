@@ -24,7 +24,7 @@ class XMLParser
 
     public string $cwmpVersion = '1.0';
 
-    public string $cwmpUri = '';
+    public string $cwmpUri = 'urn:dslforum-org:cwmp-1-0';
 
     public string $requestId = '';
 
@@ -125,6 +125,6 @@ class XMLParser
         $dom->loadXML( $xml, LIBXML_NOBLANKS | LIBXML_COMPACT );
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput  = false;
-        return $dom->saveXML();
+        return $dom->saveXML(options: LIBXML_NOEMPTYTAG);
     }
 }

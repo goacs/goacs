@@ -11,6 +11,7 @@ use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\Task;
 use App\ACS\Entities\TaskCollection;
+use App\ACS\Logic\Provision;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
 use App\ACS\Request\GetRPCMethodsCPERequest;
@@ -73,13 +74,17 @@ class Context
 
     public ParameterValuesCollection $parameterValues;
 
+    public Collection $deniedParameters;
+
     public TaskCollection $tasks;
 
     public string $bodyType;
 
     public string $cwmpVersion;
 
-    public bool $provision = false;
+    public string $cwmpUri;
+
+    public Provision $provision;
 
     public bool $lookupParameters = false;
 
@@ -89,22 +94,27 @@ class Context
 
     public string $requestId = '';
 
+    public string $sessionId = ''; //For logs only
+
     public int $provisioningCurrentState = 0;
+
+    public Collection $events;
 
     public function __construct(Request $request, Response $response)
     {
         $this->request = $request;
         $this->response = $this->configureResponse($response);
-        $this->loadFromSession();
+        $this->createOrLoadSession();
         $this->processBody();
     }
 
     public function envelopeId(): string
     {
-        if($this->requestId !== '') {
-            return $this->requestId;
+        if($this->requestId === '') {
+            $this->requestId = (string) (time() . mt_rand(100000, 999999));
         }
-        return (string) (time() . mt_rand(100000, 999999));
+
+        return $this->requestId;
     }
 
     public function session()
@@ -122,6 +132,7 @@ class Context
             $parser = new XMLParser((string)$this->request->getContent());
             $this->bodyType = $parser->bodyType;
             $this->cwmpVersion = $parser->cwmpVersion;
+            $this->cwmpUri = $parser->cwmpUri;
             $this->requestId = $parser->requestId;
 
             switch ($this->bodyType) {
@@ -131,6 +142,7 @@ class Context
                     $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
                     $this->lookupParameters = \Cache::get(self::LOOKUP_PARAMS_ENABLED_PREFIX . $this->device->serialNumber, false);
                     $this->provisioningCurrentState = self::PROVISIONING_STATE_INFORM;
+                    $this->events = $this->cpeRequest->events;
 
                     if (
                         $this->cpeRequest->hasEvent(0) ||
@@ -191,9 +203,12 @@ class Context
                     break;
 
             }
+
+            $this->provision = new Provision($this);
+
         } catch (\Throwable $throwable) {
             if($this->deviceModel !== null) {
-                Log::logError($this->deviceModel, $throwable->getMessage()."\n\n".(string) $this->request->getContent());
+                Log::logError($this, $throwable->getMessage()."\n\n".(string) $this->request->getContent());
             }
         }
     }
@@ -208,12 +223,14 @@ class Context
             ;
     }
 
-    public function loadFromSession()
+    public function createOrLoadSession()
     {
+        $this->sessionId = $this->session()->getId();
         $this->provisioningCurrentState = $this->session()->get('provisioningCurrentState', 0);
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
+        $this->deniedParameters = $this->session()->get('deniedParameters', new Collection());
         $this->tasks = $this->session()->get('tasks', new TaskCollection());
         if($this->device->serialNumber !== "") {
             $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
@@ -225,6 +242,7 @@ class Context
     }
 
     public function storeToSession() {
+        $this->session()->put('deniedParameters', $this->deniedParameters);
         $this->session()->put('provisioningCurrentState', $this->provisioningCurrentState);
         $this->session()->put('device', $this->device);
         $this->session()->put('parameterNames', $this->parameterInfos);
@@ -232,9 +250,9 @@ class Context
         $this->session()->put('tasks', $this->tasks);
         $this->session()->put('this', [
             'new' => $this->new,
-            'provision' => $this->provision,
             'newSession' => false,
             'lookupParameters' => $this->lookupParameters,
+            'events' => $this->events
         ]);
     }
 
@@ -254,7 +272,7 @@ class Context
         }
 
         $this->deviceModel->save();
-        Log::logInfo($this->deviceModel, 'Ending session');
+        Log::logInfo($this, 'Ending session');
         $this->flushSession();
     }
 

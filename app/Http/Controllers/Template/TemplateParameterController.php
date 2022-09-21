@@ -22,7 +22,7 @@ class TemplateParameterController extends Controller
     }
 
     public function index(Request $request, Template $template) {
-        $query = QueryBuilder::for($template->parameters()->orderBy('name'));
+        $query = QueryBuilder::for($template->parameters());
         $query->allowedFilters([
             'name',
             'type',

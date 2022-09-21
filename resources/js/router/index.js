@@ -29,7 +29,26 @@ const routes = [
         name: 'devices-view',
         component: () => import('@/views/device/DeviceView.vue')
       },
-
+      {
+        path: 'devices/:id/cached',
+        name: 'devices-cached-params',
+        component: () => import('@/views/device/DeviceCachedParametersView.vue')
+      },
+      {
+        path: 'configuration',
+        name: 'configuration-list',
+        component: () => import('@/views/configuration/ConfigurationList.vue')
+      },
+      {
+        path: 'configuration/create',
+        name: 'configuration-create',
+        component: () => import('@/views/configuration/ConfigurationCreate.vue')
+      },
+      {
+        path: 'configuration/:id',
+        name: 'configuration-edit',
+        component: () => import('@/views/configuration/ConfigurationEdit.vue')
+      },
       {
         path: 'templates',
         name: 'template-list',
@@ -53,7 +72,7 @@ const routes = [
           {
             path: '',
             name: 'settings-main',
-            component: () => import('@/views/settings/ConfigurationView.vue'),
+            component: () => import('@/views/settings/BaseSettings.vue'),
           },
           {
             path: 'tasks',

@@ -29,20 +29,30 @@ class GetParameterValuesResponseProcessor extends Processor
 
     public function __invoke()
     {
-        if($this->context->new) {
+        $rb = Setting::getValue('read_behaviour');
+        $flag = $rb === 'boot';
+        if($this->context->new || $rb === 'boot') {
             //Save Parameters in db
-            DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters);
+            DeviceParameter::massUpdateOrInsert($this->context->deviceModel, $this->context->cpeResponse->parameters, $flag);
 
             if($this->context->tasks->isNextTask(Types::GetParameterValues) === false) {
                 //Save object parameters
                 DeviceParameter::massUpdateOrInsert(
                     $this->context->deviceModel,
-                    $this->context->parameterInfos->filterEndsWithDot()->toParameterValuesCollecton()
+                    $this->context->parameterInfos->filterEndsWithDot()->toParameterValuesCollecton(),
+                    $flag
                 );
             }
         }
+        /*else if($rb === 'boot') {
+            DeviceParameter::massUpdateOrInsert(
+                $this->context->deviceModel,
+                $this->context->cpeResponse->parameters,
+                true
+            );
+        }  */
 
-        if($this->context->tasks->prevTask()?->name === Types::AddObject || $this->fromAddObjectTask()) {
+        if(\Arr::get($this->context->tasks->prevTask()?->payload ?? [], 'store', false) === true) {
             DeviceParameter::massUpdateOrInsert(
                 $this->context->deviceModel,
                 $this->context->cpeResponse->parameters
@@ -54,7 +64,7 @@ class GetParameterValuesResponseProcessor extends Processor
                 \Cache::put(
                     Context::LOOKUP_PARAMS_PREFIX.$this->context->device->serialNumber,
                     $this->context->parameterValues,
-                    now()->addMinutes(15)
+                    now()->addMinutes((int)Setting::getValue('lookup_cache_ttl'))
                 );
                 $this->dispatcher->dispatch(new ParameterLookupDone($this->context->deviceModel, $this->context->parameterValues));
                 return;
@@ -67,7 +77,9 @@ class GetParameterValuesResponseProcessor extends Processor
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestUsername', $settingsUsername, 'RWS', 'xsd:string');
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestPassword', $settingsPassword, 'RWS', 'xsd:string');
 
-                $this->loadGlobalTasks(Types::GetParameterValuesResponse);
+//                $this->loadGlobalTasks(Types::GetParameterValuesResponse);
+
+                $this->context->provision->queueTasks();
 
                 $this->context->tasks->addTask(new Task(Types::SetParameterValuesProcessor));
 //                (new SetParameterValuesRequestProcessor($this->context))();
@@ -75,13 +87,5 @@ class GetParameterValuesResponseProcessor extends Processor
         }
     }
 
-    private function fromAddObjectTask() {
-        if($this->context->tasks->prevTask()?->name === Types::GetParameterValues)
-        {
-            return isset($this->context->tasks->prevTask()?->payload['store']) && $this->context->tasks->prevTask()?->payload['store'] === true;
-        }
-
-        return false;
-    }
 
 }

@@ -29,11 +29,13 @@ class InformRequestProcessor extends Processor
 
         $this->updateDeviceData();
 
+        $this->context->deniedParameters = $this->context->provision->getDeniedParameters();
+
         if($this->sessionExists()) {
             $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_ERROR;
             $this->context->acsResponse = new ErrorResponse($this->context, 'Session DUP');
-            Log::logError($this->context->deviceModel,  'Session DUP', '100400', [
-                'faultString' => 'SESSION ID: '. \Cache::get("SESSID_".$this->context->device->serialNumber)
+            Log::logError($this->context,  'Session DUP', '100400', [
+                'faultString' => "KEY: SESSID_".$this->context->device->serialNumber.'  SESSION ID: '. \Cache::get("SESSID_".$this->context->device->serialNumber)
             ]);
             return;
         }
@@ -42,7 +44,7 @@ class InformRequestProcessor extends Processor
 
         $task = new Task(Types::INFORMResponse);
         $this->context->tasks->addTask($task);
-        $this->loadGlobalTasks(Types::INFORM);
+        $this->context->provision->queueTasks();
 
         if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_INFORM && $this->context->new === true) {
             $this->context->provisioningCurrentState = Context::PROVISIONING_STATE_READPARAMS;
@@ -51,25 +53,35 @@ class InformRequestProcessor extends Processor
     }
 
     private function updateDeviceData(): void {
-        $this->context->deviceModel = Device::updateOrCreate(
+        if(Device::whereSerialNumber($this->context->device->serialNumber)->exists() === false) {
+            $this->context->new = true;
+        }
+
+        $this->context->deviceModel = Device::firstOrNew(
             [
                 'serial_number' => $this->context->device->serialNumber,
-            ],
-            [
-                'software_version' => $this->context->parameterValues->get($this->context->device->root .'DeviceInfo.SoftwareVersion')?->value,
-                'product_class' => $this->context->device->productClass,
-                'oui' => $this->context->device->oui,
-                'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
-                'updated_at' => now(),
-                'debug' => true,
             ]
         );
 
-        $this->context->new = $this->context->deviceModel->wasRecentlyCreated;
+        $this->context->deviceModel->fill([
+            'software_version' => $this->context->parameterValues->get($this->context->device->root .'DeviceInfo.SoftwareVersion')?->value,
+            'product_class' => $this->context->device->productClass,
+            'oui' => $this->context->device->oui,
+            'connection_request_url' => $this->context->parameterValues->get($this->context->device->root . "ManagementServer.ConnectionRequestURL")->value,
+            'updated_at' => now(),
+        ]);
+
+        if($this->context->deviceModel->exists === false) {
+            $this->context->deviceModel->debug = env('DEBUG_NEW_DEVICES', false);
+        }
+
+        $this->context->deviceModel->save();
+
 //        $this->context->device->new = $this->context->deviceModel->wasRecentlyCreated;
     }
 
     private function sessionExists(): bool {
+        return false;
         return \Cache::has("SESSID_".$this->context->device->serialNumber);
     }
 }

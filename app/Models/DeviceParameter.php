@@ -74,10 +74,14 @@ class DeviceParameter extends Model implements ParameterInterface
     }
 
     public static function getParameterValue(int $device_id, string $path) {
-        $parameter = static::where(['name' => $path, 'device_id' => $device_id])->first();
+        $parameter = static::getParameter($device_id, $path);
 
         //magic XD
         return $parameter?->value ?? '';
+    }
+
+    public static function getParameter(int $device_id, string $path) {
+        return static::where(['name' => $path, 'device_id' => $device_id])->first();
     }
 
     public function scopePathset(Builder $query, string $path) {
@@ -93,9 +97,9 @@ class DeviceParameter extends Model implements ParameterInterface
         return $obj;
     }
 
-    public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection) {
+    public static function massUpdateOrInsert(Device $device, ParameterValuesCollection $parameterValuesCollection, bool $withoutSendFlag = false) {
         $currentDBParameters = ParameterValuesCollection::fromEloquent($device->parameters()->get());
-        $diffParameters = $parameterValuesCollection->diff($currentDBParameters);
+        $diffParameters = $parameterValuesCollection->diff($currentDBParameters, $withoutSendFlag);
 
         foreach($diffParameters->chunk(300) as $chunk) {
 

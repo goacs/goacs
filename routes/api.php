@@ -28,12 +28,16 @@ Route::apiResource('device', \App\Http\Controllers\Device\DeviceController::clas
 Route::post('device/{device}/addobject', [\App\Http\Controllers\Device\DeviceController::class, 'addObject']);
 Route::get('device/{device}/provision', [\App\Http\Controllers\Device\DeviceController::class, 'provision']);
 Route::get('device/{device}/lookup', [\App\Http\Controllers\Device\DeviceController::class, 'lookup']);
-Route::get('/device/{device}/parameters/cached', [\App\Http\Controllers\Device\DeviceParameterController::class, 'cached']);
+Route::get('/device/{device}/parameters/cached', [\App\Http\Controllers\Device\DeviceCachedParametersController::class, 'index']);
 Route::patch('/device/{device}/parameters/patch', [\App\Http\Controllers\Device\DeviceParameterController::class, 'patchParameters']);
 Route::apiResource('device.parameters', \App\Http\Controllers\Device\DeviceParameterController::class);
 Route::apiResource('device.templates', \App\Http\Controllers\Device\DeviceTemplateController::class)->only(['index', 'store', 'destroy']);
 Route::apiResource('device.tasks', \App\Http\Controllers\Device\DeviceTaskController::class);
+Route::get('/device/{device}/logs/download', [\App\Http\Controllers\Device\DeviceLogsController::class, 'downloadLogs']);
 Route::apiResource('device.logs', \App\Http\Controllers\Device\DeviceLogsController::class)->only(['index']);
+Route::get('provision/{provision}/clone', [\App\Http\Controllers\Provision\ProvisionController::class, 'clone']);
+Route::apiResource('provision', \App\Http\Controllers\Provision\ProvisionController::class);
+
 Route::apiResource('template', \App\Http\Controllers\Template\TemplateController::class);
 Route::apiResource('faults', \App\Http\Controllers\Faults\FaultsController::class)->only(['index']);
 Route::apiResource('template.parameters', \App\Http\Controllers\Template\TemplateParameterController::class);

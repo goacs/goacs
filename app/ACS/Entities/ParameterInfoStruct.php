@@ -15,9 +15,10 @@ class ParameterInfoStruct
 
     public bool $object = false;
 
-    public function setName($name) {
+    public function setName($name): self {
         $this->name = $name;
         $this->object = $this->isObject();
+        return $this;
     }
 
     public function isObject() {

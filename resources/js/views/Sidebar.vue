@@ -18,6 +18,10 @@
         :to="{ path: '/devices' }"
       />
       <CSidebarNavItem
+        name="Configuration"
+        :to="{ path: '/configuration' }"
+      />
+      <CSidebarNavItem
         name="Templates"
         :to="{ path: '/templates' }"
       />

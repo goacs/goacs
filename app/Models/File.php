@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * App\Models\File
@@ -35,4 +36,9 @@ class File extends Model
     protected $table = 'files';
 
     protected $fillable = ['name', 'type', 'disk', 'filepath', 'size'];
+    protected $appends = ['url'];
+
+    public function getUrlAttribute() {
+        return Storage::disk($this->disk)->url($this->filepath);
+    }
 }

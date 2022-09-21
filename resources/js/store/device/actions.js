@@ -41,9 +41,11 @@ export default {
       console.error("Cannot fetch device parameters")
     }
   },
-  async fetchCachedParameters({ commit }, device_id) {
+  async fetchCachedParameters({ commit }, parameters) {
+    const filterStr = filterToQueryString(parameters.filter)
+
     try {
-      const response = await this._vm.$http.get(`/api/device/${device_id}/parameters/cached`)
+      const response = await this._vm.$http.get(`/api/device/${parameters.id}/parameters/cached?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
       commit('setCachedParameters', response.data.data)
       return response
     } catch (e) {
@@ -114,4 +116,8 @@ export default {
     const filterStr = filterToQueryString(parameters.filter)
     return await this._vm.$http.get(`/api/device/${parameters.device_id}/logs?page=${parameters.page}&per_page=${parameters.perPage}${filterStr}`)
   },
+
+  async downloadLogs(context, {device_id, session_id}) {
+    return await this._vm.$http.get(`/api/device/${device_id}/logs/download?session_id=${session_id}`);
+  }
 }

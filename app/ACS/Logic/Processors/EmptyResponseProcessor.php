@@ -15,7 +15,7 @@ class EmptyResponseProcessor extends Processor
 
     public function __invoke()
     {
-        $this->loadGlobalTasks(Types::EMPTY);
+        $this->context->provision->queueTasks();
 
         if($this->context->tasks->nextTask() !== null && $this->context->tasks->nextTask()->isOnRequest(Types::EMPTY) === false) {
             return;

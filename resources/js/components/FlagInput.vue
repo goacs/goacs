@@ -5,6 +5,7 @@
     :options="flags"
     label="name"
     multiple
+    v-bind="{...$attrs, ...$props}"
   ></v-select>
 </template>
 
@@ -14,7 +15,7 @@
     props: {
       value: {
         type: Object,
-        required: true,
+        default: () => '',
       },
     },
     data() {
@@ -49,9 +50,6 @@
     },
     methods: {
       initializeFlag() {
-        if(!this.value) {
-          return
-        }
         this.selectedFlags = [];
         this.flags.forEach(flag => {
           if(this.value[flag.value] === true) {

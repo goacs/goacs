@@ -66,23 +66,6 @@
       >
         Provision
       </CButton>
-      <CButton
-        size="sm"
-        color="dark"
-        class="shadow-sm"
-        @click="lookup"
-      >
-        Lookup parameters
-      </CButton>
-      <CButton
-          v-if="hasCachedParams"
-          size="sm"
-          color="dark"
-          class="shadow-sm"
-          @click="cached"
-      >
-        Cached parameters
-      </CButton>
     </CCardFooter>
     <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>
     <CElementCover v-if="loading" :opacity="0.8"/>
@@ -126,14 +109,6 @@
           this.loading = false;
         }
       },
-      async lookup() {
-        try {
-          this.loading = true;
-          await this.$store.dispatch('device/lookup', this.device.id)
-        } finally {
-          this.loading = false;
-        }
-      },
       async update() {
         try {
           this.loading = true;
@@ -142,10 +117,6 @@
           this.loading = false;
         }
       },
-      cached() {
-        this.$store.dispatch('device/fetchCachedParameters', this.device.id);
-        this.cachedParamsDialog = true;
-      }
     },
     watch: {
       'device.debug': {

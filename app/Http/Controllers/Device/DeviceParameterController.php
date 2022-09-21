@@ -30,7 +30,7 @@ class DeviceParameterController extends Controller
     }
 
     public function index(Request $request, Device $device) {
-        $query = QueryBuilder::for($device->parameters()->orderBy('name'));
+        $query = QueryBuilder::for($device->parameters());
         $query->select('*');
         $query->addSelect(\DB::raw("'device' as source"));
         $query->allowedFilters([

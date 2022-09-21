@@ -23,35 +23,14 @@ use App\ACS\Logic\Processors\GetRPCMethodsRequestProcessor;
 use App\ACS\Logic\Processors\InformRequestProcessor;
 use App\ACS\Logic\Processors\SetParameterValuesResponseProcessor;
 use App\ACS\Logic\Processors\TransferCompleteProcessor;
-use App\ACS\Logic\Script\Sandbox;
-use App\ACS\Logic\Script\SandboxException;
-use App\ACS\Request\AddObjectRequest;
-use App\ACS\Request\DeleteObjectRequest;
-use App\ACS\Request\DownloadRequest;
-use App\ACS\Request\FactoryResetRequest;
-use App\ACS\Request\GetParameterNamesRequest;
-use App\ACS\Request\GetParameterValuesRequest;
 use App\ACS\Request\InformRequest;
-use App\ACS\Request\RebootRequest;
-use App\ACS\Request\SetParameterValuesRequest;
-use App\ACS\Response\AddObjectResponse;
-use App\ACS\Response\DownloadResponse;
 use App\ACS\Response\ErrorResponse;
-use App\ACS\Response\FaultResponse;
-use App\ACS\Response\GetParameterNamesResponse;
-use App\ACS\Response\GetRPCMethodsACSResponse;
-use App\ACS\Response\InformResponse;
 use App\ACS\Response\TransferCompleteResponse;
 use App\ACS\Types;
 use App\ACS\XML\XMLParser;
-use App\Models\Device;
-use App\Models\DeviceParameter;
 use App\Models\Log;
-use App\Models\File;
-use App\Models\Setting;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 
 class ControllerLogic
 {
@@ -77,7 +56,7 @@ class ControllerLogic
 
         if($this->context->bodyType !== Types::INFORM && $this->context->newSession) {
             $this->context->response->setContent(
-                (new ErrorResponse($this->context, 'invalid session'))
+                (new ErrorResponse($this->context, 'invalid session'))->getBody()
             );
             return $this->context->response;
         }
@@ -134,7 +113,7 @@ class ControllerLogic
         }
 
 
-        Log::logConversation($this->context->deviceModel,
+        Log::logConversation($this->context,
             'device',
             $this->context->bodyType,
             (string) $this->context->request->getContent(),
@@ -156,7 +135,7 @@ class ControllerLogic
                 ->setContent($body)
             ;
 
-            Log::logConversation($this->context->deviceModel,
+            Log::logConversation($this->context,
                 'acs',
                 $this->context->acsResponse->getBaseName(),
                 (string) $this->context->acsResponse->getBody(),
@@ -174,7 +153,7 @@ class ControllerLogic
                 ->setContent($body)
             ;
 
-            Log::logConversation($this->context->deviceModel,
+            Log::logConversation($this->context,
                 'acs',
                 $this->context->acsRequest->getBaseName(),
                 (string) $this->context->acsRequest->getBody(),

@@ -27,7 +27,7 @@ class DeviceParametersLogic
     }
 
     public function getParametersToCreateInstance(ParameterValuesCollection $sessionParameters, ParameterValuesCollection $dbParameters) {
-        $diff = $dbParameters->diff($sessionParameters)->filterByFlag('object')->filterInstances();
+        $diff = $dbParameters->diff($sessionParameters)->filterByFlag('object')->filterByFlag('send')->filterInstances();
         $toAddParams = new ParameterValuesCollection();
         /** @var ParameterValueStruct $parameter */
         foreach($diff as $parameter) {

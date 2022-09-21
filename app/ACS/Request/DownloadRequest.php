@@ -32,7 +32,7 @@ class DownloadRequest extends ACSRequest
         $body .= '<URL>'.$this->fileUrl.'</URL>';
         $body .= '<Username></Username>';
         $body .= '<Password></Password>';
-        $body .= '<Filesize>'.$this->filesize.'</Filesize>';
+        $body .= '<FileSize>'.$this->filesize.'</FileSize>';
         $body .= '<TargetFilename></TargetFilename>';
         $body .= '<DelaySeconds>0</DelaySeconds>';
         $body .= '<SuccessURL></SuccessURL>';
