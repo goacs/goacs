@@ -13,6 +13,7 @@ class DebugStoreRequest extends FormRequest
     public function rules(): array {
         return [
             'debug' => 'required|boolean',
+            'debug_new_devices' => 'required|boolean',
             'devices' => 'array',
             'devices.*' => 'integer|exists:device,id'
         ];

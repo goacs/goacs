@@ -64,10 +64,10 @@ class Setting extends Model
     }
 
     public static function encodeValue($value) {
-        if(is_array($value)) {
+        if(is_array($value) || is_bool($value)) {
             return json_encode($value);
         }
 
-        return $value;
+        return (string) $value;
     }
 }

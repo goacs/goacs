@@ -25,6 +25,26 @@
             </CCol>
           </CRow>
           <CRow>
+            <CCol sm="12">
+              <ValidationProvider vid="debug_new_devices" name="Debug new devices"
+                                  v-slot="scope">
+                <div class="form-group">
+                  <label>Debug newly added devices in ACS</label>
+                  <div class="form-control-plaintext">
+                    <CSwitch
+                      :checked.sync="debug.debug_new_devices"
+                      type="checkbox"
+                      color="dark"
+                      label-on="yes"
+                      label-off="no"
+                    >
+                    </CSwitch>
+                  </div>
+                </div>
+              </ValidationProvider>
+            </CCol>
+          </CRow>
+          <CRow>
             <CCol sm="12" md="6">
               <ValidationProvider vid="devices" name="Devices"
                                   v-slot="scope">
@@ -91,7 +111,7 @@ export default {
       try {
         this.saving = true;
         const devices = this.debug.devices.map(item => item.id);
-        await this.$store.dispatch('config/saveDebugConfig', { debug: this.debug.debug, devices });
+        await this.$store.dispatch('config/saveDebugConfig', { debug: this.debug.debug, debug_new_devices: this.debug.debug_new_devices, devices });
         this.saved = true;
         setTimeout(() => this.saved = false, 5000);
       } catch (e) {

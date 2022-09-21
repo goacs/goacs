@@ -19,7 +19,8 @@ class DebugController extends Controller
     }
 
     public function store(DebugStoreRequest $request) {
-        Setting::setValue('conversation_log', $request->debug);
+        Setting::setValue('conversation_log', $request->boolean('debug'));
+        Setting::setValue('debug_new_devices', $request->boolean('debug_new_devices'));
         Device::whereNotIn('id', $request->devices)->update(['debug' => false]);
         Device::whereIn('id', $request->devices)->update(['debug' => true]);
 
@@ -28,10 +29,12 @@ class DebugController extends Controller
 
     public function getDefaultResource() {
         $debug = (bool) Setting::getValue('conversation_log');
+        $debugNewDevices = (bool) Setting::getValue('debug_new_devices');
         $debugDevices = Device::whereDebug(true)->get();
 
         return JsonResource::make([
             'debug' => $debug,
+            'debug_new_devices' => $debugNewDevices,
             'devices' => $debugDevices
         ]);
     }
