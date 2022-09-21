@@ -12,6 +12,7 @@ class Device
     public string $manufacturer = '';
     public string $serialNumber = '';
     public string $productClass = '';
+    public string $modelName = '';
     public bool $new = false;
     public string $root = '';
 

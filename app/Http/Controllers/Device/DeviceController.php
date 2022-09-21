@@ -37,6 +37,7 @@ class DeviceController extends Controller
                 'serial_alt',
                 'software_version',
                 'product_class',
+                'model_name',
                 'updated_at',
                 AllowedFilter::scope('created_after')
             ]);

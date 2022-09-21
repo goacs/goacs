@@ -263,6 +263,10 @@ class Context
             $this->deviceModel->product_class = $param;
         }
 
+        if($param = $this->parameterValues->get($root.'DeviceInfo.ModelName')?->value) {
+            $this->deviceModel->model_name = $param;
+        }
+
         if($param = $this->parameterValues->get($root.'DeviceInfo.SoftwareVersion')?->value) {
             $this->deviceModel->software_version = $param;
         }
