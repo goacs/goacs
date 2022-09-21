@@ -48,6 +48,10 @@ export default {
           label: 'Product Class'
         },
         {
+          key: 'model_name',
+          label: 'Model'
+        },
+        {
           key: 'software_version',
           label: 'Software'
         },

@@ -18,6 +18,10 @@
           <td>{{ device.product_class }}</td>
         </tr>
         <tr>
+          <th>Model</th>
+          <td>{{ device.model_name }}</td>
+        </tr>
+        <tr>
           <th>OUI</th>
           <td>{{ device.oui }}</td>
         </tr>

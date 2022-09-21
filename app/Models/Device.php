@@ -66,7 +66,7 @@ class Device extends Model
 
     protected $fillable = ['serial_number', 'oui', 'software_version', 'hardware_version',
         'connection_request_url', 'connection_request_user', 'connection_request_password',
-        'updated_at', 'product_class', 'debug'];
+        'updated_at', 'product_class', 'model_name', 'debug'];
 
     protected $casts = [
         'debug' => 'boolean'
