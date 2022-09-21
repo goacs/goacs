@@ -14,7 +14,7 @@ class AddRequestsToProvisions extends Migration
     public function up()
     {
         Schema::table('provisions', function (Blueprint $table) {
-            $table->string('requests')->after('events');
+            $table->string('requests')->default('')->after('events');
         });
     }
 
