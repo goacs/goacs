@@ -19,7 +19,7 @@
     },
     data() {
       return {
-        type: '',
+        type: 'xsd:string',
         types: [
           {
             value: 'xsd:string',
@@ -58,6 +58,7 @@
     methods: {
       init() {
         this.type = this.types.filter(item => item.value === this.value)[0];
+        this.$emit('input', this.type.value);
       },
       onTypeSelect(val) {
         this.$emit('input', val.value)
@@ -68,7 +69,6 @@
         // deep: true,
         handler() {
           this.init();
-          console.log('value changed');
         }
       }
     },
