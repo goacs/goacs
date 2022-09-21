@@ -13,6 +13,7 @@ use App\ACS\Response\ErrorResponse;
 use App\ACS\Types;
 use App\Models\Device;
 use App\Models\Log;
+use App\Models\Setting;
 
 class InformRequestProcessor extends Processor
 {
@@ -73,7 +74,7 @@ class InformRequestProcessor extends Processor
         ]);
 
         if($this->context->deviceModel->exists === false) {
-            $this->context->deviceModel->debug = env('DEBUG_NEW_DEVICES', false);
+            $this->context->deviceModel->debug = (bool) Setting::getValue('debug_new_devices');
         }
 
         $this->context->deviceModel->save();
