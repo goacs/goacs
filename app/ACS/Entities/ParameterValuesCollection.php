@@ -100,4 +100,13 @@ class ParameterValuesCollection extends Collection
         return $parameterCollection;
     }
 
+    public static function fromArray(array $data): static {
+        $collection = new static();
+        foreach($data as $param) {
+            $collection->put($param['name'], ParameterValueStruct::fromArray($param));
+        }
+
+        return $collection;
+    }
+
 }

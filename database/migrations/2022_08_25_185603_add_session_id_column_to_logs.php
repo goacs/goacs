@@ -14,7 +14,7 @@ class AddSessionIdColumnToLogs extends Migration
     public function up()
     {
         Schema::table('logs', function (Blueprint $table) {
-            $table->string('session_id', 64);
+            $table->string('session_id', 64)->default('');
         });
 
         Schema::table('logs', function (Blueprint $table) {

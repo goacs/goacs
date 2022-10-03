@@ -46,7 +46,6 @@ class GetParameterNamesResponseProcessor extends Processor
 //                dump('denied param', $deniedParameter);
 
                 if(preg_match('/^'.$deniedParameter.'$/', $parameter->name)){
-                    dump('passed', $deniedParameter);
                     return false;
                 }
             }

@@ -24,7 +24,7 @@ class DeviceParametersLogicTest extends TestCase
     public function test_getParametersToCreateInstance() {
         $device = Device::factory()->create();
         $deviceParameters = new DeviceParametersLogic($device);
-        $flag = new Flag(true, true, true);
+        $flag = new Flag(true, true, true, true);
 
         $sessionParams = new ParameterValuesCollection([
             'InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.' => (new ParameterValueStruct())->setName('InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.')->setFlag($flag),

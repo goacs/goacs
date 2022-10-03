@@ -229,7 +229,13 @@ class Context
         $this->provisioningCurrentState = $this->session()->get('provisioningCurrentState', 0);
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
-        $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
+        $parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
+        if (! $parameterValues instanceof ParameterValuesCollection) {
+            $this->parameterValues = ParameterValuesCollection::fromArray($parameterValues);
+        }
+
+        unset($parameterValues);
+
         $this->deniedParameters = $this->session()->get('deniedParameters', new Collection());
         $this->tasks = $this->session()->get('tasks', new TaskCollection());
         if($this->device->serialNumber !== "") {
@@ -246,7 +252,7 @@ class Context
         $this->session()->put('provisioningCurrentState', $this->provisioningCurrentState);
         $this->session()->put('device', $this->device);
         $this->session()->put('parameterNames', $this->parameterInfos);
-        $this->session()->put('parameterValues', $this->parameterValues);
+        $this->session()->put('parameterValues', $this->parameterValues->toArray());
         $this->session()->put('tasks', $this->tasks);
         $this->session()->put('this', [
             'new' => $this->new,

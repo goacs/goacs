@@ -146,8 +146,8 @@ return [
     */
 
     'cache' => [
-        'rows' => 50000,
-        'bytes' => 500000,
+        'rows' => 50,
+        'bytes' => 10000000,
     ],
 
     /*
@@ -162,10 +162,14 @@ return [
     */
 
     'tables' => [
-        'parameters:1000' => [
-            'name' => 'string:256',
-            'value' => 'string:1000',
-        ],
+//        'parameters:500' => [
+//            'device_id' => 'int',
+//            'name' => 'string:256',
+//            'value' => 'string:10000',
+//            'type' => 'string:32',
+//            'flags' => 'string:100',
+//            'cached' => 'int'
+//        ],
     ],
 
     /*
