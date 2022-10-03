@@ -67,6 +67,7 @@ class XMLParser
         $this->cwmpUri = (string)$this->body->lookupNamespaceURI('cwmp');
         $this->fillCwmpVersion($this->cwmpUri);
         $this->extractRequestId();
+        unset($xml);
     }
 
     private function lookupNamespaces(): array {
