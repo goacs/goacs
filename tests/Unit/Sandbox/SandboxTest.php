@@ -16,6 +16,7 @@ class SandboxTest extends TestCase
     public function test_sandbox_eval() {
 
         $script = '
+<?php
 $test = "123";
 $ret = $test;
 $ret .= $obj->value;

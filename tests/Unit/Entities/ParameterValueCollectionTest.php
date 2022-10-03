@@ -111,6 +111,7 @@ class ParameterValueCollectionTest extends TestCase
     }
 
     public function test_default_sorting() {
+        $this->markTestIncomplete();
         $params = [
             [
                 'name' => 'InternetGatewayDevice.LANDevice.1.LANHostConfigManagement.MinAddress',
@@ -193,6 +194,6 @@ class ParameterValueCollectionTest extends TestCase
             $parameterCollection->put($parameter->name, $parameter);
         }
 
-        dump($parameterCollection);
+
     }
 }
