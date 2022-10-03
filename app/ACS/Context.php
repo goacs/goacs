@@ -229,8 +229,10 @@ class Context
         $this->provisioningCurrentState = $this->session()->get('provisioningCurrentState', 0);
         $this->device = $this->session()->get('device', new Device());
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
-        $parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
-        if (! $parameterValues instanceof ParameterValuesCollection) {
+        $parameterValues = $this->session()->get('parameterValues', null);
+        if($parameterValues === null) {
+            $this->parameterValues = new ParameterValuesCollection();
+        } else {
             $this->parameterValues = ParameterValuesCollection::fromArray($parameterValues);
         }
 
