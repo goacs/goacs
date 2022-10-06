@@ -57,7 +57,7 @@ class SetParameterValuesRequestProcessor extends Processor
         foreach ($parametersToAdd as $parameter) {
             $task = new Task(Types::AddObject);
             $task->setPayload(['parameter' => $parameter->name]);
-            $this->context->tasks->putAsNextTask($task);
+            $this->context->tasks->addTask($task);
         }
     }
 

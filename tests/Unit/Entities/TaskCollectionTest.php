@@ -29,6 +29,16 @@ class TaskCollectionTest extends TestCase
         $this->assertEquals('A.B.C.D.4', $prevTask->payload['parameter']);
     }
 
+    public function test_put_as_next_task() {
+        $tc = $this->prepareTaskCollection();
+        $task = new Task(Types::AddObject);
+        $task->setPayload(['parameter' => 'X.Y.Z.']);
+        $tc->putAsNextTask($task);
+        $nextTask = $tc->nextTask();
+        $this->assertEquals($task->payload, $nextTask->payload);
+
+    }
+
     private function prepareTaskCollection(): TaskCollection {
         $taskCollection = new TaskCollection();
         for($i = 0; $i < 10; $i++) {

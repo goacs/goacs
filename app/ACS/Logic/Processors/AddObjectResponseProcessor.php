@@ -39,6 +39,6 @@ class AddObjectResponseProcessor extends Processor
             ]
         );
 
-        $this->context->tasks->add($gpvTask);
+        $this->context->tasks->putAsNextTask($gpvTask);
     }
 }
