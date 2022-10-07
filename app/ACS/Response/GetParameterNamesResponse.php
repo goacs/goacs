@@ -31,6 +31,7 @@ class GetParameterNamesResponse extends CPEResponse
         {
            $this->processList($paramterInfoStruct);
         }
+        unset($xpath);
     }
 
     private function processList(\DOMElement $element)
