@@ -276,6 +276,7 @@ class Context
         }
 
         $this->deviceModel->save();
+        $this->session()->put('provisioningCurrentState', Context::PROVISIONING_STATE_INFORM);
         Log::logInfo($this, 'Ending session');
         $this->flushSession();
     }
@@ -283,7 +284,7 @@ class Context
 
     public function flushSession() {
         \Cache::forget("SESSID_".$this->device->serialNumber);
-        $this->session()->flush();
+        $this->session()->invalidate();
     }
 
 }
