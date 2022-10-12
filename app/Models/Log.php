@@ -92,6 +92,19 @@ class Log extends Model
         $log->save();
     }
 
+    public static function logInfoFromDevice(Device $device, string $message, array $detail = []) {
+        $log = new static();
+        $log->device_id = $device->id;
+        $log->full_xml = $message;
+        $log->code = '201000';
+        $log->message = $message;
+        $log->detail = $detail;
+        $log->type = 'INFO';
+        $log->from = 'acs';
+        $log->session_id = 'FROM_MMS_'.\Str::random();
+        $log->save();
+    }
+
     public static function logError(Context $context, string $message, string $code = '100000', array $detail = []) {
         $log = new static();
         $log->device_id = $context->deviceModel->id;

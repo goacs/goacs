@@ -12,6 +12,7 @@ use App\Http\Requests\Device\DeviceAddObjectRequest;
 use App\Http\Requests\Device\DeviceUpdateRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
+use App\Models\Log;
 use App\Models\Setting;
 use App\Models\Task;
 use GuzzleHttp\Client;
@@ -86,12 +87,15 @@ class DeviceController extends Controller
             $auth = [Setting::getValue('connection_request_username'), Setting::getValue('connection_request_password')];
         }
 
+        Log::logInfoFromDevice($device, 'KICK REQUEST');
         $kickService = new Kick($device->connection_request_url, $auth[0], $auth[1]);
 
         if($kickService->kick()) {
+            Log::logInfoFromDevice($device, 'KICK SUCCESSFUL');
             return new JsonResponse([]);
         }
 
+        Log::logInfoFromDevice($device, 'KICK FAILED');
         return response()->json(['error' => 'Kick failed'], 503);
     }
 
