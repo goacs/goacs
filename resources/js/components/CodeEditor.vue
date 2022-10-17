@@ -5,8 +5,9 @@
     lang="php"
     theme="monokai"
     width="100%"
-    height="200px"
+    height="300px"
     :options="options"
+    style="resize:vertical; overflow:auto;"
   />
 </template>
 
