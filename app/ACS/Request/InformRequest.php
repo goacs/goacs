@@ -57,9 +57,6 @@ class InformRequest extends CPERequest
                 case 'ProductClass':
                     $this->device->productClass = $param->firstChild->nodeValue;
                     break;
-                case 'ModelName':
-                    $this->device->modelName = $param->firstChild->nodeValue;
-                    break;
                 case 'SerialNumber':
                     $this->device->serialNumber = $param->firstChild->nodeValue;
                     break;
