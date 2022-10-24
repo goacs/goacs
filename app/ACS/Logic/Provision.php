@@ -21,6 +21,7 @@ class Provision
     public function queueTasks() {
         /** @var ProvisionModel $provision */
         foreach($this->getProvisions() as $provision) {
+            Log::logInfo($this->context, 'Passed provision: '.$provision->name);
             $task = new Task(Types::RunScript);
             $task->setPayload(['script' => $provision->script]);
             $this->context->tasks->addTask($task);
@@ -29,23 +30,26 @@ class Provision
 
     public function getDeniedParameters(): Collection {
         $parameters = new Collection();
-        foreach ($this->getProvisions(skipEvents: true, skipRequests: true) as $provision) {
+        foreach ($this->getProvisions(skipEvents: true, skipRequests: true, disableCache: true) as $provision) {
             foreach($provision->denied as $deniedParameter) {
                 $parameter = str_replace('$root.', $this->context->device->root, $deniedParameter->parameter);
                 $parameters[] = $parameter;
             }
         }
 
+        $this->passedProvisions = [];
+
         return $parameters->unique()->values();
     }
 
-    public function getProvisions($force = false, $skipEvents = false, $skipRequests = false): array {
+    public function getProvisions($force = false, $skipEvents = false, $skipRequests = false, $disableCache = false): array {
         if($force === false && count($this->passedProvisions) > 0) {
             return $this->passedProvisions;
         }
 
         /** @var ProvisionModel[] $storedProvisions */
         $storedProvisions = ProvisionModel::with(['rules','denied'])->orderByRaw('name, length(name)')->get();
+        $passedProvisions = [];
 
         $this->passedProvisions = [];
         foreach ($storedProvisions as $storedProvision) {
@@ -66,12 +70,16 @@ class Provision
                 continue;
             }
 
-            Log::logInfo($this->context, 'Passed provision: '.$storedProvision->name);
 //            dump('passed');
-            $this->passedProvisions[] = $storedProvision;
+            $passedProvisions[] = $storedProvision;
+
         }
 
-        return $this->passedProvisions;
+        if($disableCache === false) {
+            $this->passedProvisions = $passedProvisions;
+        }
+
+        return $passedProvisions;
     }
 
     private function evaluateRules(Collection $rules): bool {
