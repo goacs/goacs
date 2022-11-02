@@ -42,6 +42,8 @@ class XMLParser
             return;
         }
 
+        $this->xml = $this->sanitizeXML($this->xml);
+
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = true;
         $dom->loadXml($this->xml);
@@ -127,5 +129,10 @@ class XMLParser
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput  = false;
         return $dom->saveXML(options: LIBXML_NOEMPTYTAG);
+    }
+
+    private function sanitizeXML($xml)
+    {
+        return preg_replace ('/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u', ' ', $xml);
     }
 }
