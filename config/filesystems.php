@@ -49,6 +49,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'cached_params' => [
+            'driver' => 'local',
+            'root' => public_path('cached_params'),
+            'url' => env('APP_URL').'/cached_params',
+            'visibility' => 'public',
+        ],
+
         'file_store' => [
             'driver' => 'local',
             'root' => storage_path('files'),

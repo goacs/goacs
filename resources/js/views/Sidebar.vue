@@ -37,11 +37,6 @@
           :to="{ path: '/settings' }"
         />
         <CSidebarNavItem
-          name="Global tasks"
-          :to="{ path: '/settings/tasks' }"
-        >
-        </CSidebarNavItem>
-        <CSidebarNavItem
           name="Users"
           :to="{ path: '/settings/users' }"
         >
