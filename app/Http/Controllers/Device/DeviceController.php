@@ -55,8 +55,7 @@ class DeviceController extends Controller
     }
 
     public function destroy(Device $device) {
-        \Cache::forget("SESSID_".$device->serial_number);
-        \Cache::forget(Context::LOOKUP_PARAMS_PREFIX.$device->serial_number);
+        $this->clearCache($device);
         $device->templates()->sync([]);
         $device->parameters()->delete();
         $device->delete();
@@ -102,5 +101,13 @@ class DeviceController extends Controller
     public function lookup(Device $device) {
         \Cache::put(Context::LOOKUP_PARAMS_ENABLED_PREFIX.$device->serial_number, true, now()->addMinutes(5));
         return $this->kick($device);
+    }
+
+    public function clearCache(Device $device) {
+        \Cache::forget("SESSID_".$device->serial_number);
+        \Cache::forget(Context::LOOKUP_PARAMS_PREFIX.$device->serial_number);
+        \Cache::forget(Context::PROVISION_PREFIX.$device->serial_number);
+        \Cache::forget(Context::LOOKUP_PARAMS_ENABLED_PREFIX.$device->serial_number);
+        return new JsonResponse([]);
     }
 }

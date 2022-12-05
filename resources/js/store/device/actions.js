@@ -68,6 +68,9 @@ export default {
   async kickDevice(context, id) {
     return await this._vm.$http.get(`/api/device/${id}/provision`)
   },
+  async clearCache(context, id) {
+    return await this._vm.$http.delete(`/api/device/${id}/cache`)
+  },
   async deleteDevice(context, id) {
     return await this._vm.$http.delete(`/api/device/${id}`)
   },

@@ -70,6 +70,15 @@
       >
         Provision
       </CButton>
+      <CCardFooter>
+        <CButton
+          size="sm"
+          color="dark"
+          class="shadow-sm"
+          @click="clearCache"
+        >
+          Clear Cache
+        </CButton>
     </CCardFooter>
     <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>
     <CElementCover v-if="loading" :opacity="0.8"/>
@@ -109,6 +118,14 @@
         try {
           this.loading = true;
           await this.$store.dispatch('device/kickDevice', this.device.id)
+        } finally {
+          this.loading = false;
+        }
+      },
+      async clearCache() {
+        try {
+          this.loading = true;
+          await this.$store.dispatch('device/clearCache', this.device.id)
         } finally {
           this.loading = false;
         }

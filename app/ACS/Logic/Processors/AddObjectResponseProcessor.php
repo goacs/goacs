@@ -27,9 +27,14 @@ class AddObjectResponseProcessor extends Processor
         /** @var AddObjectResponse $addObjectResponse */
         $addObjectResponse = $this->context->cpeResponse;
         $path = $prevTask->payload['parameter'];
+
+        $gpnTask = new Task(Types::GetParameterNames);
+        $gpnTask->setPayload([
+            'parameter' => new ParameterInfoCollection([
+                (new ParameterInfoStruct())->setName(rtrim($path, ".").".".$addObjectResponse->getInstanceNumber().".")
+            ]),
+        ]);
         $gpvTask = new Task(Types::GetParameterValues);
-
-
         $gpvTask->setPayload(
             [
                 'parameters' => new ParameterInfoCollection([
