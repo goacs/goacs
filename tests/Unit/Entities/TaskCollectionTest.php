@@ -39,6 +39,19 @@ class TaskCollectionTest extends TestCase
 
     }
 
+    public function test_put_twice_as_next_task() {
+        $tc = $this->prepareTaskCollection();
+        $task = new Task(Types::GetParameterValues);
+        $task->setPayload(['parameter' => 'X.Y.Z.']);
+        $tc->putAsNextTask($task);
+        $task = new Task(Types::GetParameterNames);
+        $task->setPayload(['parameter' => 'X.Y.Z.']);
+        $tc->putAsNextTask($task);
+        $nextTask = $tc->nextTask();
+        $this->assertEquals($task->payload, $nextTask->payload);
+
+    }
+
     private function prepareTaskCollection(): TaskCollection {
         $taskCollection = new TaskCollection();
         for($i = 0; $i < 10; $i++) {
