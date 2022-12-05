@@ -70,15 +70,14 @@
       >
         Provision
       </CButton>
-      <CCardFooter>
-        <CButton
-          size="sm"
-          color="dark"
-          class="shadow-sm"
-          @click="clearCache"
-        >
-          Clear Cache
-        </CButton>
+      <CButton
+        size="sm"
+        color="dark"
+        class="shadow-sm"
+        @click="clearCache"
+      >
+        Clear Cache
+      </CButton>
     </CCardFooter>
     <CachedParametersDialog v-model="cachedParamsDialog"></CachedParametersDialog>
     <CElementCover v-if="loading" :opacity="0.8"/>
