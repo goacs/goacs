@@ -75,11 +75,6 @@ const routes = [
             component: () => import('@/views/settings/BaseSettings.vue'),
           },
           {
-            path: 'tasks',
-            name: 'settings-tasks',
-            component: () => import('@/views/settings/tasks/TasksList.vue'),
-          },
-          {
             path: 'users',
             name: 'settings-users',
             component: () => import('@/views/settings/users/UsersList.vue'),

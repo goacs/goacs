@@ -5,7 +5,7 @@
         <DashboardWidget icon="cil-gauge" inverse header="Last 24h informs" text="0" color="success"/>
       </CCol>
       <CCol sm="12" lg="4">
-        <DashboardWidget icon="cil-gauge" inverse header="Devices count" :text="`${dashboard.devices_count}`" color="info"/>
+        <DashboardWidget icon="cil-gauge" inverse header="Devices" :text="`${dashboard.devices_count}`" color="info"/>
       </CCol>
       <CCol sm="12" lg="4">
         <DashboardWidget icon="cil-gauge" inverse header="Last 24h faults" :text="`${dashboard.faults_count}`" color="danger"/>

@@ -3,15 +3,15 @@
     <CCardHeader>
       <strong>Parameters</strong>
       <div  class="float-right">
-      <LoadingButton
-        size="sm"
-        color="dark"
-        class="shadow-sm"
-        @click.native="lookupParameters"
-        :loading="lookupLoading"
-      >
-        Lookup parameters
-      </LoadingButton>
+        <LoadingButton
+          size="sm"
+          color="dark"
+          class="shadow-sm"
+          @click.native="lookupParameters"
+          :loading="lookupLoading"
+        >
+          Lookup parameters
+        </LoadingButton>
       <CButton
         v-if="hasCachedParams"
         size="sm"

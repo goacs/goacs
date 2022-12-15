@@ -2,6 +2,17 @@
   <CCard>
     <CCardHeader>
       <strong>Lookuped Parameters</strong>
+      <div  class="float-right">
+        <LoadingButton
+          size="sm"
+          color="dark"
+          class="shadow-sm"
+          @click.native="downloadParameters"
+          :loading="loading"
+        >
+          Download
+        </LoadingButton>
+      </div>
     </CCardHeader>
     <CCardBody>
         <PaginatedTable
@@ -52,9 +63,10 @@
   import {FlagParser} from "../../helpers/FlagParser";
   import Multiselect from "../../components/Multiselect";
   import FlagInput from "../../components/FlagInput";
+  import LoadingButton from "../../components/LoadingButton";
   export default {
     name: "DeviceCachedParameterList",
-    components: {FlagInput, Multiselect, PaginatedTable },
+    components: {LoadingButton, FlagInput, Multiselect, PaginatedTable },
     data() {
       return {
         lookup: false,
@@ -82,6 +94,7 @@
             id: this.$route.params.id
           }
         },
+        loading: false,
         flagFilter: {},
       }
     },
@@ -103,6 +116,20 @@
 
       stripString(prop, len) {
         return prop.value.substr(0, len);
+      },
+      async downloadParameters() {
+        this.loading = true;
+        try {
+          const response = await this.$store.dispatch('device/downloadCachedParameters', {
+            device_id: this.$route.params.id,
+          });
+          window.open(response.data.data.url);
+        } catch (e) {
+          //alert
+        } finally {
+          this.loading = false;
+        }
+
       },
     },
     beforeDestroy() {

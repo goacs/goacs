@@ -122,5 +122,8 @@ export default {
 
   async downloadLogs(context, {device_id, session_id}) {
     return await this._vm.$http.get(`/api/device/${device_id}/logs/download?session_id=${session_id}`);
+  },
+  async downloadCachedParameters(context, {device_id}) {
+    return await this._vm.$http.get(`/api/device/${device_id}/parameters/cached/download`);
   }
 }
