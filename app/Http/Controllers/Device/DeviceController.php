@@ -51,7 +51,9 @@ class DeviceController extends Controller
     }
 
     public function store(DeviceCreateRequest $request) {
-        $device = Device::create($request->validated());
+        $device = new Device();
+        $device->fill($request->validated());
+        $device->connection_request_url = '';
         return new DeviceResource($device);
     }
 
