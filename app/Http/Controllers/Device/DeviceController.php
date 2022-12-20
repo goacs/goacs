@@ -9,6 +9,7 @@ use App\ACS\Kick;
 use App\ACS\Types;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Device\DeviceAddObjectRequest;
+use App\Http\Requests\Device\DeviceCreateRequest;
 use App\Http\Requests\Device\DeviceUpdateRequest;
 use App\Http\Resource\Device\DeviceResource;
 use App\Models\Device;
@@ -46,6 +47,11 @@ class DeviceController extends Controller
     }
 
     public function show(Device $device) {
+        return new DeviceResource($device);
+    }
+
+    public function store(DeviceCreateRequest $request) {
+        $device = Device::create($request->validated());
         return new DeviceResource($device);
     }
 
