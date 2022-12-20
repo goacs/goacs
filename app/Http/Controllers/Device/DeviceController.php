@@ -54,6 +54,7 @@ class DeviceController extends Controller
         $device = new Device();
         $device->fill($request->validated());
         $device->connection_request_url = '';
+        $device->save();
         return new DeviceResource($device);
     }
 
