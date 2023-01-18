@@ -14,7 +14,9 @@ import router from "./router";
 import store from "./store";
 import errorsMixin from './helpers/errors.mixin'
 import JsonTree from 'vue-json-tree'
+import Echo from "laravel-echo"
 
+window.Pusher = require('pusher-js');
 window.Vue = require('vue').default;
 
 Vue.config.productionTip = false;
@@ -35,7 +37,6 @@ Vue.component('json-tree', JsonTree)
 Object.keys(rules).forEach(rule => {
   extend(rule, rules[rule]);
 });
-
 
 Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);
@@ -62,6 +63,17 @@ const authPluginOptions = { ...DEFAULT_OPTIONS,
 }
 
 Vue.use(VueAuth, authPluginOptions);
+
+
+window.Echo = new Echo({
+  broadcaster: 'pusher',
+  key: process.env.MIX_PUSHER_APP_KEY,
+  wsHost: window.location.hostname,
+  wsPort: process.env.MIX_PUSHER_APP_PORT,
+  cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+  forceTLS: false,
+  disableStats: true,
+});
 
 const app = new Vue({
   el: '#app',

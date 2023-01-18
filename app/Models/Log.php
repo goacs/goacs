@@ -7,6 +7,7 @@ namespace App\Models;
 use App\ACS\Context;
 use App\ACS\Response\FaultResponse;
 use App\ACS\Types;
+use App\Events\DeviceLogged;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
@@ -60,6 +61,13 @@ class Log extends Model
     protected $casts = [
         'detail' => 'array'
     ];
+    public static function boot()
+    {
+        parent::boot();
+        static::created(function (Log $item) {
+            broadcast(new DeviceLogged($item));
+        });
+    }
 
     public function device(): BelongsTo {
         return $this->belongsTo(Device::class);
