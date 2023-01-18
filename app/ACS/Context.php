@@ -284,6 +284,9 @@ class Context
 
     public function flushSession() {
         \Cache::forget("SESSID_".$this->device->serialNumber);
+        \Cache::forget(self::LOOKUP_PARAMS_ENABLED_PREFIX.$this->device->serialNumber);
+        \Cache::forget(self::PROVISION_PREFIX.$this->device->serialNumber);
+        $this->lookupParameters = false;
         $this->session()->invalidate();
     }
 

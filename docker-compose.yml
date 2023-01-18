@@ -9,6 +9,7 @@ services:
     - ./docker/supervisor.conf:/etc/supervisor/conf.d/goacs.conf:ro
     ports:
       - 8085:8085
+      - ${PUSHER_APP_PORT}:6001
       - 9912:9912
     restart: on-failure
     links:

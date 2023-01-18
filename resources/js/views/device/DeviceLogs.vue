@@ -56,11 +56,20 @@
         device: 'device/getDevice',
       }),
     },
+    beforeDestroy() {
+      Echo.leaveChannel(`device.${this.device.id}`);
+    },
     methods: {
       showDetails(fault) {
         this.details.json = fault.detail;
         this.details.xml = fault.full_xml;
         this.details.dialog = true;
+      },
+      subscribe() {
+        Echo.channel(`device.${this.device.id}`)
+          .listen('.device.logged', (e) => {
+            this.appendLog(e.log);
+          });
       },
       async loadLastFaults() {
         try {
@@ -74,9 +83,14 @@
         } catch (e) {
 
         }
+      },
+      appendLog(log) {
+        this.lastFaults.unshift(log);
+        this.lastFaults = this.lastFaults.slice(0, -1);
       }
     },
     mounted() {
+      this.subscribe();
       this.loadLastFaults();
     }
   }
