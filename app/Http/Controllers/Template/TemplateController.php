@@ -27,7 +27,7 @@ class TemplateController extends Controller
                 'parameters_count',
                 'updated_at'
             ]);
-        return $query->paginate(25);
+        return $query->paginate($request->input('per_page', 25));
     }
 
     public function show(Template $template) {
