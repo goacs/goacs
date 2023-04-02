@@ -1,4 +1,4 @@
-FROM php:8.0-fpm
+FROM php:8.0-fpm as base
 WORKDIR "/app"
 
 # Fix debconf warnings upon build
@@ -43,3 +43,11 @@ RUN mkdir -p /var/log/supervisor && \
         rm -rf /var/lib/apt/lists/* $HOME/.composer/*-old.phar /usr/bin/qemu-*-static
 
 CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
+
+FROM base as app
+COPY . .
+RUN rm node_modules -r
+RUN npm install && npm run prod
+RUN mkdir -p /etc/supervisor/conf.d/ && ln -s /app/docker/supervisor.conf /etc/supervisor/conf.d/goacs.conf
+CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
+

@@ -1,8 +1,26 @@
-version: '3'
+version: '3.4'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: app
+    ports:
+      - 8085:8085
+      - ${PUSHER_APP_PORT}:6001
+      - 9912:9912
+    links:
+      - redis
+      - mariadb
+    depends_on:
+      - redis
+      - mariadb
+
   acs:
-    build: docker/php-fpm
+    build:
+      context: docker
+      target: base
     working_dir: /app
     volumes:
     - ./:/app

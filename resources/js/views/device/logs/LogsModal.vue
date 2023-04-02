@@ -110,6 +110,13 @@ export default {
     hide() {
       this.$emit('input', false);
     }
+  },
+  watch: {
+    value(show) {
+      if(show) {
+        this.$refs.table.fetchItems();
+      }
+    }
   }
 }
 </script>
