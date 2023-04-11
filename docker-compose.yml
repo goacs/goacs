@@ -10,9 +10,6 @@ services:
       - 8085:8085
       - ${PUSHER_APP_PORT}:6001
       - 9912:9912
-    links:
-      - redis
-      - mariadb
     depends_on:
       - redis
       - mariadb
@@ -30,9 +27,6 @@ services:
       - ${PUSHER_APP_PORT}:6001
       - 9912:9912
     restart: on-failure
-    links:
-      - redis
-      - mariadb
     depends_on:
       - redis
       - mariadb

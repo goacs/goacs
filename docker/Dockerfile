@@ -46,8 +46,11 @@ CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
 
 FROM base as app
 COPY . .
-RUN rm node_modules -r
+RUN rm node_modules -r || true
 RUN npm install && npm run prod
-RUN mkdir -p /etc/supervisor/conf.d/ && ln -s /app/docker/supervisor.conf /etc/supervisor/conf.d/goacs.conf
-CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
-
+RUN rm node_modules -r || true
+RUN cp .env.example .env && \
+    mkdir -p /etc/supervisor/conf.d/ && ln -s /app/docker/supervisor.conf /etc/supervisor/conf.d/goacs.conf && \
+    cp /app/docker/bin/entrypoint.sh /entrypoint.sh && chmod +x /entrypoint.sh
+#CMD ["/usr/bin/supervisord","-c","/etc/supervisor/supervisord.conf"]
+CMD ["bash","/entrypoint.sh"]
