@@ -16,5 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('/acs', [\App\Http\Controllers\ACSController::class, 'process']);
 Route::get('/acs', [\App\Http\Controllers\ACSController::class, 'process']);
 
+//Route::post('/callback', function (\Illuminate\Http\Request $request) {
+//    dump($request->all());
+//});
 
 Route::get('{any}', fn() => view('app'))->where('any', '.*');

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\ACS\Events\ParameterLookupDone;
+use App\ACS\Events\ProvisionDone;
 use App\Listeners\SendLookupParametersToSocket;
+use App\Listeners\Webhooks\WebhookAfterProvision;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,6 +25,10 @@ class EventServiceProvider extends ServiceProvider
 
         ParameterLookupDone::class => [
           SendLookupParametersToSocket::class,
+        ],
+
+        ProvisionDone::class => [
+          WebhookAfterProvision::class,
         ],
     ];
 

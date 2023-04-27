@@ -20,5 +20,7 @@ class SettingsSeeder extends Seeder
         Setting::firstOrCreate(['name' => 'read_behaviour'], ['value' => 'new']);
         Setting::firstOrCreate(['name' => 'mappings'], ['value' => '[]']);
         Setting::firstOrCreate(['name' => 'debug_new_devices'], ['value' => 'false']);
+        Setting::firstOrCreate(['name' => 'webhook_timeout'], ['value' => '5']);
+        Setting::firstOrCreate(['name' => 'webhook_after_provision'], ['value' => '']);
     }
 }

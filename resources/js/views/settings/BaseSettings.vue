@@ -50,6 +50,28 @@
           </ValidationProvider>
           <h5>Mappings</h5>
           <ParametersMapping></ParametersMapping>
+
+          <h5>Webhooks</h5>
+          <ValidationProvider vid="webhook_timeout" name="Webhook after device provision"
+                              v-slot="scope">
+            <CInput
+              type="text"
+              label="Webhook call timeout"
+              v-model="config.webhook_timeout"
+              :invalid-feedback="scope.errors[0]"
+              :is-valid="isvalid(scope)"
+            ></CInput>
+          </ValidationProvider>
+          <ValidationProvider vid="webhook_after_provision" name="Webhook after device provision"
+                              v-slot="scope">
+            <CInput
+              type="text"
+              label="Webhook after device provision"
+              v-model="config.webhook_after_provision"
+              :invalid-feedback="scope.errors[0]"
+              :is-valid="isvalid(scope)"
+            ></CInput>
+          </ValidationProvider>
         </CForm>
       </ValidationObserver>
     </CCardBody>
