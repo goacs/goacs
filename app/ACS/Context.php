@@ -11,6 +11,7 @@ use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\Task;
 use App\ACS\Entities\TaskCollection;
+use App\ACS\Events\ProvisionDone;
 use App\ACS\Logic\Provision;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
@@ -277,6 +278,7 @@ class Context
 
         $this->deviceModel->save();
         $this->session()->put('provisioningCurrentState', Context::PROVISIONING_STATE_INFORM);
+        event(new ProvisionDone($this->deviceModel));
         Log::logInfo($this, 'Ending session');
         $this->flushSession();
     }

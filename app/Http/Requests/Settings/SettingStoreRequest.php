@@ -18,7 +18,9 @@ class SettingStoreRequest extends FormRequest
             'connection_request_password' => 'required|string',
             'mappings' => 'array',
             'conversation_log' => 'required|boolean',
-            'read_behaviour' => 'required|in:new,boot,none'
+            'read_behaviour' => 'required|in:new,boot,none',
+            'webhook_timeout' => 'required|integer|gt:0',
+            'webhook_after_provision' => 'string'
         ];
     }
 }
