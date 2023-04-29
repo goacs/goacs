@@ -6,17 +6,11 @@ on:
     types:
       - completed
   push:
-    branches:
-      - main
     tags:
       - v*.*.*
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build-image:
-    needs: laravel-tests
     runs-on: ubuntu-22.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
