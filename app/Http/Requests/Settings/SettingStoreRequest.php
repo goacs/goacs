@@ -19,6 +19,7 @@ class SettingStoreRequest extends FormRequest
             'mappings' => 'array',
             'conversation_log' => 'required|boolean',
             'read_behaviour' => 'required|in:new,boot,none',
+            'webhook_ssl_verify' => 'required|boolean',
             'webhook_timeout' => 'required|integer|gt:0',
             'webhook_after_provision' => 'string'
         ];
