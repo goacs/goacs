@@ -52,6 +52,22 @@
           <ParametersMapping></ParametersMapping>
 
           <h5>Webhooks</h5>
+          <ValidationProvider vid="webhook_ssl_verify" name="Webhook disable SSL Verification"
+                              v-slot="scope">
+            <div class="form-group">
+              <label>Webhook disable SSL Verification</label>
+              <div class="form-control-plaintext">
+                <CSwitch
+                  :checked.sync="config.webhook_ssl_verify"
+                  type="checkbox"
+                  color="dark"
+                  label-on="yes"
+                  label-off="no"
+                >
+                </CSwitch>
+              </div>
+            </div>
+          </ValidationProvider>
           <ValidationProvider vid="webhook_timeout" name="Webhook after device provision"
                               v-slot="scope">
             <CInput
