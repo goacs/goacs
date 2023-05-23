@@ -153,6 +153,7 @@ class TaskRunner
                 'Run Script',
                 (string) $this->currentTask->payload['script'],
             );
+
         } catch (SandboxException $exception) {
             $fault = $this->context->deviceModel->faults()->make();
             $fault->full_xml = $exception->getMessage()."\n\n".$exception->getTraceAsString();

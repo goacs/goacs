@@ -22,7 +22,7 @@ class Sandbox
         $this->addVariable('deviceModel', $this->context->deviceModel);
         $this->addVariable('device', $this->context->device);
         $this->addVariable('root', $this->context->device->root);
-        $this->addVariable('func', new Functions($this->context));
+        $this->addVariable('func', new Functions($this->context, $this));
     }
 
     public function addVariable($name, $value) {
