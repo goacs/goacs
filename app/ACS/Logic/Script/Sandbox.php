@@ -29,7 +29,7 @@ class Sandbox
         $this->variables[$name] = $value;
     }
 
-    public function run() {
+    public function execute() {
         try {
             extract($this->variables);
             $ret = eval($this->getScript());

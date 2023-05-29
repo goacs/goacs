@@ -28,7 +28,7 @@ return $ret;';
         $obj->value = "33333";
         $sandbox = $this->newSandbox($script);
         $sandbox->addVariable('obj', $obj);
-        $ret = $sandbox->run();
+        $ret = $sandbox->execute();
         $this->assertEquals('12333333555', $ret);
         $this->assertEquals('555', $obj->value);
     }

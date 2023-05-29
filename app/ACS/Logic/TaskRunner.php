@@ -147,7 +147,7 @@ class TaskRunner
     protected function runScriptTask() {
         $sandbox = new Sandbox($this->context, $this->currentTask->payload['script']);
         try {
-            $sandbox->run();
+            $sandbox->execute();
             Log::logConversation($this->context,
                 'acs',
                 'Run Script',
