@@ -34,6 +34,9 @@ class Types
     const FactoryResetResponse = 'FactoryResetResponse';
 
 
+    const Commit = 'Commit';
+
+
     const RunScript = 'RunScript';
 
     const SetParameterValuesProcessor = 'SetParameterValuesProcessor';

@@ -4,6 +4,7 @@
 namespace App\ACS\Entities;
 
 
+use App\ACS\Logic\Script\Stack;
 use Illuminate\Support\Collection;
 
 class TaskCollection extends Collection
@@ -47,7 +48,6 @@ class TaskCollection extends Collection
     }
 
 
-
     public function nextTask(): ?Task {
         return $this->filter(fn(Task $task) => $task->done_at === null)->first();
     }
@@ -68,5 +68,9 @@ class TaskCollection extends Collection
         return $this->search(function(Task $task, $key) {
             return $task->done_at === null;
         });
+    }
+
+    public function addFromStack(Stack $stack): void {
+
     }
 }

@@ -7,12 +7,6 @@ use Illuminate\Support\Collection;
 
 class Stack
 {
-    public const COMMAND_SPV = 'SPV';
-    public const COMMAND_GPV = 'GPV';
-    public const COMMAND_ADDOBJ = 'ADDOBJ';
-    public const COMMAND_DELOBJ = 'DELOBJ';
-    public const COMMAND_COMMIT = 'COMMIT';
-
     private Collection $commands;
 
     public function __construct()
@@ -27,8 +21,10 @@ class Stack
         ];
     }
 
-    public function queueTasks() {
+    public function groupByTaskType() {
+        foreach($this->commands as $command) {
 
+        }
     }
 
     public function shift(): array {

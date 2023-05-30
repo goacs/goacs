@@ -38,7 +38,7 @@ class Functions
     }
 
     public function setParameter($path, $value, $flags = 'RWS', $type = null) {
-        $this->context->getScriptStack()->add(Stack::COMMAND_SPV, [
+        $this->context->getScriptStack()->add(Types::SetParameterValues, [
             'path' => $path,
             'value' => $value,
             'flags' => $flags,
@@ -48,14 +48,14 @@ class Functions
     }
 
     public function getParameterValue($path) {
-        $this->context->getScriptStack()->add(Stack::COMMAND_GPV, [
+        $this->context->getScriptStack()->add(Types::GetParameterValues, [
             'path' => $path,
         ]);
         return DeviceParameter::getParameterValue($this->deviceModel->id, $path);
     }
 
     public function commit() {
-        $this->context->getScriptStack()->add(Stack::COMMAND_COMMIT, []);
+        $this->context->getScriptStack()->add(Types::Commit, []);
     }
 
     public function parameterExist($path) {
@@ -77,7 +77,7 @@ class Functions
     }
 
     public function addObject(string $path) {
-        $this->context->getScriptStack()->add(Stack::COMMAND_ADDOBJ, [
+        $this->context->getScriptStack()->add(Types::AddObject, [
             'path' => $path
         ]);
 //        $task = new Task(Types::AddObject);
@@ -86,7 +86,7 @@ class Functions
     }
 
     public function deleteObject(string $path) {
-        $this->context->getScriptStack()->add(Stack::COMMAND_DELOBJ, [
+        $this->context->getScriptStack()->add(Types::DeleteObject, [
             'path' => $path
         ]);
 //        $task = new Task(Types::DeleteObject);
