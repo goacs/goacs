@@ -72,7 +72,7 @@ class DeviceController extends Controller
     }
 
     public function addObject(DeviceAddObjectRequest $request, Device $device) {
-        $acsTask = new \App\ACS\Entities\Task(Types::AddObject);
+        $acsTask = new \App\ACS\Entities\Tasks\Task(Types::AddObject);
         $acsTask->setPayload(['parameter' => $request->name]);
         $task = Task::fromACSTask($acsTask);
         $task->on_request = Types::EMPTY;

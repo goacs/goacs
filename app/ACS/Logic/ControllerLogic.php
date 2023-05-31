@@ -10,7 +10,7 @@ use App\ACS\Context;
 use App\ACS\Entities\ParameterInfoStruct;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Events\ParameterLookupDone;
 use App\ACS\Logic\Processors\AddObjectResponseProcessor;
 use App\ACS\Logic\Processors\DeleteObjectResponseProcessor;

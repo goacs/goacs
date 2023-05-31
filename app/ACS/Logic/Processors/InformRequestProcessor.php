@@ -7,7 +7,7 @@ namespace App\ACS\Logic\Processors;
 
 
 use App\ACS\Context;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Request\InformRequest;
 use App\ACS\Response\ErrorResponse;
 use App\ACS\Types;

@@ -7,7 +7,7 @@ namespace App\ACS\Logic\Processors;
 
 
 use App\ACS\Entities\ParameterValueStruct;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Logic\DeviceParametersLogic;
 use App\ACS\Types;
 use App\Models\DeviceParameter;

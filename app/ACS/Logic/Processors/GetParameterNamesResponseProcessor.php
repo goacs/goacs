@@ -8,7 +8,7 @@ namespace App\ACS\Logic\Processors;
 
 use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterInfoStruct;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Types;
 

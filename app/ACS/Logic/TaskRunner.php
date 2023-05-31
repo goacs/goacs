@@ -7,7 +7,7 @@ namespace App\ACS\Logic;
 
 
 use App\ACS\Context;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Logic\Processors\SetParameterValuesRequestProcessor;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
@@ -28,7 +28,7 @@ use App\Models\Log;
 class TaskRunner
 {
     private Context $context;
-    private ?\App\ACS\Entities\Task $currentTask;
+    private ?\App\ACS\Entities\Tasks\Task $currentTask;
 
     public function __construct(Context $context) {
         $this->context = $context;

@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace App\ACS\Logic\Processors;
 
 
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Request\RebootRequest;
 use App\ACS\Response\DownloadResponse;
 use App\ACS\Types;

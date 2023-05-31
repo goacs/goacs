@@ -6,7 +6,7 @@ namespace App\ACS\Logic\Script;
 
 use App\ACS\Context;
 use App\ACS\Entities\Device;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Types;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;

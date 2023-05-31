@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 
-namespace App\ACS\Entities;
+namespace App\ACS\Entities\Tasks;
 
 
+use App\ACS\Context;
+use App\ACS\Request\ACSRequest;
 use Carbon\Carbon;
 
 class Task
@@ -27,6 +29,10 @@ class Task
         $this->done_at = now();
     }
 
+    public function toRequest(Context $context): ?ACSRequest {
+        return null;
+    }
+
     public function isOnRequest(string $requestType) {
         if($this->onRequest === '') {
             return true;
@@ -34,4 +40,5 @@ class Task
 
         return $this->onRequest === $requestType;
     }
+
 }

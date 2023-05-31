@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\ACS\Logic\Script;
 
+use App\ACS\Entities\Tasks\Task;
+use App\ACS\Types;
 use Illuminate\Support\Collection;
 
 class Stack
@@ -22,8 +24,13 @@ class Stack
     }
 
     public function groupByTaskType() {
+        $tasks = [];
+        $currentTask = new Task(Types::Commit);
         foreach($this->commands as $command) {
-
+            if($command['command'] !== $currentTask->name) {
+                $currentTask = new Task($command['command']);
+                $currentTask->setPayload($command['params']);
+            }
         }
     }
 

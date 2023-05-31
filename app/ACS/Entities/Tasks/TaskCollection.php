@@ -1,9 +1,10 @@
 <?php
 
 
-namespace App\ACS\Entities;
+namespace App\ACS\Entities\Tasks;
 
 
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Logic\Script\Stack;
 use Illuminate\Support\Collection;
 
