@@ -9,7 +9,7 @@ use App\ACS\Request\ACSRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Types;
 
-class SetParameterValuesTask extends Task
+class SetParameterValuesTask extends Task implements WithRequest
 {
 
     public function __construct()

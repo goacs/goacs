@@ -29,10 +29,6 @@ class Task
         $this->done_at = now();
     }
 
-    public function toRequest(Context $context): ?ACSRequest {
-        return null;
-    }
-
     public function isOnRequest(string $requestType) {
         if($this->onRequest === '') {
             return true;

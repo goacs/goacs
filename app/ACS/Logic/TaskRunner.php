@@ -97,11 +97,6 @@ class TaskRunner
                     $this->context->acsRequest = $request;
                     break;
 
-                case Types::TransferCompleteResponse:
-                    $response = new TransferCompleteResponse($this->context);
-                    $this->context->acsResponse = $response;
-                    break;
-
                 case Types::Reboot:
                     $request = new RebootRequest($this->context);
                     $this->context->acsRequest = $request;
@@ -167,16 +162,4 @@ class TaskRunner
 
     }
 
-    //TODO: Move to another class
-    private function getFileData(string $filename): array {
-        $file = File::whereName($filename)->first();
-        if($file === false || \Storage::disk($file->disk)->exists($file->filepath) === false) {
-            Log::logError($this->context, "Cannot find file in store: ".$filename);
-            //TODO: Throw ACS Exception, then catch in ExceptionHandler and respond with some error to device.
-        }
-        return [
-            'url' => \Storage::disk($file->disk)->url($file->filepath),
-            'size' => $file->size,
-        ];
-    }
 }

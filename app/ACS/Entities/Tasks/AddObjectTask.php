@@ -10,7 +10,7 @@ use App\ACS\Request\AddObjectRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Types;
 
-class AddObjectTask extends Task
+class AddObjectTask extends Task implements WithRequest
 {
     public function __construct()
     {

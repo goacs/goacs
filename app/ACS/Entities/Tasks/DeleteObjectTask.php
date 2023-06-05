@@ -11,7 +11,7 @@ use App\ACS\Request\DeleteObjectRequest;
 use App\ACS\Request\SetParameterValuesRequest;
 use App\ACS\Types;
 
-class DeleteObjectTask extends Task
+class DeleteObjectTask extends Task implements WithRequest
 {
     public function __construct()
     {
