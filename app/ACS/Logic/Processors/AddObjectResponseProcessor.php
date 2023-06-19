@@ -8,6 +8,8 @@ namespace App\ACS\Logic\Processors;
 
 use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterInfoStruct;
+use App\ACS\Entities\Tasks\GetParameterNamesTask;
+use App\ACS\Entities\Tasks\GetParameterValuesTask;
 use App\ACS\Entities\Tasks\Task;
 use App\ACS\Response\AddObjectResponse;
 use App\ACS\Types;
@@ -28,11 +30,11 @@ class AddObjectResponseProcessor extends Processor
         $addObjectResponse = $this->context->cpeResponse;
         $path = $prevTask->payload['parameter'];
 
-        $gpnTask = new Task(Types::GetParameterNames);
+        $gpnTask = new GetParameterNamesTask();
         $gpnTask->setPayload([
             'parameter' => rtrim($path, ".").".".$addObjectResponse->getInstanceNumber()."."
         ]);
-        $gpvTask = new Task(Types::GetParameterValues);
+        $gpvTask = new GetParameterValuesTask();
         $gpvTask->setPayload(
             [
                 'parameters' => new ParameterInfoCollection([

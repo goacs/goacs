@@ -6,9 +6,15 @@ namespace App\ACS\Entities\Tasks;
 use App\ACS\Context;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\GetParameterValuesRequest;
+use App\ACS\Types;
 
 class GetParameterValuesTask extends Task implements WithRequest
 {
+
+    public function __construct()
+    {
+        parent::__construct(Types::GetParameterValues);
+    }
 
     public function toRequest(Context $context): ACSRequest
     {

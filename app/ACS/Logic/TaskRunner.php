@@ -8,6 +8,8 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\ACS\Entities\Tasks\Task;
+use App\ACS\Entities\Tasks\WithRequest;
+use App\ACS\Entities\Tasks\WithResponse;
 use App\ACS\Logic\Processors\SetParameterValuesRequestProcessor;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
@@ -57,8 +59,14 @@ class TaskRunner
                 $this->run();
             }
 
+            if($this->currentTask instanceof WithResponse) {
+                $this->context->acsResponse = $this->currentTask->toResponse($this->context);
+            } else if($this->currentTask instanceof WithRequest) {
+                $this->context->acsRequest = $this->currentTask->toRequest($this->context);
+            }
 
-            switch ($this->currentTask->name) {
+
+/*            switch ($this->currentTask->name) {
                 case Types::INFORMResponse:
                     $acsResponse = (new InformResponse($this->context));
                     $this->context->acsResponse = $acsResponse;
@@ -120,7 +128,7 @@ class TaskRunner
                     $this->selectNextTask();
                     $this->run();
                     break;
-            }
+            }*/
 
             if ($this->currentTask !== null) {
                 $this->currentTask->done();

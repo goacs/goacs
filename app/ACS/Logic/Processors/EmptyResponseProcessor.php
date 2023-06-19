@@ -7,6 +7,7 @@ namespace App\ACS\Logic\Processors;
 
 
 use App\ACS\Context;
+use App\ACS\Entities\Tasks\GetParameterNamesTask;
 use App\ACS\Entities\Tasks\Task;
 use App\ACS\Types;
 
@@ -23,7 +24,7 @@ class EmptyResponseProcessor extends Processor
 
 //        if($this->context->new === true || $this->context->provision === true || $this->context->lookupParameters) {
         if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_READPARAMS) {
-            $task = new Task(Types::GetParameterNames);
+            $task = new GetParameterNamesTask();
             $task->setPayload([
                 'parameter' => $this->context->device->root
             ]);

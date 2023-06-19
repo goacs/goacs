@@ -8,6 +8,7 @@ namespace App\ACS\Logic\Processors;
 
 use App\ACS\Context;
 use App\ACS\Entities\ParameterValueStruct;
+use App\ACS\Entities\Tasks\SetParameterValuesProcessorTask;
 use App\ACS\Entities\Tasks\Task;
 use App\ACS\Events\ParameterLookupDone;
 use App\ACS\Logic\DeviceParametersLogic;
@@ -83,7 +84,7 @@ class GetParameterValuesResponseProcessor extends Processor
 
                 $this->context->provision->queueTasks();
 
-                $this->context->tasks->addTask(new Task(Types::SetParameterValuesProcessor));
+                $this->context->tasks->addTask(new SetParameterValuesProcessorTask());
 //                (new SetParameterValuesRequestProcessor($this->context))();
 //            }
         }
