@@ -7,6 +7,8 @@ namespace App\ACS\Logic;
 
 
 use App\ACS\Context;
+use App\ACS\Entities\Tasks\CommitTask;
+use App\ACS\Entities\Tasks\RunScriptTask;
 use App\ACS\Entities\Tasks\Task;
 use App\ACS\Entities\Tasks\WithRequest;
 use App\ACS\Entities\Tasks\WithResponse;
@@ -59,10 +61,22 @@ class TaskRunner
                 $this->run();
             }
 
-            if($this->currentTask instanceof WithResponse) {
+
+//            dump($this->currentTask);
+            if ($this->currentTask instanceof WithResponse) {
                 $this->context->acsResponse = $this->currentTask->toResponse($this->context);
-            } else if($this->currentTask instanceof WithRequest) {
+            } else if ($this->currentTask instanceof WithRequest) {
                 $this->context->acsRequest = $this->currentTask->toRequest($this->context);
+            } else if ($this->currentTask instanceof RunScriptTask) {
+                $this->runScriptTask();
+                $this->loadDeviceTasks();
+                $this->selectNextTask();
+                $this->run();
+            } else {
+                $this->currentTask->__invoke($this->context);
+                $this->currentTask->done();
+                $this->selectNextTask();
+                $this->run();
             }
 
 
@@ -133,6 +147,7 @@ class TaskRunner
             if ($this->currentTask !== null) {
                 $this->currentTask->done();
             }
+
         } catch (\Throwable $throwable) {
             Log::logError($this->context, $throwable->getMessage());
         }
@@ -150,10 +165,16 @@ class TaskRunner
     protected function runScriptTask() {
         $sandbox = new Sandbox($this->context, $this->currentTask->payload['script']);
         try {
-            $sandbox->execute();
             Log::logConversation($this->context,
                 'acs',
-                'Run Script',
+                'Executing script',
+                (string) $this->currentTask->payload['script'],
+            );
+            $sandbox->execute();
+            $this->queueStack();
+            Log::logConversation($this->context,
+                'acs',
+                'Script executed',
                 (string) $this->currentTask->payload['script'],
             );
 
@@ -170,4 +191,12 @@ class TaskRunner
 
     }
 
+    private function queueStack(): void
+    {
+        $stack = $this->context->getScriptStack();
+//        dump($stack->groupByTaskType());
+        foreach ($stack->groupByTaskType() as $task) {
+            $this->context->tasks->add($task);
+        }
+    }
 }

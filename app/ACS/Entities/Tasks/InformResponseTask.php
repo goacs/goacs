@@ -13,6 +13,7 @@ class InformResponseTask extends Task implements WithResponse
     public function __construct() {
         parent::__construct(Types::INFORMResponse);
     }
+
     public function toResponse(Context $context): ACSResponse
     {
         return new InformResponse($context);

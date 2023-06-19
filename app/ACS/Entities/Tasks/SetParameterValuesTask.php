@@ -15,11 +15,11 @@ class SetParameterValuesTask extends Task implements WithRequest
     public function __construct()
     {
         parent::__construct(Types::SetParameterValues);
-        $this->items = new ParameterValuesCollection();
     }
 
     public function toRequest(Context $context): ACSRequest
     {
-        return new SetParameterValuesRequest($context, $this->items);
+        $items = $this->payload['parameters'];
+        return new SetParameterValuesRequest($context, $items);
     }
 }

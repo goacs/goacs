@@ -19,6 +19,6 @@ class AddObjectTask extends Task implements WithRequest
 
     public function toRequest(Context $context): ACSRequest
     {
-        return new AddObjectRequest($context, $this->payload['parameter']);
+        return new AddObjectRequest($context, $this->payload['parameters']);
     }
 }

@@ -20,6 +20,6 @@ class DeleteObjectTask extends Task implements WithRequest
 
     public function toRequest(Context $context): ACSRequest
     {
-        return new DeleteObjectRequest($context, $this->payload['parameter']);
+        return new DeleteObjectRequest($context, $this->payload['parameters']);
     }
 }

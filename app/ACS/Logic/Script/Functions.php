@@ -6,11 +6,18 @@ namespace App\ACS\Logic\Script;
 
 use App\ACS\Context;
 use App\ACS\Entities\Device;
+use App\ACS\Entities\Flag;
+use App\ACS\Entities\ParameterValuesCollection;
+use App\ACS\Entities\ParameterValueStruct;
+use App\ACS\Entities\Tasks\FactoryResetTask;
+use App\ACS\Entities\Tasks\RebootTask;
 use App\ACS\Entities\Tasks\Task;
 use App\ACS\Types;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;
 use App\Models\Template;
+use Illuminate\Support\Str;
+use function PHPUnit\Framework\containsIdentical;
 
 class Functions
 {
@@ -37,19 +44,28 @@ class Functions
         $this->deviceModel->load('parameters');
     }
 
-    public function setParameter($path, $value, $flags = 'RWS', $type = null) {
+    public function setParameter($path, $value, $flag = 'RWS', $type = 'xsd:string') {
+        $flag = Flag::fromString($flag);
+
+        if($flag->system) {
+            return;
+        }
+
         $this->context->getScriptStack()->add(Types::SetParameterValues, [
-            'path' => $path,
-            'value' => $value,
-            'flags' => $flags,
-            'type' => $type,
+            'parameters' => ParameterValuesCollection::fromArray([[
+                'name' => $path,
+                'value' => (string) $value,
+                'flag' => $flag,
+                'type' => $type,
+            ]]),
         ]);
-        DeviceParameter::setParameter($this->deviceModel->id, $path, $value, $flags, $type);
+
+//        DeviceParameter::setParameter($this->deviceModel->id, $path, $value, $flag, $type);
     }
 
     public function getParameterValue($path) {
         $this->context->getScriptStack()->add(Types::GetParameterValues, [
-            'path' => $path,
+            'parameters' => $path,
         ]);
         return DeviceParameter::getParameterValue($this->deviceModel->id, $path);
     }
@@ -78,7 +94,7 @@ class Functions
 
     public function addObject(string $path) {
         $this->context->getScriptStack()->add(Types::AddObject, [
-            'path' => $path
+            'parameters' => $path
         ]);
 //        $task = new Task(Types::AddObject);
 //        $task->setPayload(['parameter' => $path]);
@@ -87,7 +103,7 @@ class Functions
 
     public function deleteObject(string $path) {
         $this->context->getScriptStack()->add(Types::DeleteObject, [
-            'path' => $path
+            'parameters' => $path
         ]);
 //        $task = new Task(Types::DeleteObject);
 //        $task->setPayload(['parameter' => $path]);
@@ -108,12 +124,12 @@ class Functions
     }
 
     public function reboot() {
-        $task = new Task(Types::Reboot);
+        $task = new RebootTask();
         $this->context->tasks->addTask($task);
     }
 
     public function factoryReset() {
-        $task = new Task(Types::FactoryReset);
+        $task = new FactoryResetTask();
         $this->context->tasks->addTask($task);
     }
 }

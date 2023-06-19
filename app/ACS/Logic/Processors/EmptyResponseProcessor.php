@@ -26,7 +26,7 @@ class EmptyResponseProcessor extends Processor
         if($this->context->provisioningCurrentState === Context::PROVISIONING_STATE_READPARAMS) {
             $task = new GetParameterNamesTask();
             $task->setPayload([
-                'parameter' => $this->context->device->root
+                'parameters' => $this->context->device->root
             ]);
 
             $this->context->tasks->addTask($task);

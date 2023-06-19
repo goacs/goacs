@@ -9,7 +9,6 @@ use App\ACS\Types;
 
 class SetParameterValuesProcessorTask extends Task
 {
-
     public function __construct()
     {
         parent::__construct(Types::SetParameterValuesProcessor);

@@ -17,6 +17,6 @@ class GetParameterNamesTask extends Task implements WithRequest
 
     public function toRequest(Context $context): ACSRequest
     {
-        return new GetParameterNamesRequest($context, $this->payload['parameter']);
+        return new GetParameterNamesRequest($context, $this->payload['parameters']);
     }
 }
