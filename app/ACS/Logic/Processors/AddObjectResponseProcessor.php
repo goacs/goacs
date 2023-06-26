@@ -32,7 +32,7 @@ class AddObjectResponseProcessor extends Processor
 
         $gpnTask = new GetParameterNamesTask();
         $gpnTask->setPayload([
-            'parameter' => rtrim($path, ".").".".$addObjectResponse->getInstanceNumber()."."
+            'parameters' => rtrim($path, ".").".".$addObjectResponse->getInstanceNumber()."."
         ]);
         $gpvTask = new GetParameterValuesTask();
         $gpvTask->setPayload(
