@@ -64,9 +64,14 @@ class Functions
     }
 
     public function getParameterValue($path) {
-        $this->context->getScriptStack()->add(Types::GetParameterValues, [
-            'parameters' => $path,
-        ]);
+//        $this->context->getScriptStack()->add(Types::GetParameterValues, [
+//            'parameters' => ParameterValuesCollection::fromArray([[
+//                'name' => $path,
+//                'value' => '',
+//                'flag' => new Flag(),
+//                'type' => 'xsd:string',
+//            ]])
+//        ]);
         return DeviceParameter::getParameterValue($this->deviceModel->id, $path);
     }
 
@@ -111,16 +116,22 @@ class Functions
     }
 
     public function uploadFirmware(string $filename) {
-        $task = $this->deviceModel->tasks()->make();
-        $task->name = Types::Download;
-        $task->on_request = '';
-        $task->not_before = now()->subDay();
-        $task->infinite = false;
-        $task->payload = [
-            'filetype' => '1 Firmware Upgrade Image',
-            'filename' => $filename
-        ];
-        $task->save();
+        $this->context->getScriptStack()->add(Types::Download,
+            [
+                'filetype' => '1 Firmware Upgrade Image',
+                'filename' => $filename
+            ]
+        );
+//        $task = $this->deviceModel->tasks()->make();
+//        $task->name = Types::Download;
+//        $task->on_request = '';
+//        $task->not_before = now()->subDay();
+//        $task->infinite = false;
+//        $task->payload = [
+//            'filetype' => '1 Firmware Upgrade Image',
+//            'filename' => $filename
+//        ];
+//        $task->save();
     }
 
     public function reboot() {

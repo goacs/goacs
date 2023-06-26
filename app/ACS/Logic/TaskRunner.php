@@ -194,9 +194,10 @@ class TaskRunner
     private function queueStack(): void
     {
         $stack = $this->context->getScriptStack();
-//        dump($stack->groupByTaskType());
         foreach ($stack->groupByTaskType() as $task) {
             $this->context->tasks->add($task);
         }
+
+        $stack->flush();
     }
 }

@@ -48,7 +48,7 @@ class Stack
         return $this->commands->shift();
     }
 
-    public function reset(): void {
+    public function flush(): void {
         $this->commands = new Collection();
     }
 }

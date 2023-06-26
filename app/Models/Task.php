@@ -70,7 +70,7 @@ class Task extends Model
     }
 
     public function toACSTask(): \App\ACS\Entities\Tasks\Task {
-        $task = new \App\ACS\Entities\Tasks\Task($this->name);
+        $task = \App\ACS\Entities\Tasks\Task::fromType($this->name);
         $task->onRequest = $this->on_request;
         $task->setPayload((array) $this->payload);
         return $task;

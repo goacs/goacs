@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\ACS\Entities\Tasks;
 
+use App\ACS\ACSException;
 use App\ACS\Context;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\DownloadRequest;
@@ -24,9 +25,9 @@ class DownloadTask extends Task implements WithRequest
 
     private function getFileData(Context $context, string $filename): array {
         $file = File::whereName($filename)->first();
-        if($file === false || \Storage::disk($file->disk)->exists($file->filepath) === false) {
-            Log::logError($context, "Cannot find file in store: ".$filename);
-            //TODO: Throw ACS Exception, then catch in ExceptionHandler and respond with some error to device.
+        if($file === null || \Storage::disk($file->disk)->exists($file->filepath) === false) {
+//            Log::logError($context, "Cannot find file in store: ".$filename);
+            throw new ACSException("Cannot find file in store: ".$filename);
         }
         return [
             'url' => \Storage::disk($file->disk)->url($file->filepath),
