@@ -47,6 +47,8 @@ class Functions
     public function setParameter($path, $value, $flag = 'RWS', $type = 'xsd:string') {
         $flag = Flag::fromString($flag);
 
+        DeviceParameter::setParameter($this->deviceModel->id, $path, $value, $flag, $type);
+
         if($flag->system) {
             return;
         }
@@ -59,8 +61,6 @@ class Functions
                 'type' => $type,
             ]]),
         ]);
-
-//        DeviceParameter::setParameter($this->deviceModel->id, $path, $value, $flag, $type);
     }
 
     public function getParameterValue($path) {
