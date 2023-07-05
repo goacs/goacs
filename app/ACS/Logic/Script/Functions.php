@@ -12,6 +12,7 @@ use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Tasks\FactoryResetTask;
 use App\ACS\Entities\Tasks\RebootTask;
 use App\ACS\Entities\Tasks\Task;
+use App\ACS\Logic\DeviceParametersLogic;
 use App\ACS\Types;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;
@@ -71,7 +72,10 @@ class Functions
 //                'type' => 'xsd:string',
 //            ]])
 //        ]);
-        return DeviceParameter::getParameterValue($this->deviceModel->id, $path);
+        $deviceParametersLogic = new DeviceParametersLogic($this->deviceModel);
+        $parameters = $deviceParametersLogic->combinedDeviceParametersWithTemplates();
+        return $parameters->getValue($path);
+//        return DeviceParameter::getParameterValue($this->deviceModel->id, $path);
     }
 
     public function commit() {
@@ -79,7 +83,10 @@ class Functions
     }
 
     public function parameterExist($path) {
-        return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->exists();
+        $deviceParametersLogic = new DeviceParametersLogic($this->deviceModel);
+        $parameters = $deviceParametersLogic->combinedDeviceParametersWithTemplates();
+        return $parameters->parameterExists($path);
+//        return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->exists();
     }
 
     public function assignTemplateByName($name, int $priority = 100) {
