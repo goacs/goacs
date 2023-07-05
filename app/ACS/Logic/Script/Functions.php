@@ -86,7 +86,10 @@ class Functions
         $deviceParametersLogic = new DeviceParametersLogic($this->deviceModel);
         $parameters = $deviceParametersLogic->combinedDeviceParametersWithTemplates();
         return $parameters->parameterExists($path);
-//        return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->exists();
+    }
+
+    public function deleteParameter($path) {
+        return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->delete();
     }
 
     public function assignTemplateByName($name, int $priority = 100) {
