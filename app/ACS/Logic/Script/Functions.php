@@ -146,13 +146,13 @@ class Functions
     }
 
     public function reboot() {
-        $task = new RebootTask();
-        $this->context->tasks->addTask($task);
+        $this->context->getScriptStack()->add(Types::Reboot, []);
+
     }
 
     public function factoryReset() {
-        $task = new FactoryResetTask();
-        $this->context->tasks->addTask($task);
+        $this->context->getScriptStack()->add(Types::FactoryReset, []);
+
     }
 
     public function dump(...$args) {
@@ -160,7 +160,7 @@ class Functions
     }
 
     public function kick() {
-        $this->context->tasks->addTask(new KickTask());
+        $this->context->getScriptStack()->add(Types::Kick, []);
     }
 
     public function provision() {
