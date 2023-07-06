@@ -90,6 +90,7 @@ class DeviceController extends Controller
 
     public function kick(Device $device) {
         Log::logInfoFromDevice($device, 'KICK REQUEST');
+
         $kickService = Kick::fromDevice($device);
 
         if($kickService->kick()) {

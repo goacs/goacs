@@ -7,6 +7,7 @@ use App\ACS\Context;
 
 use App\ACS\Kick;
 use App\ACS\Types;
+use App\Models\Log;
 
 class KickTask extends Task
 {
@@ -15,7 +16,14 @@ class KickTask extends Task
         parent::__construct(Types::Kick);
     }
 
-    public function __invoke(Context $context) {
-        Kick::fromDevice($context->deviceModel)->kick();
+    public function __invoke(Context $context): bool {
+        Log::logInfoFromDevice($context->deviceModel, 'KICK REQUEST');
+        if(Kick::fromDevice($context->deviceModel)->kick()) {
+            Log::logInfoFromDevice($context->deviceModel, 'KICK SUCCESSFUL');
+            return true;
+        } else {
+            Log::logInfoFromDevice($context->deviceModel, 'KICK FAILED');
+            return false;
+        }
     }
 }
