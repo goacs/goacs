@@ -10,6 +10,7 @@ use App\ACS\Entities\Flag;
 use App\ACS\Entities\ParameterValuesCollection;
 use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Tasks\FactoryResetTask;
+use App\ACS\Entities\Tasks\KickTask;
 use App\ACS\Entities\Tasks\RebootTask;
 use App\ACS\Entities\Tasks\Task;
 use App\ACS\Kick;
@@ -159,7 +160,7 @@ class Functions
     }
 
     public function kick() {
-        Kick::fromDevice($this->deviceModel)->kick();
+        $this->context->tasks->addTask(new KickTask());
     }
 
     public function provision() {
