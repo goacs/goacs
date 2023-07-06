@@ -12,6 +12,7 @@ use App\ACS\Entities\ParameterValueStruct;
 use App\ACS\Entities\Tasks\FactoryResetTask;
 use App\ACS\Entities\Tasks\RebootTask;
 use App\ACS\Entities\Tasks\Task;
+use App\ACS\Kick;
 use App\ACS\Logic\DeviceParametersLogic;
 use App\ACS\Types;
 use App\Models\Device as DeviceModel;
@@ -151,5 +152,17 @@ class Functions
     public function factoryReset() {
         $task = new FactoryResetTask();
         $this->context->tasks->addTask($task);
+    }
+
+    public function dump(...$args) {
+        dump($args);
+    }
+
+    public function kick() {
+        Kick::fromDevice($this->deviceModel)->kick();
+    }
+
+    public function provision() {
+        $this->kick();
     }
 }

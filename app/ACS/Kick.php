@@ -4,6 +4,8 @@
 namespace App\ACS;
 
 
+use App\Models\Device;
+use App\Models\Setting;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -23,6 +25,16 @@ class Kick
         $this->username = $username;
         $this->password = $password;
         $this->checkForHttpie();
+    }
+
+    public static function fromDevice(Device $device) {
+        if($device->connection_request_password !== null && $device->connection_request_password !== '') {
+            $auth = [$device->connection_request_user, $device->connection_request_password];
+        } else {
+            $auth = [Setting::getValue('connection_request_username'), Setting::getValue('connection_request_password')];
+        }
+
+        return new Kick($device->connection_request_url, $auth[0], $auth[1]);
     }
 
     public function kick(): bool {

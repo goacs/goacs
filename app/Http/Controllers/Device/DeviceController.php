@@ -89,14 +89,8 @@ class DeviceController extends Controller
     }
 
     public function kick(Device $device) {
-        if($device->connection_request_password !== null && $device->connection_request_password !== '') {
-            $auth = [$device->connection_request_user, $device->connection_request_password];
-        } else {
-            $auth = [Setting::getValue('connection_request_username'), Setting::getValue('connection_request_password')];
-        }
-
         Log::logInfoFromDevice($device, 'KICK REQUEST');
-        $kickService = new Kick($device->connection_request_url, $auth[0], $auth[1]);
+        $kickService = Kick::fromDevice($device);
 
         if($kickService->kick()) {
             Log::logInfoFromDevice($device, 'KICK SUCCESSFUL');
