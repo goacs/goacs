@@ -91,6 +91,10 @@ class Functions
         return $parameters->parameterExists($path);
     }
 
+    public function parameterNotExist($path) {
+        return !$this->parameterExist($path);
+    }
+
     public function deleteParameter($path) {
         return DeviceParameter::where(['device_id' => $this->deviceModel->id, 'name' => $path])->delete();
     }
@@ -108,6 +112,19 @@ class Functions
             $this->deviceModel->templates()->attach($id, ['priority' => $priority]);
         }
     }
+
+    public function unassignTemplateByName($name) {
+        $template = Template::where('name', $name)->first();
+
+        if($template !== null) {
+            $this->unassignTemplateByName($template->id);
+        }
+    }
+
+    public function unssignTemplateById($id) {
+        $this->deviceModel->templates()->detach($id);
+    }
+
 
     public function addObject(string $path) {
         $this->context->getScriptStack()->add(Types::AddObject, [

@@ -75,6 +75,9 @@ class SetParameterValuesRequestProcessor extends Processor
         if(($spread = Setting::getValue('pii')) !== '')
         {
             [$min, $max] = explode('-', $spread);
+        } else {
+            $min = 60;
+            $max = 240;
         }
         return rand((int)$min, (int)$max);
     }
