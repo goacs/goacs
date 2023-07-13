@@ -18,6 +18,7 @@ use App\ACS\Logic\DeviceParametersLogic;
 use App\ACS\Types;
 use App\Models\Device as DeviceModel;
 use App\Models\DeviceParameter;
+use App\Models\Log;
 use App\Models\Template;
 use Illuminate\Support\Str;
 use function PHPUnit\Framework\containsIdentical;
@@ -165,5 +166,11 @@ class Functions
 
     public function provision() {
         $this->kick();
+    }
+
+    public function log(string $title, string $details = '') {
+        Log::logInfo($this->context, $title, [
+            'details' => $details
+        ]);
     }
 }
