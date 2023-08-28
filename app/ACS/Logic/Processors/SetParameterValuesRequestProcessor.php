@@ -42,7 +42,7 @@ class SetParameterValuesRequestProcessor extends Processor
         foreach($diffParameters->chunk(self::SET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
             $task = new SetParameterValuesTask();
             $task->setPayload(['parameters' => $chunk]);
-            $this->context->tasks->addTaskBeforeTask($task, Types::SetParameterValues);
+            $this->context->tasks->addTask($task);
         }
     }
 
