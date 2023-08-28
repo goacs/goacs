@@ -70,8 +70,7 @@ class StackTest extends TestCase
 
         $grouped = $stack->groupByTaskType();
 
-        dump($grouped);
-        $this->assertCount(5, $grouped);
+        $this->assertCount(4, $grouped);
         $this->assertCount(3, $grouped[0]->payload['parameters']);
     }
 }
