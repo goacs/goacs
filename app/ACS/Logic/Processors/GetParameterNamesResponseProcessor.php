@@ -8,7 +8,8 @@ namespace App\ACS\Logic\Processors;
 
 use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterInfoStruct;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\GetParameterValuesTask;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Response\GetParameterNamesResponse;
 use App\ACS\Types;
 
@@ -30,7 +31,7 @@ class GetParameterNamesResponseProcessor extends Processor
             }
 
             foreach ($filteredParameters->chunk(self::GET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
-                $task = new Task(Types::GetParameterValues);
+                $task = new GetParameterValuesTask();
                 $task->setPayload([
                     'parameters' => $chunk
                 ]);

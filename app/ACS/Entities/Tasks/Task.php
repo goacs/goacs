@@ -3,9 +3,12 @@
 declare(strict_types=1);
 
 
-namespace App\ACS\Entities;
+namespace App\ACS\Entities\Tasks;
 
 
+use App\ACS\Context;
+use App\ACS\Entities\ParameterValuesCollection;
+use App\ACS\Request\ACSRequest;
 use Carbon\Carbon;
 
 class Task
@@ -23,6 +26,14 @@ class Task
         $this->payload = $payload;
     }
 
+    public function addParams(ParameterValuesCollection $params) {
+        if(!isset($this->payload['parameters'])) {
+            $this->payload['parameters'] = new ParameterValuesCollection();
+        }
+
+        $this->payload['parameters'] = $this->payload['parameters']->merge($params);
+    }
+
     public function done() {
         $this->done_at = now();
     }
@@ -34,4 +45,10 @@ class Task
 
         return $this->onRequest === $requestType;
     }
+
+    public static function fromType(string $type): Task {
+        $name = "\\App\\ACS\\Entities\\Tasks\\{$type}Task";
+        return new $name();
+    }
+
 }

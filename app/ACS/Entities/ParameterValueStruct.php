@@ -7,6 +7,7 @@ namespace App\ACS\Entities;
 
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 
 class ParameterValueStruct implements Arrayable
 {
@@ -40,11 +41,27 @@ class ParameterValueStruct implements Arrayable
     }
 
     public static function fromArray(array $data): static {
+        if(!isset($data['value'])) {
+            $data['value'] = '';
+        }
+
+        if(!isset($data['flag'])) {
+            $data['flag'] = 'R';
+        }
+
         $obj = new static();
         $obj->name = $data['name'];
         $obj->value = $data['value'];
-        $obj->type = $data['type'];
-        $obj->flag = Flag::fromArray($data['flag']);
+        $obj->type = $data['type'] ?? 'xsd:string';
+
+        if(is_array($data['flag'])) {
+            $obj->flag = Flag::fromArray($data['flag']);
+        } elseif(is_string($data['flag'])) {
+            $obj->flag = Flag::fromString($data['flag']);
+        } else if ($data['flag'] instanceof Flag){
+            $obj->flag = $data['flag'];
+        }
+
         return $obj;
     }
 

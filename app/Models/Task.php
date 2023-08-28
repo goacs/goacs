@@ -4,7 +4,7 @@
 namespace App\Models;
 
 
-use App\ACS\Entities\TaskCollection;
+use App\ACS\Entities\Tasks\TaskCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -69,14 +69,14 @@ class Task extends Model
         return $this->morphTo('for');
     }
 
-    public function toACSTask(): \App\ACS\Entities\Task {
-        $task = new \App\ACS\Entities\Task($this->name);
+    public function toACSTask(): \App\ACS\Entities\Tasks\Task {
+        $task = \App\ACS\Entities\Tasks\Task::fromType($this->name);
         $task->onRequest = $this->on_request;
         $task->setPayload((array) $this->payload);
         return $task;
     }
 
-    public static function fromACSTask(\App\ACS\Entities\Task $acsTask): static {
+    public static function fromACSTask(\App\ACS\Entities\Tasks\Task $acsTask): static {
         $task = new static();
         $task->payload = $acsTask->payload;
         $task->name = $acsTask->name;

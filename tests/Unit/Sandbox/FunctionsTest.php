@@ -19,7 +19,7 @@ class FunctionsTest extends TestCase
     public function test_set_parameter() {
         $context = $this->newContext();
         $sandbox = $this->newSandbox($context, file_get_contents(__DIR__.'/scripts/setparameter.php'));
-        $sandbox->run();
+        $sandbox->execute();
         $this->assertDatabaseHas('device_parameters',[
             'device_id' => $context->deviceModel->id,
             'name' => 'A.B.C.D',
@@ -43,7 +43,7 @@ class FunctionsTest extends TestCase
     public function test_get_parameter() {
         $context = $this->newContext();
         $sandbox = $this->newSandbox($context, file_get_contents(__DIR__.'/scripts/getparameter.php'));
-        $ret = $sandbox->run();
+        $ret = $sandbox->execute();
         $this->assertEquals('test', $ret);
 
         $context->deviceModel->parameters()->forceDelete();
@@ -53,11 +53,11 @@ class FunctionsTest extends TestCase
     public function test_parameter_exist() {
         $context = $this->newContext();
         $sandbox = $this->newSandbox($context, file_get_contents(__DIR__.'/scripts/parameterexist.php'));
-        $ret = $sandbox->run();
+        $ret = $sandbox->execute();
         $this->assertFalse($ret);
 
         DeviceParameter::setParameter($context->deviceModel->id, 'A.B.C.D', 'test', 'RWS', 'xsd:string');
-        $ret = $sandbox->run();
+        $ret = $sandbox->execute();
         $this->assertTrue($ret);
 
         $context->deviceModel->parameters()->forceDelete();
@@ -73,7 +73,7 @@ class FunctionsTest extends TestCase
         DeviceParameter::setParameter($context->deviceModel->id, 'InternetGatewayDevice.ManagementServer.PeriodicInformInterval', '30', 'RWS', XSDTypes::UINTEGER);
 
         $sandbox = $this->newSandbox($context, file_get_contents(__DIR__.'/scripts/provision.php'));
-        $sandbox->run();
+        $sandbox->execute();
 
         $this->assertDatabaseHas('device_parameters',[
             'device_id' => $context->deviceModel->id,

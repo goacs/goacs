@@ -32,10 +32,9 @@ class Types
     const RebootResponse = 'RebootResponse';
     const FactoryReset = 'FactoryReset';
     const FactoryResetResponse = 'FactoryResetResponse';
-
-
+    const Commit = 'Commit';
     const RunScript = 'RunScript';
-
     const SetParameterValuesProcessor = 'SetParameterValuesProcessor';
+    const Kick = 'Kick';
 
 }

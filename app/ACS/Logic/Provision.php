@@ -4,7 +4,8 @@ namespace App\ACS\Logic;
 
 use App\ACS\Context;
 use App\ACS\Entities\Event;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\RunScriptTask;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Types;
 use App\Models\DeviceParameter;
 use App\Models\Log;
@@ -22,7 +23,7 @@ class Provision
         /** @var ProvisionModel $provision */
         foreach($this->getProvisions() as $provision) {
             Log::logInfo($this->context, 'Passed provision: '.$provision->name);
-            $task = new Task(Types::RunScript);
+            $task = new RunScriptTask();
             $task->setPayload(['script' => $provision->script]);
             $this->context->tasks->addTask($task);
         }

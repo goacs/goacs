@@ -9,10 +9,11 @@ namespace App\ACS;
 use App\ACS\Entities\Device;
 use App\ACS\Entities\ParameterInfoCollection;
 use App\ACS\Entities\ParameterValuesCollection;
-use App\ACS\Entities\Task;
-use App\ACS\Entities\TaskCollection;
+use App\ACS\Entities\Tasks\Task;
+use App\ACS\Entities\Tasks\TaskCollection;
 use App\ACS\Events\ProvisionDone;
 use App\ACS\Logic\Provision;
+use App\ACS\Logic\Script\Stack;
 use App\ACS\Request\ACSRequest;
 use App\ACS\Request\CPERequest;
 use App\ACS\Request\GetRPCMethodsCPERequest;
@@ -78,6 +79,8 @@ class Context
     public Collection $deniedParameters;
 
     public TaskCollection $tasks;
+
+    public Stack $scriptStack;
 
     public string $bodyType;
 
@@ -214,6 +217,9 @@ class Context
         }
     }
 
+    public function getScriptStack(): Stack {
+        return $this->scriptStack;
+    }
     private function configureResponse(Response $response)
     {
         return $response
@@ -232,6 +238,7 @@ class Context
         $this->parameterInfos = $this->session()->get('parameterNames', new ParameterInfoCollection());
         $this->parameterValues = $this->session()->get('parameterValues', new ParameterValuesCollection());
         $this->deniedParameters = $this->session()->get('deniedParameters', new Collection());
+        $this->scriptStack = $this->session()->get('stack', new Stack());
         $this->tasks = $this->session()->get('tasks', new TaskCollection());
         if($this->device->serialNumber !== "") {
             $this->deviceModel = DeviceModel::whereSerialNumber($this->device->serialNumber)->first();
@@ -248,6 +255,7 @@ class Context
         $this->session()->put('device', $this->device);
         $this->session()->put('parameterNames', $this->parameterInfos);
         $this->session()->put('parameterValues', $this->parameterValues);
+        $this->session()->put('stack', $this->scriptStack);
         $this->session()->put('tasks', $this->tasks);
         $this->session()->put('this', [
             'new' => $this->new,

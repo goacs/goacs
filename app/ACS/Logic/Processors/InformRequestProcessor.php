@@ -7,7 +7,8 @@ namespace App\ACS\Logic\Processors;
 
 
 use App\ACS\Context;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\InformResponseTask;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Request\InformRequest;
 use App\ACS\Response\ErrorResponse;
 use App\ACS\Types;
@@ -43,7 +44,7 @@ class InformRequestProcessor extends Processor
 
         \Cache::put("SESSID_".$this->context->device->serialNumber, $this->context->session()->getId(),(5*60));
 
-        $task = new Task(Types::INFORMResponse);
+        $task = new InformResponseTask();
         $this->context->tasks->addTask($task);
         $this->context->provision->queueTasks();
 

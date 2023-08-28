@@ -4,8 +4,8 @@
 namespace Tests\Unit\Entities;
 
 
-use App\ACS\Entities\Task;
-use App\ACS\Entities\TaskCollection;
+use App\ACS\Entities\Tasks\Task;
+use App\ACS\Entities\Tasks\TaskCollection;
 use App\ACS\Types;
 use Tests\TestCase;
 

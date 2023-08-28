@@ -7,7 +7,11 @@ namespace App\ACS\Logic;
 
 
 use App\ACS\Context;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\CommitTask;
+use App\ACS\Entities\Tasks\RunScriptTask;
+use App\ACS\Entities\Tasks\Task;
+use App\ACS\Entities\Tasks\WithRequest;
+use App\ACS\Entities\Tasks\WithResponse;
 use App\ACS\Logic\Processors\SetParameterValuesRequestProcessor;
 use App\ACS\Logic\Script\Sandbox;
 use App\ACS\Logic\Script\SandboxException;
@@ -28,7 +32,7 @@ use App\Models\Log;
 class TaskRunner
 {
     private Context $context;
-    private ?\App\ACS\Entities\Task $currentTask;
+    private ?\App\ACS\Entities\Tasks\Task $currentTask;
 
     public function __construct(Context $context) {
         $this->context = $context;
@@ -58,7 +62,25 @@ class TaskRunner
             }
 
 
-            switch ($this->currentTask->name) {
+//            dump($this->currentTask);
+            if ($this->currentTask instanceof WithResponse) {
+                $this->context->acsResponse = $this->currentTask->toResponse($this->context);
+            } else if ($this->currentTask instanceof WithRequest) {
+                $this->context->acsRequest = $this->currentTask->toRequest($this->context);
+            } else if ($this->currentTask instanceof RunScriptTask) {
+                $this->runScriptTask();
+                $this->loadDeviceTasks();
+                $this->selectNextTask();
+                $this->run();
+            } else {
+                $this->currentTask->__invoke($this->context);
+                $this->currentTask->done();
+                $this->selectNextTask();
+                $this->run();
+            }
+
+
+/*            switch ($this->currentTask->name) {
                 case Types::INFORMResponse:
                     $acsResponse = (new InformResponse($this->context));
                     $this->context->acsResponse = $acsResponse;
@@ -97,11 +119,6 @@ class TaskRunner
                     $this->context->acsRequest = $request;
                     break;
 
-                case Types::TransferCompleteResponse:
-                    $response = new TransferCompleteResponse($this->context);
-                    $this->context->acsResponse = $response;
-                    break;
-
                 case Types::Reboot:
                     $request = new RebootRequest($this->context);
                     $this->context->acsRequest = $request;
@@ -125,11 +142,12 @@ class TaskRunner
                     $this->selectNextTask();
                     $this->run();
                     break;
-            }
+            }*/
 
             if ($this->currentTask !== null) {
                 $this->currentTask->done();
             }
+
         } catch (\Throwable $throwable) {
             Log::logError($this->context, $throwable->getMessage());
         }
@@ -147,12 +165,19 @@ class TaskRunner
     protected function runScriptTask() {
         $sandbox = new Sandbox($this->context, $this->currentTask->payload['script']);
         try {
-            $sandbox->run();
             Log::logConversation($this->context,
                 'acs',
-                'Run Script',
+                'Executing script',
                 (string) $this->currentTask->payload['script'],
             );
+            $sandbox->execute();
+            $this->queueStack();
+            Log::logConversation($this->context,
+                'acs',
+                'Script executed',
+                (string) $this->currentTask->payload['script'],
+            );
+
         } catch (SandboxException $exception) {
             $fault = $this->context->deviceModel->faults()->make();
             $fault->full_xml = $exception->getMessage()."\n\n".$exception->getTraceAsString();
@@ -166,16 +191,13 @@ class TaskRunner
 
     }
 
-    //TODO: Move to another class
-    private function getFileData(string $filename): array {
-        $file = File::whereName($filename)->first();
-        if($file === false || \Storage::disk($file->disk)->exists($file->filepath) === false) {
-            Log::logError($this->context, "Cannot find file in store: ".$filename);
-            //TODO: Throw ACS Exception, then catch in ExceptionHandler and respond with some error to device.
+    private function queueStack(): void
+    {
+        $stack = $this->context->getScriptStack();
+        foreach ($stack->groupByTaskType() as $task) {
+            $this->context->tasks->add($task);
         }
-        return [
-            'url' => \Storage::disk($file->disk)->url($file->filepath),
-            'size' => $file->size,
-        ];
+
+        $stack->flush();
     }
 }

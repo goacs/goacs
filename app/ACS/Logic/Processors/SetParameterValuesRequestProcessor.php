@@ -7,7 +7,9 @@ namespace App\ACS\Logic\Processors;
 
 
 use App\ACS\Entities\ParameterValueStruct;
-use App\ACS\Entities\Task;
+use App\ACS\Entities\Tasks\AddObjectTask;
+use App\ACS\Entities\Tasks\SetParameterValuesTask;
+use App\ACS\Entities\Tasks\Task;
 use App\ACS\Logic\DeviceParametersLogic;
 use App\ACS\Types;
 use App\Models\DeviceParameter;
@@ -38,9 +40,9 @@ class SetParameterValuesRequestProcessor extends Processor
         ;
 
         foreach($diffParameters->chunk(self::SET_PARAMETER_VALUES_CHUNK_SIZE) as $chunk) {
-            $task = new Task(Types::SetParameterValues);
+            $task = new SetParameterValuesTask();
             $task->setPayload(['parameters' => $chunk]);
-            $this->context->tasks->addTask($task);
+            $this->context->tasks->addTaskBeforeTask($task, Types::SetParameterValues);
         }
     }
 
@@ -55,8 +57,8 @@ class SetParameterValuesRequestProcessor extends Processor
 
         /** @var ParameterValueStruct $parameter */
         foreach ($parametersToAdd as $parameter) {
-            $task = new Task(Types::AddObject);
-            $task->setPayload(['parameter' => $parameter->name]);
+            $task = new AddObjectTask();
+            $task->setPayload(['parameters' => $parameter->name]);
             $this->context->tasks->addTask($task);
         }
     }
@@ -73,6 +75,9 @@ class SetParameterValuesRequestProcessor extends Processor
         if(($spread = Setting::getValue('pii')) !== '')
         {
             [$min, $max] = explode('-', $spread);
+        } else {
+            $min = 60;
+            $max = 240;
         }
         return rand((int)$min, (int)$max);
     }
