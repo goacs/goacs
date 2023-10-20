@@ -79,7 +79,7 @@ class GetParameterValuesResponseProcessor extends Processor
                 $settingsPassword = Setting::getValue('connection_request_password');
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestUsername', $settingsUsername, 'RWS', 'xsd:string');
                 DeviceParameter::setParameter($this->context->deviceModel->id, $root.'ManagementServer.ConnectionRequestPassword', $settingsPassword, 'RWS', 'xsd:string');
-
+                $this->setPII();
 //                $this->loadGlobalTasks(Types::GetParameterValuesResponse);
 
                 $this->context->provision->queueTasks();
@@ -88,6 +88,25 @@ class GetParameterValuesResponseProcessor extends Processor
 //                (new SetParameterValuesRequestProcessor($this->context))();
 //            }
         }
+    }
+
+    private function setPII()
+    {
+        if($pvs = $this->context->parameterValues->get($this->context->device->root.'ManagementServer.PeriodicInformInterval')) {
+            $pvs->value = (string)$this->calculatePIIValue();
+            DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
+        }
+    }
+
+    private function calculatePIIValue(): int {
+        if(($spread = Setting::getValue('pii')) !== '')
+        {
+            [$min, $max] = explode('-', $spread);
+        } else {
+            $min = 60;
+            $max = 240;
+        }
+        return rand((int)$min, (int)$max);
     }
 
 

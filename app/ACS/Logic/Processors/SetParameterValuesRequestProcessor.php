@@ -21,7 +21,6 @@ class SetParameterValuesRequestProcessor extends Processor
 
     public function __invoke()
     {
-        $this->setPII();
         $this->compareAndProcessObjectParameters();
         $this->compareAndProcessSetParameters();
     }
@@ -63,22 +62,5 @@ class SetParameterValuesRequestProcessor extends Processor
         }
     }
 
-    private function setPII()
-    {
-        if($pvs = $this->context->parameterValues->get($this->context->device->root.'ManagementServer.PeriodicInformInterval')) {
-            $pvs->value = (string)$this->calculatePIIValue();
-            DeviceParameter::setParameter($this->context->deviceModel->id, $pvs->name, $pvs->value);
-        }
-    }
 
-    private function calculatePIIValue(): int {
-        if(($spread = Setting::getValue('pii')) !== '')
-        {
-            [$min, $max] = explode('-', $spread);
-        } else {
-            $min = 60;
-            $max = 240;
-        }
-        return rand((int)$min, (int)$max);
-    }
 }
